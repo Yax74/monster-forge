@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
     paths: [monster-forge-source.tar.gz]
+  workflow_dispatch:
 
 permissions:
   contents: write
