@@ -1,0 +1,253 @@
+.monster-forge {
+  --mf-accent: #8f3f27;
+  --mf-accent-soft: color-mix(in srgb, var(--mf-accent) 16%, transparent);
+  display: grid;
+  gap: 0.75rem;
+  max-height: min(78vh, 900px);
+  overflow-y: auto;
+  padding: 0.15rem 0.35rem 0.65rem 0;
+}
+
+.monster-forge .mf-hero,
+.monster-forge .mf-section-heading,
+.monster-forge .mf-management,
+.monster-forge .mf-section-heading > div {
+  align-items: center;
+  display: flex;
+}
+
+.monster-forge .mf-hero,
+.monster-forge .mf-section-heading {
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.monster-forge .mf-hero {
+  background: linear-gradient(125deg, color-mix(in srgb, var(--mf-accent) 86%, #111), var(--mf-accent));
+  border-radius: 8px;
+  color: #fff;
+  padding: 0.85rem 1rem;
+}
+
+.monster-forge .mf-hero h2,
+.monster-forge .mf-hero p,
+.monster-forge .mf-section h3,
+.monster-forge .mf-preview h3 {
+  margin: 0;
+}
+
+.monster-forge .mf-eyebrow {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  opacity: 0.78;
+  text-transform: uppercase;
+}
+
+.monster-forge .mf-management {
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  justify-content: flex-end;
+}
+
+.monster-forge .mf-management button {
+  background: rgba(255, 255, 255, 0.13);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: inherit;
+  white-space: nowrap;
+}
+
+.monster-forge .mf-section,
+.monster-forge .mf-preview {
+  background: color-mix(in srgb, var(--color-bg-option, #eee) 82%, transparent);
+  border: 1px solid var(--color-border-light-tertiary, #999);
+  border-radius: 8px;
+  padding: 0.8rem;
+}
+
+.monster-forge .mf-preview {
+  border-left: 4px solid var(--mf-accent);
+}
+
+.monster-forge .mf-section-heading {
+  margin-bottom: 0.65rem;
+}
+
+.monster-forge .mf-section-heading > div {
+  gap: 0.5rem;
+}
+
+.monster-forge .mf-step {
+  align-items: center;
+  background: var(--mf-accent);
+  border-radius: 999px;
+  color: #fff;
+  display: inline-flex;
+  font-size: 0.78rem;
+  font-weight: 700;
+  height: 1.6rem;
+  justify-content: center;
+  width: 1.6rem;
+}
+
+.monster-forge .mf-grid {
+  display: grid;
+  gap: 0.55rem 0.7rem;
+}
+
+.monster-forge .mf-grid-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.monster-forge .mf-grid-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.monster-forge label {
+  display: grid;
+  font-size: 0.76rem;
+  font-weight: 600;
+  gap: 0.22rem;
+}
+
+.monster-forge input,
+.monster-forge select {
+  min-height: 2rem;
+  width: 100%;
+}
+
+.monster-forge .mf-switch {
+  align-items: center;
+  display: flex;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+.monster-forge .mf-switch input {
+  min-height: auto;
+  width: auto;
+}
+
+.monster-forge .mf-attack-columns {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 0.7rem;
+}
+
+.monster-forge fieldset {
+  border: 1px solid var(--color-border-light-tertiary, #999);
+  border-radius: 6px;
+  margin: 0;
+  min-width: 0;
+  padding: 0.65rem;
+}
+
+.monster-forge legend {
+  color: var(--mf-accent);
+  font-weight: 700;
+  padding: 0 0.35rem;
+}
+
+.monster-forge .mf-custom {
+  background: var(--mf-accent-soft);
+  border-left: 3px solid var(--mf-accent);
+  margin-top: 0.65rem;
+  padding: 0.55rem;
+}
+
+.monster-forge .mf-custom > strong {
+  display: block;
+  margin-bottom: 0.45rem;
+}
+
+.monster-forge .mf-link-button {
+  background: none;
+  border: 0;
+  color: var(--color-text-hyperlink, #7a2e1f);
+  font-size: 0.76rem;
+  width: auto;
+}
+
+.monster-forge .mf-help,
+.monster-forge .mf-callout {
+  font-size: 0.76rem;
+  line-height: 1.35;
+  margin: 0.65rem 0 0;
+}
+
+.monster-forge .mf-callout {
+  background: color-mix(in srgb, #d99b2b 18%, transparent);
+  border: 1px solid color-mix(in srgb, #d99b2b 55%, transparent);
+  border-radius: 6px;
+  margin: 0;
+  padding: 0.65rem;
+}
+
+.monster-forge .mf-metrics {
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.monster-forge .mf-metrics > div {
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 5px;
+  display: grid;
+  padding: 0.5rem;
+}
+
+.monster-forge .mf-metrics span,
+.monster-forge .mf-metrics small {
+  font-size: 0.68rem;
+  opacity: 0.75;
+}
+
+.monster-forge .mf-metrics strong {
+  font-size: 1.05rem;
+}
+
+.monster-forge .mf-metrics .is-warning {
+  box-shadow: inset 0 0 0 2px #c57a1f;
+}
+
+.monster-forge .mf-preview-grid {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 0.65rem;
+}
+
+.monster-forge .mf-preview-grid > div {
+  display: grid;
+  font-size: 0.76rem;
+  grid-template-columns: 6.5rem 1fr;
+}
+
+.monster-forge .mf-warnings {
+  font-size: 0.74rem;
+  margin: 0.55rem 0 0;
+  padding-left: 1.2rem;
+}
+
+.monster-forge .mf-warnings li::marker {
+  color: #c57a1f;
+}
+
+.monster-forge .mf-warnings .is-good::marker {
+  color: #3f8b45;
+}
+
+.monster-forge [hidden] {
+  display: none !important;
+}
+
+@media (max-width: 700px) {
+  .monster-forge .mf-grid-3,
+  .monster-forge .mf-attack-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .monster-forge .mf-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

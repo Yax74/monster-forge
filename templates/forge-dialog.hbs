@@ -1,0 +1,233 @@
+<div class="monster-forge">
+  <header class="mf-hero">
+    <div>
+      <p class="mf-eyebrow">NPC attack builder</p>
+      <h2>{{actor.name}}</h2>
+      <p>Actor CR {{actor.cr}} · <span data-generated-count>{{actor.generated}}</span> generated item(s)</p>
+    </div>
+    <div class="mf-management" aria-label="Generated item management">
+      <button type="button" data-action="undo" {{#unless actor.hasUndo}}disabled{{/unless}}>
+        <i class="fa-solid fa-rotate-left"></i> Undo last
+      </button>
+      <button type="button" data-action="remove" {{#unless actor.generated}}disabled{{/unless}}>
+        <i class="fa-solid fa-broom"></i> Remove generated
+      </button>
+    </div>
+  </header>
+
+  {{#if actor.hasLegacyData}}
+  <p class="mf-callout"><i class="fa-solid fa-wand-magic-sparkles"></i> Legacy macro data was detected. Replace mode will adopt and replace only items marked by the old Monster Forge macro.</p>
+  {{/if}}
+
+  <section class="mf-section">
+    <div class="mf-section-heading">
+      <div>
+        <span class="mf-step">1</span>
+        <h3>Damage budget</h3>
+      </div>
+      <button type="button" class="mf-link-button" data-action="recommend-attacks">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> Use suggested attack count
+      </button>
+    </div>
+    <div class="mf-grid mf-grid-3">
+      <label>Challenge rating
+        <select name="cr">
+          {{#each crOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+        </select>
+      </label>
+      <label>Role adjustment
+        <select name="roleModifier">
+          {{#each roleOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+        </select>
+      </label>
+      <label>Attack accuracy
+        <select name="accuracyMode">
+          {{#each accuracyOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+        </select>
+      </label>
+      <label>Saving throw DC
+        <select name="saveDcMode">
+          {{#each saveDcOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+        </select>
+      </label>
+      <label>Apply behavior
+        <select name="applyMode">
+          {{#each applyModeOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+        </select>
+      </label>
+    </div>
+    <p class="mf-help">Published Forge of Foes DPR is the baseline. The attack-count suggestion is deliberately compressed for faster play, and both remain editable. Monster Forge does not infer final CR from defenses, area effects, recharge powers, legendary actions, or encounter context.</p>
+  </section>
+
+  <section class="mf-section">
+    <div class="mf-section-heading">
+      <div><span class="mf-step">2</span><h3>Attacks</h3></div>
+      <label class="mf-switch"><input type="checkbox" name="secondaryEnabled" {{#if config.secondaryEnabled}}checked{{/if}}> Secondary attack</label>
+    </div>
+    <label data-field="split">Damage split
+      <select name="splitPrimary">
+        {{#each splitOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+      </select>
+    </label>
+
+    <div class="mf-attack-columns">
+      <fieldset>
+        <legend>Primary</legend>
+        <div class="mf-grid mf-grid-2">
+          <label>Attack profile
+            <select name="primary.weaponKey">
+              {{#each primary.weaponOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+            </select>
+          </label>
+          <label>Uses in Multiattack
+            <input type="number" name="primary.count" min="1" max="20" step="1" value="{{primary.count}}">
+          </label>
+          <label>Rename (optional)
+            <input type="text" name="primary.name" maxlength="80" value="{{primary.name}}" placeholder="Keep preset name">
+          </label>
+          <label>Extra damage type
+            <select name="primary.extraType">
+              {{#each primary.extraTypeOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+            </select>
+          </label>
+          <label>Extra damage die
+            <select name="primary.extraDie">
+              {{#each primary.extraDieOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+            </select>
+          </label>
+          <label>Status rider
+            <select name="primary.rider">
+              {{#each primary.riderOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+            </select>
+          </label>
+          <label data-rider-save="primary">Rider save
+            <select name="primary.saveAbility">
+              {{#each primary.saveOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+            </select>
+          </label>
+        </div>
+        <div class="mf-custom" data-custom="primary">
+          <strong>Custom profile</strong>
+          <div class="mf-grid mf-grid-2">
+            <label>Action type
+              <select name="primary.customAction">{{#each primary.customActionOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
+            </label>
+            <label>Ability
+              <select name="primary.customAbility">{{#each primary.customAbilityOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
+            </label>
+            <label>Base die
+              <select name="primary.customDie">{{#each primary.customDieOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
+            </label>
+            <label>Base type
+              <select name="primary.customDamageType">{{#each primary.customDamageOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
+            </label>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset data-panel="secondary">
+        <legend>Secondary</legend>
+        <div class="mf-grid mf-grid-2">
+          <label>Attack profile
+            <select name="secondary.weaponKey">
+              {{#each secondary.weaponOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+            </select>
+          </label>
+          <label>Uses in Multiattack
+            <input type="number" name="secondary.count" min="1" max="20" step="1" value="{{secondary.count}}">
+          </label>
+          <label>Rename (optional)
+            <input type="text" name="secondary.name" maxlength="80" value="{{secondary.name}}" placeholder="Keep preset name">
+          </label>
+          <label>Extra damage type
+            <select name="secondary.extraType">
+              {{#each secondary.extraTypeOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+            </select>
+          </label>
+          <label>Extra damage die
+            <select name="secondary.extraDie">
+              {{#each secondary.extraDieOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+            </select>
+          </label>
+          <label>Status rider
+            <select name="secondary.rider">
+              {{#each secondary.riderOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+            </select>
+          </label>
+          <label data-rider-save="secondary">Rider save
+            <select name="secondary.saveAbility">
+              {{#each secondary.saveOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+            </select>
+          </label>
+        </div>
+        <div class="mf-custom" data-custom="secondary">
+          <strong>Custom profile</strong>
+          <div class="mf-grid mf-grid-2">
+            <label>Action type
+              <select name="secondary.customAction">{{#each secondary.customActionOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
+            </label>
+            <label>Ability
+              <select name="secondary.customAbility">{{#each secondary.customAbilityOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
+            </label>
+            <label>Base die
+              <select name="secondary.customDie">{{#each secondary.customDieOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
+            </label>
+            <label>Base type
+              <select name="secondary.customDamageType">{{#each secondary.customDamageOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
+            </label>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+  </section>
+
+  <section class="mf-section">
+    <div class="mf-section-heading">
+      <div><span class="mf-step">3</span><h3>Tertiary on-hit feature</h3></div>
+      <label class="mf-switch"><input type="checkbox" name="tertiary.enabled" {{#if tertiary.enabled}}checked{{/if}}> Include feature</label>
+    </div>
+    <div class="mf-grid mf-grid-3" data-panel="tertiary">
+      <label>Preset
+        <select name="tertiary.preset">{{#each tertiary.presetOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
+      </label>
+      <label>Rename (optional)
+        <input type="text" name="tertiary.name" maxlength="80" value="{{tertiary.name}}">
+      </label>
+      <label>Uses budgeted per round
+        <input type="number" name="tertiary.usesPerRound" min="1" max="20" value="{{tertiary.usesPerRound}}">
+      </label>
+      <label>Dice
+        <input type="number" name="tertiary.dice" min="1" max="100" value="{{tertiary.dice}}">
+      </label>
+      <label>Die
+        <select name="tertiary.die">{{#each tertiary.dieOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
+      </label>
+      <label>Damage type
+        <select name="tertiary.damageType">{{#each tertiary.damageTypeOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
+      </label>
+      <label>Saving throw
+        <select name="tertiary.saveAbility">{{#each tertiary.saveOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
+      </label>
+      <label data-tertiary-dc>Actor DC ability
+        <select name="tertiary.dcAbility">{{#each tertiary.dcAbilityOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
+      </label>
+    </div>
+  </section>
+
+  <section class="mf-preview" aria-live="polite">
+    <div class="mf-section-heading"><div><span class="mf-step"><i class="fa-solid fa-chart-line"></i></span><h3>Live sanity check</h3></div></div>
+    <div class="mf-metrics">
+      <div><span>FoF baseline</span><strong data-preview="baseline">—</strong></div>
+      <div><span>Target DPR</span><strong data-preview="target">—</strong></div>
+      <div data-metric="achieved"><span>Generated DPR</span><strong data-preview="achieved">—</strong><small data-preview="variance"></small></div>
+      <div><span>Attack count</span><strong data-preview="attacks">—</strong></div>
+    </div>
+    <div class="mf-preview-grid">
+      <div><strong>Primary</strong><span data-preview="primary">—</span></div>
+      <div><strong>Secondary</strong><span data-preview="secondary">—</span></div>
+      <div><strong>Tertiary</strong><span data-preview="tertiary">—</span></div>
+      <div><strong>Accuracy / DC</strong><span><span data-preview="accuracy">—</span> · <span data-preview="save-dc">—</span></span></div>
+    </div>
+    <ul class="mf-warnings" data-preview="warnings"></ul>
+  </section>
+</div>

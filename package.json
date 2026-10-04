@@ -1,0 +1,16 @@
+{
+  "name": "monster-forge",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "CR-aware NPC attack builder for Foundry VTT's D&D5e system.",
+  "scripts": {
+    "test": "node --test",
+    "validate": "node tools/validate-release.mjs",
+    "check": "npm run test && npm run validate"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT"
+}
