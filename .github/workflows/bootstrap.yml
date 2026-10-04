@@ -1,0 +1,25 @@
+name: Bootstrap source
+
+on:
+  push:
+    branches: [main]
+    paths: [monster-forge-source.tar.gz]
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+      - name: Import the prepared source tree
+        run: |
+          tar -xzf monster-forge-source.tar.gz
+          rm monster-forge-source.tar.gz
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Import Monster Forge 1.0.0"
+          git push
