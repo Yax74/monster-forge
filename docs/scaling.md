@@ -44,7 +44,7 @@ The **FoF attacks** column is preserved for reference. **Suggested attacks** is 
 ## Allocation
 
 1. Start with the published total DPR for the selected CR.
-2. Apply the optional Monster Forge role adjustment (−20% to +20%).
+2. Apply the optional Monster Forge damage adjustment (−20% to +20%). This changes DPR only; it does not imply a minion, elite, or boss defensive package.
 3. Subtract the optional tertiary feature's average damage multiplied by its expected uses per round.
 4. Divide the remaining budget between primary and secondary profiles.
 5. Divide each profile's budget by its selected number of attacks.

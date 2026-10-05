@@ -1,6 +1,6 @@
 export const MODULE_ID = "monster-forge";
 export const MODULE_TITLE = "Monster Forge";
-export const MODULE_VERSION = "1.0.0";
+export const MODULE_VERSION = "1.1.0";
 
 /**
  * Baseline statistics from the published Forge of Foes monster statistics
@@ -227,15 +227,18 @@ export const WEAPONS = Object.freeze({
 export const DEFAULTS = Object.freeze({
   cr: "1",
   roleModifier: 0,
+  followCrAttacks: true,
   accuracyMode: "actor",
   saveDcMode: "cr",
+  riderAutomation: "midi",
   applyMode: "replace",
   splitPrimary: 60,
-  secondaryEnabled: true,
+  secondaryEnabled: false,
   primary: {
     count: 1,
     weaponKey: "longsword",
     name: "",
+    abilityOverride: "auto",
     extraType: "none",
     extraDie: 6,
     rider: "none",
@@ -245,6 +248,7 @@ export const DEFAULTS = Object.freeze({
     count: 1,
     weaponKey: "shortbow",
     name: "",
+    abilityOverride: "auto",
     extraType: "none",
     extraDie: 6,
     rider: "none",

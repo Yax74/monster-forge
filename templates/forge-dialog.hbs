@@ -19,15 +19,22 @@
   <p class="mf-callout"><i class="fa-solid fa-wand-magic-sparkles"></i> Legacy macro data was detected. Replace mode will adopt and replace only items marked by the old Monster Forge macro.</p>
   {{/if}}
 
+  {{#if actor.existingOffense}}
+  <p class="mf-callout mf-callout-warning"><i class="fa-solid fa-triangle-exclamation"></i> This actor already has {{actor.existingOffense}} ungenerated offensive item(s): {{actor.existingOffenseNames}}{{#if actor.existingOffenseMore}}, plus {{actor.existingOffenseMore}} more{{/if}}. Their damage is not included in the generated DPR budget.</p>
+  {{/if}}
+
   <section class="mf-section">
     <div class="mf-section-heading">
       <div>
         <span class="mf-step">1</span>
         <h3>Damage budget</h3>
       </div>
-      <button type="button" class="mf-link-button" data-action="recommend-attacks">
-        <i class="fa-solid fa-wand-magic-sparkles"></i> Use suggested attack count
-      </button>
+      <div class="mf-heading-actions">
+        <label class="mf-switch"><input type="checkbox" name="followCrAttacks" {{#if config.followCrAttacks}}checked{{/if}}> Follow CR count</label>
+        <button type="button" class="mf-link-button" data-action="recommend-attacks">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Use suggested count now
+        </button>
+      </div>
     </div>
     <div class="mf-grid mf-grid-3">
       <label>Challenge rating
@@ -35,9 +42,9 @@
           {{#each crOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
         </select>
       </label>
-      <label>Role adjustment
+      <label>Damage adjustment
         <select name="roleModifier">
-          {{#each roleOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+          {{#each damageAdjustmentOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
         </select>
       </label>
       <label>Attack accuracy
@@ -50,13 +57,23 @@
           {{#each saveDcOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
         </select>
       </label>
+      <label>Condition automation
+        <select name="riderAutomation">
+          {{#each riderAutomationOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+        </select>
+      </label>
       <label>Apply behavior
         <select name="applyMode">
           {{#each applyModeOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
         </select>
       </label>
     </div>
-    <p class="mf-help">Published Forge of Foes DPR is the baseline. The attack-count suggestion is deliberately compressed for faster play, and both remain editable. Monster Forge does not infer final CR from defenses, area effects, recharge powers, legendary actions, or encounter context.</p>
+    <p class="mf-help">Published Forge of Foes DPR is the baseline. The attack-count suggestion is deliberately compressed for faster play, while the number of distinct attack profiles remains your choice. Editing either Uses field turns off Follow CR count. Monster Forge does not infer final CR from defenses, area effects, recharge powers, legendary actions, or encounter context.</p>
+    {{#if integration.ready}}
+    <p class="mf-help mf-integration-ready"><i class="fa-solid fa-link"></i> Midi-QOL and DAE are active. Automated riders will trigger their save after a hit and apply the embedded condition on a failed save when Midi-QOL item-effect automation is enabled.</p>
+    {{else}}
+    <p class="mf-help"><i class="fa-solid fa-circle-info"></i> Automated rider data can still be generated, but automatic save chaining and condition application require active Midi-QOL and DAE modules.</p>
+    {{/if}}
   </section>
 
   <section class="mf-section">
@@ -84,6 +101,11 @@
           </label>
           <label>Rename (optional)
             <input type="text" name="primary.name" maxlength="80" value="{{primary.name}}" placeholder="Keep preset name">
+          </label>
+          <label>Ability override
+            <select name="primary.abilityOverride">
+              {{#each primary.abilityOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+            </select>
           </label>
           <label>Extra damage type
             <select name="primary.extraType">
@@ -138,6 +160,11 @@
           </label>
           <label>Rename (optional)
             <input type="text" name="secondary.name" maxlength="80" value="{{secondary.name}}" placeholder="Keep preset name">
+          </label>
+          <label>Ability override
+            <select name="secondary.abilityOverride">
+              {{#each secondary.abilityOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+            </select>
           </label>
           <label>Extra damage type
             <select name="secondary.extraType">
@@ -227,6 +254,13 @@
       <div><strong>Secondary</strong><span data-preview="secondary">—</span></div>
       <div><strong>Tertiary</strong><span data-preview="tertiary">—</span></div>
       <div><strong>Accuracy / DC</strong><span><span data-preview="accuracy">—</span> · <span data-preview="save-dc">—</span></span></div>
+    </div>
+    <h4 class="mf-audit-title">Actor versus Forge of Foes</h4>
+    <div class="mf-audit-grid">
+      <div><strong>Hit points</strong><span>Actor <b data-preview="actor-hp">—</b> · FoF <b data-preview="fof-hp">—</b></span></div>
+      <div><strong>Armor class</strong><span>Actor <b data-preview="actor-ac">—</b> · FoF <b data-preview="fof-ac">—</b></span></div>
+      <div><strong>Attack bonus</strong><span>Generated <b data-preview="actor-attack">—</b> · FoF <b data-preview="fof-attack">—</b></span></div>
+      <div><strong>Save DC</strong><span>Generated <b data-preview="actor-dc">—</b> · FoF <b data-preview="fof-dc">—</b></span></div>
     </div>
     <ul class="mf-warnings" data-preview="warnings"></ul>
   </section>

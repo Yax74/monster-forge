@@ -26,6 +26,42 @@ export function getAbilityMods(actor) {
   );
 }
 
+export function getActorCombatProfile(actor) {
+  const hp = actor.system?.attributes?.hp ?? {};
+  return {
+    abilityMods: getAbilityMods(actor),
+    proficiency: Number(actor.system?.attributes?.prof) || 0,
+    hp: Number(hp.max ?? hp.value) || 0,
+    ac: Number(actor.system?.attributes?.ac?.value) || 0,
+    spellDc: Number(actor.system?.attributes?.spelldc) || null
+  };
+}
+
+function activityValues(item) {
+  const activities = item.system?.activities;
+  if (!activities) return [];
+  if (typeof activities.values === "function") return [...activities.values()];
+  return Object.values(activities);
+}
+
+function hasDamageParts(activity) {
+  const parts = activity?.damage?.parts;
+  if (Array.isArray(parts)) return parts.length > 0;
+  return Boolean(parts?.size);
+}
+
+export function getExistingOffensiveItems(actor) {
+  return actor.items.filter((item) => {
+    if (isGeneratedItem(item)) return false;
+    const activities = activityValues(item);
+    if (activities.some((activity) => activity.type === "attack" || hasDamageParts(activity))) return true;
+
+    const baseDamage = item.system?.damage?.base;
+    const baseDice = Number(baseDamage?.number) || 0;
+    return baseDice > 0 || Boolean(baseDamage?.custom?.formula);
+  });
+}
+
 function assertWritableNpc(actor) {
   if (!actor) throw new Error("Select one NPC token or open an NPC sheet first.");
   if (actor.type !== "npc") throw new Error(`${actor.name} is not an NPC actor.`);

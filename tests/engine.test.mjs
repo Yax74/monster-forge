@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 
 import { CR_KEYS, FOF_STATS, MODULE_ID } from "../scripts/constants.js";
 import {
+  applyRecommendedAttacks,
   buildDamagePlan,
   getCrStats,
   normalizeConfig,
@@ -13,7 +14,13 @@ import {
   targetDpr
 } from "../scripts/engine.js";
 import { buildWeaponItem } from "../scripts/item-builder.js";
-import { applyPlan, getGeneratedItems, undoLastOperation } from "../scripts/actor-service.js";
+import {
+  applyPlan,
+  getActorCombatProfile,
+  getExistingOffensiveItems,
+  getGeneratedItems,
+  undoLastOperation
+} from "../scripts/actor-service.js";
 
 test("normalizes fractional and numeric CR values", () => {
   assert.equal(normalizeCr("1/8"), "1/8");
@@ -80,6 +87,21 @@ test("uses the agreed compressed attack-count schedule", () => {
   assert.equal(getCrStats(15).publishedAttacks, 5);
 });
 
+test("recommended counts preserve one or two attack profiles", () => {
+  const single = applyRecommendedAttacks({ cr: "5", secondaryEnabled: false });
+  assert.equal(single.secondaryEnabled, false);
+  assert.equal(single.primary.count, 3);
+
+  const dual = applyRecommendedAttacks({ cr: "5", secondaryEnabled: true, splitPrimary: 60 });
+  assert.equal(dual.secondaryEnabled, true);
+  assert.equal(dual.primary.count, 2);
+  assert.equal(dual.secondary.count, 1);
+
+  const fractional = applyRecommendedAttacks({ cr: "1/2", secondaryEnabled: true });
+  assert.equal(fractional.secondaryEnabled, false);
+  assert.equal(fractional.primary.count, 1);
+});
+
 test("normalizes stale or invalid saved form values", () => {
   const config = normalizeConfig({
     cr: "999",
@@ -100,6 +122,8 @@ test("normalizes stale or invalid saved form values", () => {
   assert.equal(config.cr, "30");
   assert.equal(config.budgetPoint, undefined);
   assert.equal(config.roleModifier, 0);
+  assert.equal(config.followCrAttacks, true);
+  assert.equal(config.riderAutomation, "midi");
   assert.equal(config.splitPrimary, 95);
   assert.equal(config.primary.count, 20);
   assert.equal(config.primary.weaponKey, "longsword");
@@ -111,6 +135,30 @@ test("normalizes stale or invalid saved form values", () => {
   assert.equal(config.tertiary.die, 6);
   assert.equal(config.tertiary.usesPerRound, 20);
   assert.equal(config.tertiary.damageType, "poison");
+});
+
+test("ability overrides drive exact actor attack bonuses and save DCs", () => {
+  const plan = buildDamagePlan({
+    cr: "5",
+    accuracyMode: "actor",
+    saveDcMode: "actor",
+    secondaryEnabled: false,
+    primary: {
+      count: 3,
+      weaponKey: "longsword",
+      abilityOverride: "dex",
+      rider: "prone",
+      saveAbility: "str"
+    }
+  }, {
+    abilityMods: { str: 4, dex: 3 },
+    proficiency: 3
+  });
+
+  assert.equal(plan.primary.weapon.ability, "dex");
+  assert.equal(plan.primary.attackBonus, 6);
+  assert.equal(plan.primary.riderSaveDc, 14);
+  assert.equal(plan.primary.formula.includes("@abilities.dex.mod"), true);
 });
 
 test("dice optimizer preserves selected extra damage", () => {
@@ -168,6 +216,96 @@ test("builds D&D5e attack activities with modern type fields and module flags", 
   assert.equal(activity.attack.bonus, "5");
   assert.equal(activity.damage.includeBase, true);
   assert.ok(activity.damage.parts.length >= 1);
+  assert.match(item.system.description.value, /\[\[\/attack extended\]\]/);
+  assert.match(item.system.description.value, /\[\[\/damage extended\]\]/);
+});
+
+test("builds optional Midi-QOL rider chaining and a native condition effect", () => {
+  const plan = buildDamagePlan({
+    cr: "5",
+    accuracyMode: "actor",
+    saveDcMode: "actor",
+    riderAutomation: "midi",
+    secondaryEnabled: false,
+    primary: { count: 3, weaponKey: "longsword", rider: "prone", saveAbility: "str" }
+  }, { abilityMods: { str: 4 }, proficiency: 3 });
+  let index = 0;
+  const item = buildWeaponItem(plan.primary, plan, {
+    setId: "set-id",
+    role: "primary",
+    idFactory: () => `id-${++index}`
+  });
+  const activities = Object.values(item.system.activities);
+  const attack = activities.find((entry) => entry.type === "attack");
+  const save = activities.find((entry) => entry.type === "save");
+
+  assert.equal(item.effects.length, 1);
+  assert.deepEqual(item.effects[0].statuses, ["prone"]);
+  assert.equal(attack.midiProperties.triggeredActivityId, save._id);
+  assert.equal(attack.midiProperties.triggeredActivityTargets, "hitTargets");
+  assert.deepEqual(save.effects, [{ _id: item.effects[0]._id, onSave: false }]);
+  assert.deepEqual(save.appliedEffects, [item.effects[0]._id]);
+  assert.ok(item.system.description.value.includes(`[[/save activity=${save._id} format=long]]`));
+  assert.match(item.system.description.value, /&Reference\[condition=prone\]/);
+
+  const manualPlan = buildDamagePlan({
+    ...plan.config,
+    riderAutomation: "manual"
+  }, { abilityMods: { str: 4 }, proficiency: 3 });
+  index = 0;
+  const manualItem = buildWeaponItem(manualPlan.primary, manualPlan, {
+    setId: "manual-set",
+    role: "primary",
+    idFactory: () => `manual-${++index}`
+  });
+  const manualAttack = Object.values(manualItem.system.activities).find((entry) => entry.type === "attack");
+  const manualSave = Object.values(manualItem.system.activities).find((entry) => entry.type === "save");
+  assert.equal(manualItem.effects.length, 1);
+  assert.deepEqual(manualSave.effects, [{ _id: manualItem.effects[0]._id, onSave: false }]);
+  assert.equal(manualAttack.midiProperties, undefined);
+});
+
+test("extracts actor audit stats and excludes generated items from existing offense", () => {
+  class ItemCollection extends Map {
+    filter(predicate) {
+      return [...this.values()].filter(predicate);
+    }
+  }
+
+  const actor = {
+    system: {
+      abilities: { str: { mod: 4 }, dex: { mod: 2 } },
+      attributes: { prof: 3, hp: { value: 40, max: 55 }, ac: { value: 16 }, spelldc: 15 }
+    },
+    items: new ItemCollection()
+  };
+  actor.items.set("manual", {
+    name: "Manual Claw",
+    type: "weapon",
+    system: { activities: { attack: { type: "attack" } } },
+    getFlag: () => false
+  });
+  actor.items.set("utility", {
+    name: "Utility",
+    type: "feat",
+    system: { activities: { utility: { type: "utility" } } },
+    getFlag: () => false
+  });
+  actor.items.set("generated", {
+    name: "Generated Bite",
+    type: "weapon",
+    system: { activities: { attack: { type: "attack" } } },
+    getFlag: (scope, key) => scope === MODULE_ID && key === "generated"
+  });
+
+  assert.deepEqual(getActorCombatProfile(actor), {
+    abilityMods: { str: 4, dex: 2 },
+    proficiency: 3,
+    hp: 55,
+    ac: 16,
+    spellDc: 15
+  });
+  assert.deepEqual(getExistingOffensiveItems(actor).map((item) => item.name), ["Manual Claw"]);
 });
 
 test("replace and undo touch only generated items", async () => {

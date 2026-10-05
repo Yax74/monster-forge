@@ -84,6 +84,33 @@ export function mergeDefaults(saved = {}, actorCr = DEFAULTS.cr) {
 }
 
 /**
+ * Apply Monster Forge's table-friendly attack cadence without deciding how
+ * many distinct attack profiles the creature must have. With two profiles,
+ * the selected damage split also controls the distribution of attacks.
+ */
+export function applyRecommendedAttacks(config = {}, rawCr = config.cr) {
+  const recommendation = getCrStats(rawCr).recommendedAttacks;
+  const merged = mergeDefaults(config, rawCr);
+  const useSecondary = Boolean(merged.secondaryEnabled) && recommendation > 1;
+  let primaryCount = recommendation;
+  let secondaryCount = merged.secondary?.count ?? 1;
+
+  if (useSecondary) {
+    const split = clamp(merged.splitPrimary, 5, 95, DEFAULTS.splitPrimary) / 100;
+    primaryCount = Math.min(recommendation - 1, Math.max(1, Math.round(recommendation * split)));
+    secondaryCount = recommendation - primaryCount;
+  }
+
+  return {
+    ...merged,
+    cr: normalizeCr(rawCr),
+    secondaryEnabled: useSecondary,
+    primary: { ...merged.primary, count: primaryCount },
+    secondary: { ...merged.secondary, count: secondaryCount }
+  };
+}
+
+/**
  * Find a compact base/extra dice combination whose average is closest to the
  * requested dice-only average. At least one base die is retained so the item
  * remains a valid weapon attack.
@@ -131,19 +158,24 @@ export function optimizeDice({
 
 export function resolveWeapon(attack = {}) {
   if (attack.weaponKey !== "custom" && WEAPONS[attack.weaponKey]) {
+    const preset = WEAPONS[attack.weaponKey];
     return {
-      ...WEAPONS[attack.weaponKey],
-      name: attack.name?.trim() || WEAPONS[attack.weaponKey].name
+      ...preset,
+      name: attack.name?.trim() || preset.name,
+      ability: attack.abilityOverride !== "auto" ? attack.abilityOverride : preset.ability
     };
   }
 
   const action = attack.customAction ?? "mwak";
+  const customAbility = attack.abilityOverride !== "auto"
+    ? attack.abilityOverride
+    : attack.customAbility ?? "str";
   return {
     name: attack.name?.trim() || "Custom Attack",
     baseDice: 1,
     die: Number(attack.customDie) || 8,
     damageType: attack.customDamageType ?? "slashing",
-    ability: attack.customAbility ?? "str",
+    ability: customAbility,
     rangeType: action.startsWith("r") ? "ranged" : "melee",
     classification: action.endsWith("sak") ? "spell" : "weapon",
     weaponType: action.startsWith("r") ? "martialR" : "martialM",
@@ -165,6 +197,7 @@ function normalizeAttack(attack, fallback) {
     count: Math.round(clamp(merged.count, 1, 20, fallback.count)),
     weaponKey,
     name: String(merged.name ?? "").slice(0, 80),
+    abilityOverride: ["auto", ...ABILITIES].includes(merged.abilityOverride) ? merged.abilityOverride : "auto",
     extraType: ["none", ...DAMAGE_TYPES].includes(merged.extraType) ? merged.extraType : "none",
     extraDie: DIE_SIZES.includes(Number(merged.extraDie)) ? Number(merged.extraDie) : fallback.extraDie,
     rider: Object.hasOwn(RIDERS, merged.rider) ? merged.rider : "none",
@@ -183,8 +216,10 @@ export function normalizeConfig(config = {}) {
     ...current,
     cr: normalizeCr(current.cr),
     roleModifier: clamp(current.roleModifier, -50, 50, 0),
+    followCrAttacks: current.followCrAttacks !== false,
     accuracyMode: current.accuracyMode === "cr" ? "cr" : "actor",
     saveDcMode: current.saveDcMode === "actor" ? "actor" : "cr",
+    riderAutomation: current.riderAutomation === "manual" ? "manual" : "midi",
     applyMode: current.applyMode === "append" ? "append" : "replace",
     splitPrimary: clamp(current.splitPrimary, 5, 95, DEFAULTS.splitPrimary),
     secondaryEnabled: Boolean(current.secondaryEnabled),
@@ -214,9 +249,21 @@ export function normalizeConfig(config = {}) {
   };
 }
 
-function planAttack(attack, allocatedDpr, abilityMods = {}) {
+function normalizeActorProfile(input = {}) {
+  const abilityMods = input.abilityMods ?? input;
+  return {
+    abilityMods: Object.fromEntries(ABILITIES.map((ability) => [ability, Number(abilityMods?.[ability]) || 0])),
+    proficiency: Number(input.proficiency ?? input.prof) || 0
+  };
+}
+
+function actorSaveDc(profile, ability) {
+  return 8 + profile.proficiency + (Number(profile.abilityMods[ability]) || 0);
+}
+
+function planAttack(attack, allocatedDpr, actorProfile) {
   const weapon = resolveWeapon(attack);
-  const abilityMod = Number(abilityMods[weapon.ability]) || 0;
+  const abilityMod = Number(actorProfile.abilityMods[weapon.ability]) || 0;
   const targetPerHit = allocatedDpr / attack.count;
   const diceTarget = Math.max(0, targetPerHit - abilityMod);
   const dice = optimizeDice({
@@ -232,6 +279,8 @@ function planAttack(attack, allocatedDpr, abilityMods = {}) {
     ...attack,
     weapon,
     abilityMod,
+    attackBonus: abilityMod + actorProfile.proficiency,
+    riderSaveDc: attack.rider !== "none" ? actorSaveDc(actorProfile, weapon.ability) : null,
     targetPerHit: roundHalf(targetPerHit),
     averagePerHit: roundHalf(averagePerHit),
     averagePerRound: roundHalf(averagePerHit * attack.count),
@@ -247,8 +296,9 @@ function planAttack(attack, allocatedDpr, abilityMods = {}) {
   };
 }
 
-export function buildDamagePlan(inputConfig = {}, abilityMods = {}) {
+export function buildDamagePlan(inputConfig = {}, actorData = {}) {
   const config = normalizeConfig(inputConfig);
+  const actorProfile = normalizeActorProfile(actorData);
   const stats = getCrStats(config.cr);
   const target = targetDpr(config.cr, config.roleModifier);
   const tertiary = config.tertiary;
@@ -257,9 +307,9 @@ export function buildDamagePlan(inputConfig = {}, abilityMods = {}) {
     : 0;
   const weaponBudget = Math.max(0, target - tertiaryAverage);
   const primaryShare = config.secondaryEnabled ? config.splitPrimary / 100 : 1;
-  const primary = planAttack(config.primary, weaponBudget * primaryShare, abilityMods);
+  const primary = planAttack(config.primary, weaponBudget * primaryShare, actorProfile);
   const secondary = config.secondaryEnabled
-    ? planAttack(config.secondary, weaponBudget * (1 - primaryShare), abilityMods)
+    ? planAttack(config.secondary, weaponBudget * (1 - primaryShare), actorProfile)
     : null;
   const achieved = roundHalf(primary.averagePerRound + (secondary?.averagePerRound ?? 0) + tertiaryAverage);
   const variance = roundHalf(achieved - target);
@@ -276,7 +326,14 @@ export function buildDamagePlan(inputConfig = {}, abilityMods = {}) {
     warnings.push(`This profile makes ${totalAttacks} attacks; Monster Forge recommends ${stats.recommendedAttacks} at CR ${stats.cr}.`);
   }
   if (config.roleModifier !== 0) {
-    warnings.push("The role modifier intentionally moves the target away from the published Forge of Foes baseline.");
+    warnings.push("The damage adjustment intentionally moves the target away from the published Forge of Foes baseline.");
+  }
+  if (config.accuracyMode === "actor") {
+    for (const [label, attack] of [["Primary", primary], ["Secondary", secondary]]) {
+      if (attack && Math.abs(attack.attackBonus - stats.attackBonus) >= 2) {
+        warnings.push(`${label} attack bonus ${attack.attackBonus >= 0 ? "+" : ""}${attack.attackBonus} differs from the Forge of Foes +${stats.attackBonus} benchmark.`);
+      }
+    }
   }
 
   return {
@@ -290,6 +347,10 @@ export function buildDamagePlan(inputConfig = {}, abilityMods = {}) {
     primary,
     secondary,
     totalAttacks,
+    actorProfile,
+    tertiarySaveDc: tertiary.enabled && tertiary.saveAbility !== "none"
+      ? actorSaveDc(actorProfile, tertiary.dcAbility)
+      : null,
     suggestedAttackBonus: suggestedAttackBonus(config.cr),
     suggestedSaveDc: suggestedSaveDc(config.cr),
     warnings

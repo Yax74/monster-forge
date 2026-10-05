@@ -44,43 +44,57 @@ function moduleFlags(setId, kind, role) {
   };
 }
 
-function buildAttackActivity(attack, plan, idFactory) {
+function buildAttackActivity(attack, plan, idFactory, triggeredActivityId = null) {
   const id = idFactory();
   const extraParts = attack.dice.extraDice > 0 && attack.extraType !== "none"
     ? [damagePart(attack.dice.extraDice, Number(attack.extraDie), attack.extraType, idFactory)]
     : [];
   const useFlatBonus = plan.config.accuracyMode === "cr";
 
+  const data = {
+    _id: id,
+    type: "attack",
+    name: "Attack",
+    sort: 0,
+    activation: activityActivation("action"),
+    attack: {
+      ability: attack.weapon.ability,
+      bonus: useFlatBonus ? String(plan.suggestedAttackBonus) : "",
+      critical: { threshold: null },
+      flat: useFlatBonus,
+      type: {
+        value: attack.weapon.rangeType,
+        classification: attack.weapon.classification
+      }
+    },
+    damage: {
+      critical: { bonus: "" },
+      includeBase: true,
+      parts: extraParts
+    }
+  };
+
+  if (triggeredActivityId) {
+    data.midiProperties = {
+      triggeredActivityId,
+      triggeredActivityConditionText: "",
+      triggeredActivityTargets: "hitTargets",
+      triggeredActivityRollAs: "self",
+      triggeredActivityConsume: false,
+      triggeredActivityConfigure: false
+    };
+  }
+
   return {
     id,
-    data: {
-      _id: id,
-      type: "attack",
-      name: "Attack",
-      sort: 0,
-      activation: activityActivation("action"),
-      attack: {
-        ability: attack.weapon.ability,
-        bonus: useFlatBonus ? String(plan.suggestedAttackBonus) : "",
-        critical: { threshold: null },
-        flat: useFlatBonus,
-        type: {
-          value: attack.weapon.rangeType,
-          classification: attack.weapon.classification
-        }
-      },
-      damage: {
-        critical: { bonus: "" },
-        includeBase: true,
-        parts: extraParts
-      }
-    }
+    data
   };
 }
 
-function buildRiderActivity(attack, plan, idFactory) {
+function buildRiderActivity(attack, plan, idFactory, effectId = null) {
   if (!attack.rider || attack.rider === "none") return null;
   const id = idFactory();
+  const effects = effectId ? [{ _id: effectId, onSave: false }] : [];
   return {
     id,
     data: {
@@ -89,6 +103,8 @@ function buildRiderActivity(attack, plan, idFactory) {
       name: `${RIDERS[attack.rider] ?? attack.rider} Save`,
       sort: 10,
       activation: activityActivation("special", `After ${attack.weapon.name} hits`),
+      effects,
+      appliedEffects: effectId ? [effectId] : [],
       save: {
         ability: [attack.saveAbility],
         dc: saveDc(plan, attack.weapon.ability)
@@ -98,28 +114,54 @@ function buildRiderActivity(attack, plan, idFactory) {
   };
 }
 
+function buildRiderEffect(attack, effectId) {
+  const label = RIDERS[attack.rider] ?? attack.rider;
+  return {
+    _id: effectId,
+    name: label,
+    img: `systems/dnd5e/icons/svg/statuses/${attack.rider}.svg`,
+    type: "base",
+    system: { changes: [] },
+    changes: [],
+    disabled: false,
+    duration: {
+      startTime: null,
+      seconds: null,
+      combat: null,
+      rounds: null,
+      turns: null,
+      startRound: null,
+      startTurn: null
+    },
+    description: `<p>Applied by ${escapeHtml(attack.weapon.name)} after a failed ${attack.saveAbility.toUpperCase()} saving throw. Remove the condition when its rules allow.</p>`,
+    transfer: false,
+    statuses: [attack.rider],
+    flags: {}
+  };
+}
+
 export function buildWeaponItem(attack, plan, { idFactory, setId, role }) {
-  const attackActivity = buildAttackActivity(attack, plan, idFactory);
-  const riderActivity = buildRiderActivity(attack, plan, idFactory);
+  const automateRider = plan.config.riderAutomation === "midi" && attack.rider !== "none";
+  const effectId = attack.rider !== "none" ? idFactory() : null;
+  const riderActivity = buildRiderActivity(attack, plan, idFactory, effectId);
+  const attackActivity = buildAttackActivity(attack, plan, idFactory, automateRider ? riderActivity?.id : null);
   const activities = { [attackActivity.id]: attackActivity.data };
   if (riderActivity) activities[riderActivity.id] = riderActivity.data;
+  const effects = effectId ? [buildRiderEffect(attack, effectId)] : [];
 
-  const weaponName = escapeHtml(attack.weapon.name);
-  const riderText = attack.rider !== "none"
-    ? `<p><strong>Rider.</strong> On a hit, the target must succeed on a ${attack.saveAbility.toUpperCase()} saving throw or be ${escapeHtml(attack.rider)}. Use the item's Rider Save activity, then apply the condition manually or with your preferred automation module.</p>`
+  const riderText = riderActivity
+    ? `<p><strong>Rider.</strong> On a hit, the target must succeed on a [[/save activity=${riderActivity.id} format=long]] or be &Reference[condition=${attack.rider}].</p>`
     : "";
-  const accuracyText = plan.config.accuracyMode === "cr"
-    ? `flat +${plan.suggestedAttackBonus}`
-    : `actor proficiency + ${attack.weapon.ability.toUpperCase()}`;
 
   return {
     name: attack.weapon.name,
     type: "weapon",
     img: attack.weapon.img,
     flags: moduleFlags(setId, "attack", role),
+    effects,
     system: {
       description: {
-        value: `<p><strong>Monster Forge estimate.</strong> ${weaponName} averages ${attack.averagePerHit} damage per hit (${attack.formula}); ${attack.count} use(s) contribute about ${attack.averagePerRound} DPR. Accuracy: ${accuracyText}.</p>${riderText}`,
+        value: `<p>[[/attack extended]]. [[/damage extended]]</p>${riderText}`,
         chat: "",
         unidentified: ""
       },
@@ -174,9 +216,9 @@ export function buildTertiaryItem(plan, { idFactory, setId }) {
     };
   }
 
-  const saveText = hasSave
-    ? ` The target makes a ${tertiary.saveAbility.toUpperCase()} saving throw; use the activity for the configured DC.`
-    : "";
+  const description = hasSave
+    ? `<p>After it hits with an attack, the creature can use this feature. The target must make a [[/save activity=${id} format=long]]. On a failed save, it takes [[/damage activity=${id} format=long]].</p>`
+    : `<p>After it hits with an attack, the creature can deal [[/damage activity=${id} format=long]].</p>`;
 
   return {
     name,
@@ -185,7 +227,7 @@ export function buildTertiaryItem(plan, { idFactory, setId }) {
     flags: moduleFlags(setId, "tertiary", "tertiary"),
     system: {
       description: {
-        value: `<p>After it hits with an attack, the creature can deal an extra ${tertiary.dice}d${tertiary.die} ${escapeHtml(tertiary.damageType)} damage.${saveText}</p><p>Monster Forge budgets this feature at ${tertiary.usesPerRound} use(s) each round (${plan.tertiaryAverage} DPR). Adjust that assumption if the feature is situational or limited.</p>`,
+        value: description,
         chat: "",
         unidentified: ""
       },
@@ -223,7 +265,7 @@ export function buildMultiattackItem(plan, createdWeapons, { idFactory, setId })
     flags: moduleFlags(setId, "multiattack", "multiattack"),
     system: {
       description: {
-        value: `<p>${sentence}</p><p><strong>Expected output:</strong> ${plan.achieved} DPR against a target of ${plan.target} (CR ${plan.stats.cr}; published Forge of Foes baseline ${plan.stats.dpr}). This is an offensive estimate, not a complete CR calculation.</p>`,
+        value: `<p>${sentence}</p>`,
         chat: "",
         unidentified: ""
       },
