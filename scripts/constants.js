@@ -1,6 +1,6 @@
 export const MODULE_ID = "monster-forge";
 export const MODULE_TITLE = "Monster Forge";
-export const MODULE_VERSION = "1.1.0";
+export const MODULE_VERSION = "1.2.0";
 
 /**
  * Baseline statistics from the published Forge of Foes monster statistics
@@ -67,6 +67,189 @@ export const DAMAGE_TYPES = Object.freeze([
 
 export const ABILITIES = Object.freeze(["str", "dex", "con", "int", "wis", "cha"]);
 export const DIE_SIZES = Object.freeze([4, 6, 8, 10, 12]);
+
+/**
+ * These are Monster Forge recommendations layered over the published Forge of
+ * Foes row. They are intentionally data-only so the dialog can show every
+ * adjustment before it changes an actor.
+ */
+export const COMBAT_ROLES = Object.freeze({
+  balanced: {
+    label: "Balanced",
+    description: "No benchmark adjustment; a flexible all-rounder.",
+    hpPct: 0,
+    ac: 0,
+    attackBonus: 0,
+    saveDc: 0,
+    dprPct: 0,
+    speed: 0,
+    attackAbility: "str",
+    saveAbility: "wis",
+    abilities: { str: 12, dex: 12, con: 12, int: 10, wis: 12, cha: 10 }
+  },
+  brute: {
+    label: "Brute",
+    description: "Hard-hitting and durable, but easier to hit and less accurate.",
+    hpPct: 20,
+    ac: -2,
+    attackBonus: -1,
+    saveDc: 0,
+    dprPct: 10,
+    speed: 0,
+    attackAbility: "str",
+    saveAbility: "con",
+    abilities: { str: 16, dex: 8, con: 16, int: 8, wis: 10, cha: 8 }
+  },
+  soldier: {
+    label: "Soldier",
+    description: "Armored and accurate, trading health and damage for reliability.",
+    hpPct: -15,
+    ac: 2,
+    attackBonus: 1,
+    saveDc: 0,
+    dprPct: -10,
+    speed: 0,
+    attackAbility: "str",
+    saveAbility: "wis",
+    abilities: { str: 14, dex: 12, con: 14, int: 10, wis: 12, cha: 10 }
+  },
+  skirmisher: {
+    label: "Skirmisher",
+    description: "Mobile and quick, with slightly lower durability.",
+    hpPct: -10,
+    ac: 0,
+    attackBonus: 0,
+    saveDc: 0,
+    dprPct: 0,
+    speed: 10,
+    attackAbility: "dex",
+    saveAbility: "dex",
+    abilities: { str: 10, dex: 16, con: 12, int: 10, wis: 12, cha: 10 }
+  },
+  sniper: {
+    label: "Sniper",
+    description: "Accurate at range, but fragile when pinned down.",
+    hpPct: -15,
+    ac: -1,
+    attackBonus: 1,
+    saveDc: 0,
+    dprPct: 0,
+    speed: 0,
+    attackAbility: "dex",
+    saveAbility: "wis",
+    abilities: { str: 8, dex: 16, con: 10, int: 12, wis: 14, cha: 10 }
+  },
+  controller: {
+    label: "Controller",
+    description: "Stronger save effects with less direct damage.",
+    hpPct: 0,
+    ac: 0,
+    attackBonus: 0,
+    saveDc: 1,
+    dprPct: -15,
+    speed: 0,
+    attackAbility: "int",
+    saveAbility: "int",
+    abilities: { str: 8, dex: 12, con: 12, int: 16, wis: 14, cha: 12 }
+  },
+  support: {
+    label: "Support",
+    description: "Stays in the fight longer while spending less budget on damage.",
+    hpPct: 10,
+    ac: 0,
+    attackBonus: 0,
+    saveDc: 0,
+    dprPct: -20,
+    speed: 0,
+    attackAbility: "wis",
+    saveAbility: "wis",
+    abilities: { str: 10, dex: 10, con: 14, int: 12, wis: 16, cha: 14 }
+  },
+  caster: {
+    label: "Caster",
+    description: "Potent spells and damage at the cost of defenses.",
+    hpPct: -20,
+    ac: -1,
+    attackBonus: 1,
+    saveDc: 1,
+    dprPct: 10,
+    speed: 0,
+    attackAbility: "int",
+    saveAbility: "int",
+    abilities: { str: 8, dex: 12, con: 12, int: 16, wis: 14, cha: 14 }
+  },
+  leader: {
+    label: "Leader",
+    description: "Durable and commanding, with some damage shifted into allies.",
+    hpPct: 10,
+    ac: 0,
+    attackBonus: 0,
+    saveDc: 1,
+    dprPct: -10,
+    speed: 0,
+    attackAbility: "cha",
+    saveAbility: "cha",
+    abilities: { str: 12, dex: 10, con: 14, int: 12, wis: 14, cha: 16 }
+  }
+});
+
+export const CREATURE_TIERS = Object.freeze({
+  minion: {
+    label: "Minion",
+    description: "25% hit points and 75% damage; action economy still needs GM judgment.",
+    hpMultiplier: 0.25,
+    dprMultiplier: 0.75
+  },
+  standard: {
+    label: "Standard",
+    description: "Uses the selected role without an additional tier multiplier.",
+    hpMultiplier: 1,
+    dprMultiplier: 1
+  },
+  elite: {
+    label: "Elite",
+    description: "150% hit points and 110% damage.",
+    hpMultiplier: 1.5,
+    dprMultiplier: 1.1
+  },
+  boss: {
+    label: "Boss",
+    description: "200% hit points and 120% damage; add action-economy features separately.",
+    hpMultiplier: 2,
+    dprMultiplier: 1.2
+  }
+});
+
+/**
+ * Species names mirror the campaign NPC generator. These presets recommend
+ * body data and small 2014-style ability tendencies; they never imply culture
+ * or faction membership.
+ */
+export const SPECIES_PROFILES = Object.freeze({
+  preserve: { label: "Preserve actor", size: null, speed: null, darkvision: null, abilities: {} },
+  human: { label: "Human", size: "med", speed: 30, darkvision: 0, abilities: { str: 1, dex: 1, con: 1, int: 1, wis: 1, cha: 1 } },
+  halfElf: { label: "Half-Elf", size: "med", speed: 30, darkvision: 60, abilities: { dex: 1, wis: 1, cha: 2 } },
+  dwarf: { label: "Dwarf", size: "med", speed: 25, darkvision: 60, abilities: { con: 2 } },
+  halfling: { label: "Halfling", size: "sm", speed: 25, darkvision: 0, abilities: { dex: 2 } },
+  gnome: { label: "Gnome", size: "sm", speed: 25, darkvision: 60, abilities: { int: 2 } },
+  elf: { label: "Elf", size: "med", speed: 30, darkvision: 60, abilities: { dex: 2 } },
+  tiefling: { label: "Tiefling", size: "med", speed: 30, darkvision: 60, abilities: { int: 1, cha: 2 } },
+  halfOrc: { label: "Half-Orc", size: "med", speed: 30, darkvision: 60, abilities: { str: 2, con: 1 } },
+  orc: { label: "Orc", size: "med", speed: 30, darkvision: 60, abilities: { str: 2, con: 1 } },
+  goliath: { label: "Goliath", size: "med", speed: 30, darkvision: 0, abilities: { str: 2, con: 1 } },
+  drow: { label: "Drow", size: "med", speed: 30, darkvision: 120, abilities: { dex: 2, cha: 1 } },
+  duergar: { label: "Duergar", size: "med", speed: 25, darkvision: 120, abilities: { con: 2, str: 1 } },
+  deepGnome: { label: "Deep Gnome", size: "sm", speed: 25, darkvision: 120, abilities: { int: 2, dex: 1 } }
+});
+
+export const ACTOR_SIZES = Object.freeze({
+  tiny: "Tiny",
+  sm: "Small",
+  med: "Medium",
+  lg: "Large",
+  huge: "Huge",
+  grg: "Gargantuan"
+});
 
 export const RIDERS = Object.freeze({
   none: "None",
@@ -226,6 +409,30 @@ export const WEAPONS = Object.freeze({
 
 export const DEFAULTS = Object.freeze({
   cr: "1",
+  foundation: {
+    mode: "apply",
+    role: "balanced",
+    species: "preserve",
+    tier: "standard",
+    hpPolicy: "ratio",
+    manage: {
+      hp: true,
+      ac: true,
+      abilities: true,
+      body: true
+    },
+    overrides: {
+      hp: "",
+      ac: "",
+      attackBonus: "",
+      saveDc: "",
+      dpr: "",
+      speed: "",
+      darkvision: "",
+      size: "",
+      abilities: { str: "", dex: "", con: "", int: "", wis: "", cha: "" }
+    }
+  },
   roleModifier: 0,
   followCrAttacks: true,
   accuracyMode: "actor",

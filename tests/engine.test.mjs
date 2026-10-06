@@ -15,12 +15,20 @@ import {
 } from "../scripts/engine.js";
 import { buildWeaponItem } from "../scripts/item-builder.js";
 import {
+  applyFoundationPlan,
   applyPlan,
+  buildFoundationActorUpdate,
   getActorCombatProfile,
   getExistingOffensiveItems,
   getGeneratedItems,
   undoLastOperation
 } from "../scripts/actor-service.js";
+import {
+  buildFoundationPlan,
+  crProficiency,
+  getEffectiveActorProfile,
+  normalizeFoundationConfig
+} from "../scripts/foundation.js";
 
 test("normalizes fractional and numeric CR values", () => {
   assert.equal(normalizeCr("1/8"), "1/8");
@@ -77,6 +85,76 @@ test("matches the published FoF attack bonus and AC/DC values", () => {
   assert.equal(suggestedSaveDc(30), 27);
 });
 
+test("derives the standard proficiency bonus from CR", () => {
+  assert.equal(crProficiency(0), 2);
+  assert.equal(crProficiency(4), 2);
+  assert.equal(crProficiency(5), 3);
+  assert.equal(crProficiency(17), 6);
+  assert.equal(crProficiency(30), 9);
+});
+
+test("layers transparent role, tier, and campaign species recommendations", () => {
+  const foundation = buildFoundationPlan({
+    cr: "5",
+    foundation: { role: "brute", tier: "elite", species: "halfOrc" },
+    primary: { weaponKey: "longsword", abilityOverride: "auto" }
+  }, { speed: 30, darkvision: 0, size: "med" });
+
+  assert.deepEqual(foundation.final, {
+    hp: 171,
+    ac: 13,
+    attackBonus: 6,
+    saveDc: 15,
+    dpr: 42.5
+  });
+  assert.equal(foundation.proficiency, 3);
+  assert.equal(foundation.abilities.str, 16);
+  assert.equal(foundation.abilities.con, 18);
+  assert.deepEqual(foundation.body, { size: "med", speed: 30, darkvision: 60 });
+  assert.match(foundation.sources.baseline, /Forge of Foes CR 5/);
+  assert.match(foundation.sources.role, /Monster Forge Brute/);
+});
+
+test("foundation overrides are bounded and feed attack planning", () => {
+  const config = {
+    cr: "5",
+    roleModifier: 10,
+    foundation: {
+      mode: "apply",
+      overrides: {
+        hp: 200,
+        attackBonus: 9,
+        saveDc: 17,
+        dpr: 50,
+        abilities: { str: 22 }
+      }
+    },
+    primary: { count: 3, weaponKey: "longsword", extraType: "none" }
+  };
+  const foundation = buildFoundationPlan(config);
+  const profile = getEffectiveActorProfile(foundation, { abilityMods: { str: 1 }, proficiency: 2 });
+  const damage = buildDamagePlan(
+    { ...config, foundation: foundation.config },
+    profile,
+    foundation.final
+  );
+
+  assert.equal(foundation.final.hp, 200);
+  assert.equal(foundation.final.attackBonus, 9);
+  assert.equal(foundation.abilities.str, 22);
+  assert.equal(damage.target, 55);
+  assert.equal(damage.suggestedAttackBonus, 9);
+  assert.equal(damage.suggestedSaveDc, 17);
+  assert.equal(profile.proficiency, 3);
+});
+
+test("audit mode keeps the live actor profile", () => {
+  const foundation = buildFoundationPlan({ cr: "10", foundation: { mode: "audit" } });
+  const actor = { abilityMods: { str: 2 }, proficiency: 2, hp: 12, ac: 11 };
+  assert.equal(getEffectiveActorProfile(foundation, actor), actor);
+  assert.equal(normalizeFoundationConfig({ mode: "invalid" }).mode, "apply");
+});
+
 test("uses the agreed compressed attack-count schedule", () => {
   assert.equal(getCrStats("1/2").recommendedAttacks, 1);
   assert.equal(getCrStats(1).recommendedAttacks, 2);
@@ -124,6 +202,10 @@ test("normalizes stale or invalid saved form values", () => {
   assert.equal(config.roleModifier, 0);
   assert.equal(config.followCrAttacks, true);
   assert.equal(config.riderAutomation, "midi");
+  assert.equal(config.foundation.mode, "apply");
+  assert.equal(config.foundation.role, "balanced");
+  assert.equal(config.foundation.manage.hp, true);
+  assert.equal(config.foundation.overrides.abilities.str, "");
   assert.equal(config.splitPrimary, 95);
   assert.equal(config.primary.count, 20);
   assert.equal(config.primary.weaponKey, "longsword");
@@ -300,12 +382,77 @@ test("extracts actor audit stats and excludes generated items from existing offe
 
   assert.deepEqual(getActorCombatProfile(actor), {
     abilityMods: { str: 4, dex: 2 },
+    abilityScores: { str: 10, dex: 10 },
     proficiency: 3,
+    cr: 0,
+    hpValue: 40,
     hp: 55,
     ac: 16,
-    spellDc: 15
+    spellDc: 15,
+    speed: 0,
+    darkvision: 0,
+    size: null
   });
   assert.deepEqual(getExistingOffensiveItems(actor).map((item) => item.name), ["Manual Claw"]);
+});
+
+test("builds D&D5e 6 actor updates and preserves current HP percentage", () => {
+  const actor = {
+    system: {
+      details: { cr: 2 },
+      abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map((ability) => [ability, { value: 10 }])),
+      attributes: {
+        hp: { value: 20, max: 40 },
+        ac: { value: 13, override: null },
+        movement: { speeds: { walk: 30 } },
+        senses: { ranges: { darkvision: 0 } }
+      },
+      traits: { size: "med" }
+    }
+  };
+  const foundation = buildFoundationPlan({
+    cr: "5",
+    foundation: { role: "skirmisher", species: "drow", tier: "standard" },
+    primary: { weaponKey: "longbow", abilityOverride: "auto" }
+  }, getActorCombatProfile(actor));
+  const update = buildFoundationActorUpdate(actor, foundation);
+
+  assert.equal(update["system.details.cr"], 5);
+  assert.equal(update["system.attributes.hp.max"], 86);
+  assert.equal(update["system.attributes.hp.value"], 43);
+  assert.equal(update["system.attributes.ac.override"], 15);
+  assert.equal(update["system.abilities.dex.value"], 18);
+  assert.equal(update["system.traits.size"], "med");
+  assert.equal(update["system.attributes.movement.speeds.walk"], 40);
+  assert.equal(update["system.attributes.senses.ranges.darkvision"], 120);
+});
+
+test("builds legacy D&D5e 5 actor paths when nested v6 fields are absent", () => {
+  const actor = {
+    system: {
+      details: { cr: { value: 2 } },
+      abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map((ability) => [ability, { value: 10 }])),
+      attributes: {
+        hp: { value: 40, max: 40 },
+        ac: { value: 13, calc: "default", flat: 13 },
+        movement: { walk: 30 },
+        senses: { darkvision: 0 }
+      },
+      traits: { size: "med" }
+    }
+  };
+  const foundation = buildFoundationPlan({
+    cr: "5",
+    foundation: { species: "dwarf" },
+    primary: { weaponKey: "mace", abilityOverride: "auto" }
+  }, getActorCombatProfile(actor));
+  const update = buildFoundationActorUpdate(actor, foundation);
+
+  assert.equal(update["system.details.cr.value"], 5);
+  assert.equal(update["system.attributes.ac.calc"], "natural");
+  assert.equal(update["system.attributes.ac.flat"], 15);
+  assert.equal(update["system.attributes.movement.walk"], 25);
+  assert.equal(update["system.attributes.senses.darkvision"], 60);
 });
 
 test("replace and undo touch only generated items", async () => {
@@ -409,4 +556,122 @@ test("replace and undo touch only generated items", async () => {
   assert.deepEqual(actor.getFlag("world", "monsterForgeData"), legacyOperation);
   assert.ok(actor.items.has("old-forge"));
   assert.equal(getGeneratedItems(actor).length, 1);
+});
+
+test("foundation application and undo restore actor data as one transaction", async () => {
+  let generatedId = 0;
+  globalThis.foundry = {
+    utils: {
+      deepClone: structuredClone,
+      randomID: () => `foundation-${++generatedId}`
+    }
+  };
+
+  class ItemCollection extends Map {
+    filter(predicate) {
+      return [...this.values()].filter(predicate);
+    }
+  }
+
+  const setPath = (object, path, value) => {
+    const parts = path.split(".");
+    const deletePart = parts.at(-1);
+    if (deletePart.startsWith("-=")) {
+      parts.pop();
+      const parent = parts.reduce((entry, key) => entry[key], object);
+      delete parent[deletePart.slice(2)];
+      return;
+    }
+    const key = parts.pop();
+    const parent = parts.reduce((entry, part) => (entry[part] ??= {}), object);
+    parent[key] = structuredClone(value);
+  };
+  const wrapItem = (source, actor) => ({
+    id: source._id,
+    name: source.name,
+    uuid: `Actor.foundation.Item.${source._id}`,
+    getFlag: (scope, key) => source.flags?.[scope]?.[key],
+    toObject: () => structuredClone(source),
+    actor
+  });
+  const originalSystem = {
+    details: { cr: 2 },
+    abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map((ability) => [ability, { value: 10, mod: 0 }])),
+    attributes: {
+      prof: 2,
+      hp: { value: 20, max: 40 },
+      ac: { value: 13, override: null },
+      movement: { speeds: { walk: 30 } },
+      senses: { ranges: { darkvision: 0 } }
+    },
+    traits: { size: "med" }
+  };
+  const actor = {
+    name: "Foundation NPC",
+    type: "npc",
+    isOwner: true,
+    system: structuredClone(originalSystem),
+    items: new ItemCollection(),
+    flags: {},
+    toObject() {
+      return { system: structuredClone(this.system), flags: structuredClone(this.flags) };
+    },
+    getFlag(scope, key) {
+      return this.flags?.[scope]?.[key];
+    },
+    async setFlag(scope, key, value) {
+      this.flags[scope] ??= {};
+      this.flags[scope][key] = structuredClone(value);
+    },
+    async unsetFlag(scope, key) {
+      if (this.flags[scope]) delete this.flags[scope][key];
+    },
+    async update(changes) {
+      for (const [path, value] of Object.entries(changes)) setPath(this, path, value);
+    },
+    async createEmbeddedDocuments(_type, data, options = {}) {
+      return data.map((raw) => {
+        const source = structuredClone(raw);
+        source._id = options.keepId && source._id ? source._id : `item-${++generatedId}`;
+        const item = wrapItem(source, this);
+        this.items.set(item.id, item);
+        return item;
+      });
+    },
+    async deleteEmbeddedDocuments(_type, ids) {
+      for (const id of ids) this.items.delete(id);
+    }
+  };
+
+  const config = {
+    cr: "5",
+    foundation: { mode: "apply", role: "brute", tier: "standard", species: "human" },
+    primary: { count: 3, weaponKey: "longsword", extraType: "none" }
+  };
+  const actorProfile = getActorCombatProfile(actor);
+  const foundation = buildFoundationPlan(config, actorProfile);
+  const plan = buildDamagePlan(config, getEffectiveActorProfile(foundation, actorProfile), foundation.final);
+  plan.foundation = foundation;
+
+  const applied = await applyPlan(actor, plan);
+  assert.equal(applied.actorUpdated, true);
+  assert.equal(actor.system.details.cr, 5);
+  assert.equal(actor.system.attributes.hp.max, 114);
+  assert.equal(actor.system.attributes.hp.value, 57);
+  assert.equal(actor.system.attributes.ac.override, 13);
+  assert.equal(actor.getFlag(MODULE_ID, "foundation").final.hp, 114);
+
+  const undone = await undoLastOperation(actor);
+  assert.equal(undone.actorRestored, true);
+  assert.deepEqual(actor.system, originalSystem);
+  assert.equal(actor.getFlag(MODULE_ID, "foundation"), undefined);
+  assert.equal(getGeneratedItems(actor).length, 0);
+
+  const foundationOnly = await applyFoundationPlan(actor, foundation);
+  assert.equal(foundationOnly.actorUpdated, true);
+  assert.equal(actor.system.details.cr, 5);
+  assert.equal(getGeneratedItems(actor).length, 0);
+  const foundationUndo = await undoLastOperation(actor);
+  assert.equal(foundationUndo.actorRestored, true);
+  assert.deepEqual(actor.system, originalSystem);
 });

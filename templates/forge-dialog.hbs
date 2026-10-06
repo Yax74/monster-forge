@@ -1,7 +1,7 @@
 <div class="monster-forge">
   <header class="mf-hero">
     <div>
-      <p class="mf-eyebrow">NPC attack builder</p>
+      <p class="mf-eyebrow">FoF-first NPC builder</p>
       <h2>{{actor.name}}</h2>
       <p>Actor CR {{actor.cr}} · <span data-generated-count>{{actor.generated}}</span> generated item(s)</p>
     </div>
@@ -19,6 +19,10 @@
   <p class="mf-callout"><i class="fa-solid fa-wand-magic-sparkles"></i> Legacy macro data was detected. Replace mode will adopt and replace only items marked by the old Monster Forge macro.</p>
   {{/if}}
 
+  {{#if actor.importedSpecies}}
+  <p class="mf-callout"><i class="fa-solid fa-link"></i> Species was read from this actor's Wraeclast NPC Generator data: <strong>{{actor.importedSpecies}}</strong>. Culture and faction remain narrative data and are not converted into mechanics.</p>
+  {{/if}}
+
   {{#if actor.existingOffense}}
   <p class="mf-callout mf-callout-warning"><i class="fa-solid fa-triangle-exclamation"></i> This actor already has {{actor.existingOffense}} ungenerated offensive item(s): {{actor.existingOffenseNames}}{{#if actor.existingOffenseMore}}, plus {{actor.existingOffenseMore}} more{{/if}}. Their damage is not included in the generated DPR budget.</p>
   {{/if}}
@@ -27,6 +31,98 @@
     <div class="mf-section-heading">
       <div>
         <span class="mf-step">1</span>
+        <h3>NPC foundation</h3>
+      </div>
+      <label>Foundation behavior
+        <select name="foundation.mode">
+          {{#each foundation.modeOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+        </select>
+      </label>
+    </div>
+    <div class="mf-grid mf-grid-4">
+      <label>Challenge rating
+        <select name="cr">
+          {{#each crOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+        </select>
+      </label>
+      <label>Combat role
+        <select name="foundation.role">
+          {{#each foundation.roleOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+        </select>
+      </label>
+      <label>Creature tier
+        <select name="foundation.tier">
+          {{#each foundation.tierOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+        </select>
+      </label>
+      <label>Species
+        <select name="foundation.species">
+          {{#each foundation.speciesOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+        </select>
+      </label>
+    </div>
+
+    <div class="mf-foundation-controls" data-foundation-apply>
+      <div class="mf-check-grid" aria-label="Managed actor fields">
+        <label class="mf-switch"><input type="checkbox" name="foundation.manage.hp" {{#if foundation.manage.hp}}checked{{/if}}> Hit points</label>
+        <label class="mf-switch"><input type="checkbox" name="foundation.manage.ac" {{#if foundation.manage.ac}}checked{{/if}}> Armor class</label>
+        <label class="mf-switch"><input type="checkbox" name="foundation.manage.abilities" {{#if foundation.manage.abilities}}checked{{/if}}> Ability scores</label>
+        <label class="mf-switch"><input type="checkbox" name="foundation.manage.body" {{#if foundation.manage.body}}checked{{/if}}> Size, speed & vision</label>
+      </div>
+      <label>Current HP after apply
+        <select name="foundation.hpPolicy">
+          {{#each foundation.hpPolicyOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+        </select>
+      </label>
+    </div>
+
+    <div class="mf-foundation-preview">
+      <div><strong data-preview="foundation-mode">—</strong><span data-preview="foundation-cr">—</span></div>
+      <div><strong>HP</strong><span data-preview="foundation-hp">—</span></div>
+      <div><strong>AC</strong><span data-preview="foundation-ac">—</span></div>
+      <div><strong>Attack / DC / DPR</strong><span data-preview="foundation-offense">—</span></div>
+    </div>
+    <div class="mf-preview-grid mf-foundation-detail">
+      <div><strong>Role</strong><span data-preview="foundation-role">—</span></div>
+      <div><strong>Tier</strong><span data-preview="foundation-tier">—</span></div>
+      <div><strong>Species/body</strong><span data-preview="foundation-species">—</span></div>
+      <div><strong>Abilities</strong><span data-preview="foundation-abilities">—</span></div>
+      <div><strong>Body result</strong><span data-preview="foundation-body">—</span></div>
+      <div><strong>Sources</strong><span data-preview="foundation-source">—</span></div>
+    </div>
+
+    <details class="mf-overrides">
+      <summary>Manual overrides <small>Blank fields stay automatic</small></summary>
+      <div class="mf-grid mf-grid-5">
+        <label>HP <input type="number" name="foundation.overrides.hp" min="1" max="10000" value="{{foundation.overrides.hp}}" placeholder="Auto"></label>
+        <label>AC <input type="number" name="foundation.overrides.ac" min="1" max="40" value="{{foundation.overrides.ac}}" placeholder="Auto"></label>
+        <label>Attack bonus <input type="number" name="foundation.overrides.attackBonus" min="-5" max="30" value="{{foundation.overrides.attackBonus}}" placeholder="Auto"></label>
+        <label>Save DC <input type="number" name="foundation.overrides.saveDc" min="5" max="40" value="{{foundation.overrides.saveDc}}" placeholder="Auto"></label>
+        <label>DPR <input type="number" name="foundation.overrides.dpr" min="0" max="2000" step="0.5" value="{{foundation.overrides.dpr}}" placeholder="Auto"></label>
+      </div>
+      <p class="mf-mini-heading">Ability scores</p>
+      <div class="mf-grid mf-grid-6">
+        <label>STR <input type="number" name="foundation.overrides.abilities.str" min="1" max="30" value="{{foundation.overrides.abilities.str}}" placeholder="Auto"></label>
+        <label>DEX <input type="number" name="foundation.overrides.abilities.dex" min="1" max="30" value="{{foundation.overrides.abilities.dex}}" placeholder="Auto"></label>
+        <label>CON <input type="number" name="foundation.overrides.abilities.con" min="1" max="30" value="{{foundation.overrides.abilities.con}}" placeholder="Auto"></label>
+        <label>INT <input type="number" name="foundation.overrides.abilities.int" min="1" max="30" value="{{foundation.overrides.abilities.int}}" placeholder="Auto"></label>
+        <label>WIS <input type="number" name="foundation.overrides.abilities.wis" min="1" max="30" value="{{foundation.overrides.abilities.wis}}" placeholder="Auto"></label>
+        <label>CHA <input type="number" name="foundation.overrides.abilities.cha" min="1" max="30" value="{{foundation.overrides.abilities.cha}}" placeholder="Auto"></label>
+      </div>
+      <p class="mf-mini-heading">Body</p>
+      <div class="mf-grid mf-grid-3">
+        <label>Walk speed <input type="number" name="foundation.overrides.speed" min="0" max="300" value="{{foundation.overrides.speed}}" placeholder="Auto"></label>
+        <label>Darkvision <input type="number" name="foundation.overrides.darkvision" min="0" max="1000" value="{{foundation.overrides.darkvision}}" placeholder="Auto"></label>
+        <label>Size <select name="foundation.overrides.size">{{#each foundation.sizeOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+      </div>
+    </details>
+    <p class="mf-help">CR supplies the published <em>Forge of Foes</em> baseline. Role, tier, species/body data, and ability arrays are transparent Monster Forge recommendations—not additional Forge of Foes tables. Species remains separate from culture and faction. Apply mode always sets the selected CR; the field checkboxes control the other actor data.</p>
+  </section>
+
+  <section class="mf-section">
+    <div class="mf-section-heading">
+      <div>
+        <span class="mf-step">2</span>
         <h3>Damage budget</h3>
       </div>
       <div class="mf-heading-actions">
@@ -37,12 +133,7 @@
       </div>
     </div>
     <div class="mf-grid mf-grid-3">
-      <label>Challenge rating
-        <select name="cr">
-          {{#each crOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
-        </select>
-      </label>
-      <label>Damage adjustment
+      <label>Fine DPR adjustment
         <select name="roleModifier">
           {{#each damageAdjustmentOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
         </select>
@@ -62,13 +153,13 @@
           {{#each riderAutomationOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
         </select>
       </label>
-      <label>Apply behavior
+      <label>Generated item behavior
         <select name="applyMode">
           {{#each applyModeOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
         </select>
       </label>
     </div>
-    <p class="mf-help">Published Forge of Foes DPR is the baseline. The attack-count suggestion is deliberately compressed for faster play, while the number of distinct attack profiles remains your choice. Editing either Uses field turns off Follow CR count. Monster Forge does not infer final CR from defenses, area effects, recharge powers, legendary actions, or encounter context.</p>
+    <p class="mf-help">The selected foundation DPR feeds this budget. The optional fine adjustment is applied after role and tier. The attack-count suggestion remains deliberately compressed for faster play, while the number of distinct attack profiles remains your choice. Editing either Uses field turns off Follow CR count.</p>
     {{#if integration.ready}}
     <p class="mf-help mf-integration-ready"><i class="fa-solid fa-link"></i> Midi-QOL and DAE are active. Automated riders will trigger their save after a hit and apply the embedded condition on a failed save when Midi-QOL item-effect automation is enabled.</p>
     {{else}}
@@ -78,7 +169,7 @@
 
   <section class="mf-section">
     <div class="mf-section-heading">
-      <div><span class="mf-step">2</span><h3>Attacks</h3></div>
+      <div><span class="mf-step">3</span><h3>Attacks</h3></div>
       <label class="mf-switch"><input type="checkbox" name="secondaryEnabled" {{#if config.secondaryEnabled}}checked{{/if}}> Secondary attack</label>
     </div>
     <label data-field="split">Damage split
@@ -210,7 +301,7 @@
 
   <section class="mf-section">
     <div class="mf-section-heading">
-      <div><span class="mf-step">3</span><h3>Tertiary on-hit feature</h3></div>
+      <div><span class="mf-step">4</span><h3>Tertiary on-hit feature</h3></div>
       <label class="mf-switch"><input type="checkbox" name="tertiary.enabled" {{#if tertiary.enabled}}checked{{/if}}> Include feature</label>
     </div>
     <div class="mf-grid mf-grid-3" data-panel="tertiary">
@@ -255,12 +346,12 @@
       <div><strong>Tertiary</strong><span data-preview="tertiary">—</span></div>
       <div><strong>Accuracy / DC</strong><span><span data-preview="accuracy">—</span> · <span data-preview="save-dc">—</span></span></div>
     </div>
-    <h4 class="mf-audit-title">Actor versus Forge of Foes</h4>
+    <h4 class="mf-audit-title">Actor versus selected foundation</h4>
     <div class="mf-audit-grid">
-      <div><strong>Hit points</strong><span>Actor <b data-preview="actor-hp">—</b> · FoF <b data-preview="fof-hp">—</b></span></div>
-      <div><strong>Armor class</strong><span>Actor <b data-preview="actor-ac">—</b> · FoF <b data-preview="fof-ac">—</b></span></div>
-      <div><strong>Attack bonus</strong><span>Generated <b data-preview="actor-attack">—</b> · FoF <b data-preview="fof-attack">—</b></span></div>
-      <div><strong>Save DC</strong><span>Generated <b data-preview="actor-dc">—</b> · FoF <b data-preview="fof-dc">—</b></span></div>
+      <div><strong>Hit points</strong><span>Actor <b data-preview="actor-hp">—</b> · Target <b data-preview="fof-hp">—</b></span></div>
+      <div><strong>Armor class</strong><span>Actor <b data-preview="actor-ac">—</b> · Target <b data-preview="fof-ac">—</b></span></div>
+      <div><strong>Attack bonus</strong><span>Generated <b data-preview="actor-attack">—</b> · Target <b data-preview="fof-attack">—</b></span></div>
+      <div><strong>Save DC</strong><span>Generated <b data-preview="actor-dc">—</b> · Target <b data-preview="fof-dc">—</b></span></div>
     </div>
     <ul class="mf-warnings" data-preview="warnings"></ul>
   </section>

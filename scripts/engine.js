@@ -73,10 +73,24 @@ export function crToNumber(cr) {
 }
 
 export function mergeDefaults(saved = {}, actorCr = DEFAULTS.cr) {
+  const savedFoundation = saved.foundation ?? {};
   return {
     ...DEFAULTS,
     ...saved,
     cr: normalizeCr(actorCr ?? saved.cr ?? DEFAULTS.cr),
+    foundation: {
+      ...DEFAULTS.foundation,
+      ...savedFoundation,
+      manage: { ...DEFAULTS.foundation.manage, ...(savedFoundation.manage ?? {}) },
+      overrides: {
+        ...DEFAULTS.foundation.overrides,
+        ...(savedFoundation.overrides ?? {}),
+        abilities: {
+          ...DEFAULTS.foundation.overrides.abilities,
+          ...(savedFoundation.overrides?.abilities ?? {})
+        }
+      }
+    },
     primary: { ...DEFAULTS.primary, ...(saved.primary ?? {}) },
     secondary: { ...DEFAULTS.secondary, ...(saved.secondary ?? {}) },
     tertiary: { ...DEFAULTS.tertiary, ...(saved.tertiary ?? {}) }
@@ -162,12 +176,12 @@ export function resolveWeapon(attack = {}) {
     return {
       ...preset,
       name: attack.name?.trim() || preset.name,
-      ability: attack.abilityOverride !== "auto" ? attack.abilityOverride : preset.ability
+      ability: ABILITIES.includes(attack.abilityOverride) ? attack.abilityOverride : preset.ability
     };
   }
 
   const action = attack.customAction ?? "mwak";
-  const customAbility = attack.abilityOverride !== "auto"
+  const customAbility = ABILITIES.includes(attack.abilityOverride)
     ? attack.abilityOverride
     : attack.customAbility ?? "str";
   return {
@@ -296,11 +310,16 @@ function planAttack(attack, allocatedDpr, actorProfile) {
   };
 }
 
-export function buildDamagePlan(inputConfig = {}, actorData = {}) {
+export function buildDamagePlan(inputConfig = {}, actorData = {}, foundationBenchmark = null) {
   const config = normalizeConfig(inputConfig);
   const actorProfile = normalizeActorProfile(actorData);
   const stats = getCrStats(config.cr);
-  const target = targetDpr(config.cr, config.roleModifier);
+  const benchmark = {
+    dpr: Number(foundationBenchmark?.dpr ?? stats.dpr),
+    attackBonus: Number(foundationBenchmark?.attackBonus ?? stats.attackBonus),
+    saveDc: Number(foundationBenchmark?.saveDc ?? stats.saveDc)
+  };
+  const target = roundHalf(benchmark.dpr * (1 + config.roleModifier / 100));
   const tertiary = config.tertiary;
   const tertiaryAverage = tertiary.enabled
     ? roundHalf(tertiary.dice * dieAverage(tertiary.die) * tertiary.usesPerRound)
@@ -326,12 +345,12 @@ export function buildDamagePlan(inputConfig = {}, actorData = {}) {
     warnings.push(`This profile makes ${totalAttacks} attacks; Monster Forge recommends ${stats.recommendedAttacks} at CR ${stats.cr}.`);
   }
   if (config.roleModifier !== 0) {
-    warnings.push("The damage adjustment intentionally moves the target away from the published Forge of Foes baseline.");
+    warnings.push("The fine DPR adjustment intentionally moves the target away from the selected foundation benchmark.");
   }
   if (config.accuracyMode === "actor") {
     for (const [label, attack] of [["Primary", primary], ["Secondary", secondary]]) {
-      if (attack && Math.abs(attack.attackBonus - stats.attackBonus) >= 2) {
-        warnings.push(`${label} attack bonus ${attack.attackBonus >= 0 ? "+" : ""}${attack.attackBonus} differs from the Forge of Foes +${stats.attackBonus} benchmark.`);
+      if (attack && Math.abs(attack.attackBonus - benchmark.attackBonus) >= 2) {
+        warnings.push(`${label} attack bonus ${attack.attackBonus >= 0 ? "+" : ""}${attack.attackBonus} differs from the selected +${benchmark.attackBonus} foundation benchmark.`);
       }
     }
   }
@@ -339,6 +358,7 @@ export function buildDamagePlan(inputConfig = {}, actorData = {}) {
   return {
     config,
     stats,
+    benchmark,
     target,
     achieved,
     variance,
@@ -351,8 +371,8 @@ export function buildDamagePlan(inputConfig = {}, actorData = {}) {
     tertiarySaveDc: tertiary.enabled && tertiary.saveAbility !== "none"
       ? actorSaveDc(actorProfile, tertiary.dcAbility)
       : null,
-    suggestedAttackBonus: suggestedAttackBonus(config.cr),
-    suggestedSaveDc: suggestedSaveDc(config.cr),
+    suggestedAttackBonus: benchmark.attackBonus,
+    suggestedSaveDc: benchmark.saveDc,
     warnings
   };
 }

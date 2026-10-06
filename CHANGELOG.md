@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.2.0
+
+- Added a FoF-first NPC foundation stage before attack generation.
+- Added nine transparent combat roles: Balanced, Brute, Soldier, Skirmisher, Sniper, Controller, Support, Caster, and Leader.
+- Added separate Minion, Standard, Elite, and Boss tiers without conflating tier with combat role.
+- Added the thirteen species used by Wraeclast NPC Generator, plus a preserve-actor option; species affects recommended body data and ability tendencies but never culture or faction.
+- Added automatic species pickup from Wraeclast NPC Generator actor flags.
+- Added recommended HP, AC, attack bonus, save DC, DPR, proficiency, six ability scores, size, walk speed, and darkvision.
+- Added manual overrides for every recommended statistic and checkboxes for the actor fields Monster Forge may manage.
+- Added preview-only foundation mode, preserve-current-HP-percentage and heal-to-full policies, and a clear before/after preview.
+- Added **Apply foundation only** for a stats-first workflow before attacks or later ranked boosts are added.
+- Attack damage, flat accuracy, and flat save DC now consume the selected final foundation benchmark.
+- Added D&D5e 5.x/6.x-aware actor paths for AC, movement, and senses.
+- Foundation updates and generated items now share one rollback-safe operation; **Undo last** restores both actor data and items.
+- Stored foundation provenance distinguishes published *Forge of Foes* values from Monster Forge role, tier, species, and override decisions.
+- Expanded automated coverage for foundation math, overrides, D&D5e 6 actor updates, HP preservation, and full transaction undo.
+
 ## 1.1.0
 
 - Renamed the DPR-only role selector to the more accurate **Damage adjustment**.

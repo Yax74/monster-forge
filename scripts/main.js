@@ -61,7 +61,8 @@ Hooks.once("ready", () => {
     open: openForge,
     undo: async (actor = null) => undoLastOperation(actor ?? resolveTargetActor()),
     removeGenerated: async (actor = null) => removeGeneratedItems(actor ?? resolveTargetActor()),
-    getGenerated: (actor = null) => getGeneratedItems(actor ?? resolveTargetActor())
+    getGenerated: (actor = null) => getGeneratedItems(actor ?? resolveTargetActor()),
+    getFoundation: (actor = null) => (actor ?? resolveTargetActor()).getFlag(MODULE_ID, "foundation") ?? null
   });
 
   if (game.system.version && !/^5\.|^6\./.test(game.system.version)) {

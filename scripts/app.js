@@ -1,14 +1,19 @@
 import {
   ABILITIES,
+  ACTOR_SIZES,
+  COMBAT_ROLES,
   CR_KEYS,
+  CREATURE_TIERS,
   DAMAGE_TYPES,
   DIE_SIZES,
   MODULE_ID,
   MODULE_TITLE,
   RIDERS,
+  SPECIES_PROFILES,
   WEAPONS
 } from "./constants.js";
 import {
+  applyFoundationPlan,
   applyPlan,
   getActorCombatProfile,
   getExistingOffensiveItems,
@@ -18,6 +23,11 @@ import {
   undoLastOperation
 } from "./actor-service.js";
 import { applyRecommendedAttacks, buildDamagePlan, getCrStats, mergeDefaults } from "./engine.js";
+import {
+  buildFoundationPlan,
+  getEffectiveActorProfile,
+  normalizeFoundationConfig
+} from "./foundation.js";
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -39,6 +49,14 @@ function options(entries, selected) {
 function actorCr(actor) {
   const cr = actor.system?.details?.cr;
   return cr?.value ?? cr ?? 0;
+}
+
+function generatorSpecies(actor) {
+  const species = actor.getFlag?.("wraeclast-npc-gen", "npc")?.species;
+  if (!species) return null;
+  const match = Object.entries(SPECIES_PROFILES)
+    .find(([_key, profile]) => profile.label.toLowerCase() === String(species).toLowerCase());
+  return match ? { key: match[0], label: match[1].label } : null;
 }
 
 function attackContext(attack) {
@@ -76,6 +94,8 @@ function buildContext(actor, config) {
   const existingOffense = getExistingOffensiveItems(actor);
   const midiActive = Boolean(game.modules?.get?.("midi-qol")?.active);
   const daeActive = Boolean(game.modules?.get?.("dae")?.active);
+  const importedSpecies = generatorSpecies(actor);
+  const hasFoundation = Boolean(actor.getFlag(MODULE_ID, "foundation"));
   return {
     actor: {
       name: actor.name,
@@ -85,7 +105,9 @@ function buildContext(actor, config) {
       existingOffenseNames: existingOffense.slice(0, 6).map((item) => item.name).join(", "),
       existingOffenseMore: Math.max(0, existingOffense.length - 6),
       hasUndo: Boolean(actor.getFlag(MODULE_ID, "lastOperation")),
-      hasLegacyData: Boolean(actor.getFlag("world", "monsterForgeData"))
+      hasFoundation,
+      hasLegacyData: Boolean(actor.getFlag("world", "monsterForgeData")),
+      importedSpecies: hasFoundation ? null : importedSpecies?.label ?? null
     },
     integration: {
       midiActive,
@@ -94,19 +116,46 @@ function buildContext(actor, config) {
     },
     config,
     crOptions: options(CR_KEYS.map((cr) => [cr, `CR ${cr}`]), config.cr),
+    foundation: {
+      ...config.foundation,
+      modeOptions: options([
+        ["apply", "Apply selected foundation fields"],
+        ["audit", "Preview only; leave actor stats unchanged"]
+      ], config.foundation.mode),
+      roleOptions: options(
+        Object.entries(COMBAT_ROLES).map(([key, role]) => [key, role.label]),
+        config.foundation.role
+      ),
+      tierOptions: options(
+        Object.entries(CREATURE_TIERS).map(([key, tier]) => [key, tier.label]),
+        config.foundation.tier
+      ),
+      speciesOptions: options(
+        Object.entries(SPECIES_PROFILES).map(([key, species]) => [key, species.label]),
+        config.foundation.species
+      ),
+      hpPolicyOptions: options([
+        ["ratio", "Preserve current HP percentage"],
+        ["full", "Set current HP to full"]
+      ], config.foundation.hpPolicy),
+      sizeOptions: options([
+        ["", "Use species / preserve actor"],
+        ...Object.entries(ACTOR_SIZES)
+      ], config.foundation.overrides.size)
+    },
     damageAdjustmentOptions: options([
       [-20, "−20% DPR"],
       [-10, "−10% DPR"],
-      [0, "Published DPR"],
+      [0, "No fine adjustment"],
       [10, "+10% DPR"],
       [20, "+20% DPR"]
     ], config.roleModifier),
     accuracyOptions: options([
       ["actor", "Use actor ability + proficiency"],
-      ["cr", "Use flat Forge of Foes attack bonus"]
+      ["cr", "Use flat foundation attack bonus"]
     ], config.accuracyMode),
     saveDcOptions: options([
-      ["cr", "Use flat Forge of Foes save DC"],
+      ["cr", "Use flat foundation save DC"],
       ["actor", "Use the attack/feature ability DC"]
     ], config.saveDcMode),
     riderAutomationOptions: options([
@@ -153,6 +202,13 @@ function numberField(formData, name, fallback) {
   return Number.isFinite(value) ? value : fallback;
 }
 
+function optionalNumberField(formData, name) {
+  const value = String(field(formData, name, "")).trim();
+  if (!value) return "";
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? numeric : "";
+}
+
 function parseAttack(formData, prefix) {
   return {
     count: numberField(formData, `${prefix}.count`, 1),
@@ -174,6 +230,33 @@ export function parseForgeForm(form) {
   const data = new FormData(form);
   return {
     cr: field(data, "cr", "0"),
+    foundation: {
+      mode: field(data, "foundation.mode", "apply"),
+      role: field(data, "foundation.role", "balanced"),
+      tier: field(data, "foundation.tier", "standard"),
+      species: field(data, "foundation.species", "preserve"),
+      hpPolicy: field(data, "foundation.hpPolicy", "ratio"),
+      manage: {
+        hp: data.has("foundation.manage.hp"),
+        ac: data.has("foundation.manage.ac"),
+        abilities: data.has("foundation.manage.abilities"),
+        body: data.has("foundation.manage.body")
+      },
+      overrides: {
+        hp: optionalNumberField(data, "foundation.overrides.hp"),
+        ac: optionalNumberField(data, "foundation.overrides.ac"),
+        attackBonus: optionalNumberField(data, "foundation.overrides.attackBonus"),
+        saveDc: optionalNumberField(data, "foundation.overrides.saveDc"),
+        dpr: optionalNumberField(data, "foundation.overrides.dpr"),
+        speed: optionalNumberField(data, "foundation.overrides.speed"),
+        darkvision: optionalNumberField(data, "foundation.overrides.darkvision"),
+        size: field(data, "foundation.overrides.size", ""),
+        abilities: Object.fromEntries(ABILITIES.map((ability) => [
+          ability,
+          optionalNumberField(data, `foundation.overrides.abilities.${ability}`)
+        ]))
+      }
+    },
     roleModifier: numberField(data, "roleModifier", 0),
     followCrAttacks: data.has("followCrAttacks"),
     accuracyMode: field(data, "accuracyMode", "actor"),
@@ -212,13 +295,37 @@ function signed(value) {
   return `${value >= 0 ? "+" : ""}${value}`;
 }
 
+function buildForgePlan(config, actor) {
+  const actorProfile = getActorCombatProfile(actor);
+  const foundation = buildFoundationPlan(config, actorProfile);
+  const effectiveProfile = getEffectiveActorProfile(foundation, actorProfile);
+  const plan = buildDamagePlan({
+    ...config,
+    foundation: foundation.config
+  }, effectiveProfile, foundation.final);
+  plan.foundation = foundation;
+  return { actorProfile, effectiveProfile, foundation, plan };
+}
+
+function abilitySummary(scores) {
+  return ABILITIES.map((ability) => `${ability.toUpperCase()} ${scores[ability]}`).join(" · ");
+}
+
+function bodySummary(body) {
+  const size = ACTOR_SIZES[body.size] ?? "Preserved";
+  const speed = body.speed === null ? "speed preserved" : `${body.speed} ft speed`;
+  const vision = body.darkvision === null
+    ? "vision preserved"
+    : body.darkvision > 0 ? `${body.darkvision} ft darkvision` : "no darkvision";
+  return `${size} · ${speed} · ${vision}`;
+}
+
 function updatePreview(root, actor) {
   const form = root.querySelector("form") ?? root.closest("form") ?? root;
   const config = parseForgeForm(form);
-  const profile = getActorCombatProfile(actor);
+  const { actorProfile: profile, foundation, plan } = buildForgePlan(config, actor);
   const existingOffense = getExistingOffensiveItems(actor);
   const midiReady = Boolean(game.modules?.get?.("midi-qol")?.active && game.modules?.get?.("dae")?.active);
-  const plan = buildDamagePlan(config, profile);
 
   toggle(root, "[data-panel='secondary']", config.secondaryEnabled);
   toggle(root, "[data-field='split']", config.secondaryEnabled);
@@ -228,6 +335,7 @@ function updatePreview(root, actor) {
   toggle(root, "[data-rider-save='primary']", config.primary.rider !== "none");
   toggle(root, "[data-rider-save='secondary']", config.secondary.rider !== "none");
   toggle(root, "[data-tertiary-dc]", config.tertiary.saveAbility !== "none" && config.saveDcMode === "actor");
+  toggle(root, "[data-foundation-apply]", foundation.config.mode === "apply");
 
   setText(root, "[data-preview='baseline']", plan.stats.dpr);
   setText(root, "[data-preview='target']", plan.target);
@@ -256,13 +364,24 @@ function updatePreview(root, actor) {
     ? `${config.tertiary.dice}d${config.tertiary.die} ${config.tertiary.damageType} × ${config.tertiary.usesPerRound} = ${plan.tertiaryAverage} DPR`
     : "Disabled");
   setText(root, "[data-preview='actor-hp']", profile.hp || "—");
-  setText(root, "[data-preview='fof-hp']", plan.stats.hp);
+  setText(root, "[data-preview='fof-hp']", foundation.final.hp);
   setText(root, "[data-preview='actor-ac']", profile.ac || "—");
-  setText(root, "[data-preview='fof-ac']", plan.stats.ac);
+  setText(root, "[data-preview='fof-ac']", foundation.final.ac);
   setText(root, "[data-preview='actor-attack']", accuracy);
-  setText(root, "[data-preview='fof-attack']", `+${plan.stats.attackBonus}`);
+  setText(root, "[data-preview='fof-attack']", signed(foundation.final.attackBonus));
   setText(root, "[data-preview='actor-dc']", saveDc);
-  setText(root, "[data-preview='fof-dc']", `DC ${plan.stats.saveDc}`);
+  setText(root, "[data-preview='fof-dc']", `DC ${foundation.final.saveDc}`);
+  setText(root, "[data-preview='foundation-mode']", foundation.config.mode === "apply" ? "Will update actor" : "Preview only");
+  setText(root, "[data-preview='foundation-role']", `${foundation.role.label} · ${foundation.role.description}`);
+  setText(root, "[data-preview='foundation-tier']", `${foundation.tier.label} · ${foundation.tier.description}`);
+  setText(root, "[data-preview='foundation-species']", foundation.sources.species);
+  setText(root, "[data-preview='foundation-source']", `${foundation.sources.baseline} · ${foundation.sources.role} · ${foundation.sources.tier}`);
+  setText(root, "[data-preview='foundation-abilities']", abilitySummary(foundation.abilities));
+  setText(root, "[data-preview='foundation-body']", bodySummary(foundation.body));
+  setText(root, "[data-preview='foundation-cr']", `${profile.cr ?? "—"} → ${foundation.stats.cr}`);
+  setText(root, "[data-preview='foundation-hp']", `${profile.hp || "—"} → ${foundation.final.hp}`);
+  setText(root, "[data-preview='foundation-ac']", `${profile.ac || "—"} → ${foundation.final.ac}`);
+  setText(root, "[data-preview='foundation-offense']", `${signed(foundation.final.attackBonus)} / DC ${foundation.final.saveDc} / ${plan.target} DPR`);
 
   const varianceCard = root.querySelector("[data-metric='achieved']");
   varianceCard?.classList.toggle("is-warning", Math.abs(plan.variance) > Math.max(2, plan.target * 0.1));
@@ -270,7 +389,13 @@ function updatePreview(root, actor) {
   const warnings = root.querySelector("[data-preview='warnings']");
   if (warnings) {
     warnings.replaceChildren();
-    const previewWarnings = [...plan.warnings];
+    const previewWarnings = [...foundation.warnings, ...plan.warnings];
+    if (foundation.config.mode === "audit") {
+      previewWarnings.push("Foundation mode is Preview only: actor CR, defenses, abilities, and body data will not be changed, and actor-derived attacks will continue to use the current actor profile.");
+    }
+    if (foundation.config.mode === "apply" && !foundation.config.manage.abilities && config.accuracyMode === "actor") {
+      previewWarnings.push("Ability management is off, so actor-derived attack bonuses may not reach the selected foundation benchmark.");
+    }
     if (existingOffense.length) {
       previewWarnings.push(`${existingOffense.length} existing offensive item(s) are not included in this generated DPR budget.`);
     }
@@ -355,9 +480,13 @@ function attachListeners(_event, dialog, actor) {
     if (!confirmed) return;
     try {
       const result = await undoLastOperation(actor);
-      if (result.undone) ui.notifications.info(`Monster Forge: removed ${result.removed} and restored ${result.restored} item(s).`);
+      if (result.undone) {
+        const actorText = result.actorRestored ? " Actor foundation stats were restored." : "";
+        ui.notifications.info(`Monster Forge: removed ${result.removed} and restored ${result.restored} item(s).${actorText}`);
+      }
       else ui.notifications.warn(result.reason);
       refreshManagementState(root, actor);
+      preview();
     } catch (error) {
       console.error(`${MODULE_ID} | Failed to undo the last operation.`, error);
       ui.notifications.error(`Monster Forge: ${error.message}`);
@@ -392,7 +521,18 @@ export async function openForge(targetActor = null) {
     if (!actor.isOwner) throw new Error(`You do not have permission to edit ${actor.name}.`);
 
     const saved = game.settings.get(MODULE_ID, "defaults") ?? {};
-    let config = mergeDefaults(saved, actorCr(actor));
+    const actorFoundation = actor.getFlag(MODULE_ID, "foundation")?.config;
+    const importedSpecies = generatorSpecies(actor);
+    const rememberedFoundation = actorFoundation
+      ? { ...(saved.foundation ?? {}), ...actorFoundation }
+      : importedSpecies
+        ? { ...(saved.foundation ?? {}), species: importedSpecies.key }
+        : saved.foundation;
+    const remembered = rememberedFoundation
+      ? { ...saved, foundation: rememberedFoundation }
+      : saved;
+    let config = mergeDefaults(remembered, actorCr(actor));
+    config.foundation = normalizeFoundationConfig(config);
     if (config.followCrAttacks) config = applyRecommendedAttacks(config, config.cr);
     const context = buildContext(actor, config);
     const render = foundry.applications.handlebars?.renderTemplate ?? globalThis.renderTemplate;
@@ -401,23 +541,43 @@ export async function openForge(targetActor = null) {
     return foundry.applications.api.DialogV2.wait({
       id: `${MODULE_ID}-dialog`,
       window: { title: `${MODULE_TITLE}: ${actor.name}`, icon: "fa-solid fa-hammer" },
-      position: { width: 760, height: "auto" },
+      position: { width: 920, height: "auto" },
       content,
       rejectClose: false,
       render: (event, dialog) => attachListeners(event, dialog, actor),
       buttons: [
         {
+          action: "foundation",
+          label: "Apply foundation only",
+          icon: "fa-solid fa-shield-halved",
+          callback: async (_event, button) => {
+            try {
+              const parsed = parseForgeForm(button.form);
+              const { foundation, plan } = buildForgePlan(parsed, actor);
+              await game.settings.set(MODULE_ID, "defaults", plan.config);
+              const result = await applyFoundationPlan(actor, foundation);
+              ui.notifications.info(`Monster Forge applied ${result.updatedFields} foundation field(s) to ${actor.name}.`);
+              return true;
+            } catch (error) {
+              console.error(`${MODULE_ID} | Failed to apply the NPC foundation.`, error);
+              ui.notifications.error(`Monster Forge: ${error.message}`);
+              return false;
+            }
+          }
+        },
+        {
           action: "apply",
-          label: "Forge attacks",
+          label: "Forge NPC",
           icon: "fa-solid fa-hammer",
           default: true,
           callback: async (_event, button) => {
             try {
               const parsed = parseForgeForm(button.form);
-              const plan = buildDamagePlan(parsed, getActorCombatProfile(actor));
+              const { plan } = buildForgePlan(parsed, actor);
               await game.settings.set(MODULE_ID, "defaults", plan.config);
               const result = await applyPlan(actor, plan);
-              ui.notifications.info(`Monster Forge added ${result.created.length} item(s) to ${actor.name}${result.replaced ? ` and replaced ${result.replaced}` : ""}.`);
+              const actorText = result.actorUpdated ? " and applied its NPC foundation" : "";
+              ui.notifications.info(`Monster Forge added ${result.created.length} item(s) to ${actor.name}${actorText}${result.replaced ? ` and replaced ${result.replaced}` : ""}.`);
               return true;
             } catch (error) {
               console.error(`${MODULE_ID} | Failed to forge attacks.`, error);
