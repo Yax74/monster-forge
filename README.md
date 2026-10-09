@@ -105,7 +105,7 @@ npm test
 npm run check
 ```
 
-Release tags must match `module.json`, for example `v1.4.0`.
+Release tags must match `module.json`, for example `v1.4.1`.
 
 ## License
 

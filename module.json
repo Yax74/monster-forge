@@ -2,10 +2,10 @@
   "id": "monster-forge",
   "title": "Monster Forge",
   "description": "A reversible D&D5e NPC builder using Forge of Foes foundations, live role and attribute previews, ranked compendium boosts, and modern activity data.",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "url": "https://github.com/Yax74/monster-forge",
   "manifest": "https://github.com/Yax74/monster-forge/releases/latest/download/module.json",
-  "download": "https://github.com/Yax74/monster-forge/releases/download/v1.4.0/monster-forge.zip",
+  "download": "https://github.com/Yax74/monster-forge/releases/download/v1.4.1/monster-forge.zip",
   "authors": [
     {
       "name": "Yax74",

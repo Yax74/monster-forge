@@ -58,8 +58,12 @@ function actorCr(actor) {
   return cr?.value ?? cr ?? 0;
 }
 
-function generatorSpecies(actor) {
-  const species = actor.getFlag?.("wraeclast-npc-gen", "npc")?.species;
+export function generatorSpecies(actor) {
+  // Foundry validates getFlag() scopes and rejects module IDs that are not
+  // currently active. Read this optional legacy integration from the stored
+  // document data so Monster Forge can still open when NPC Generator is off.
+  const species = actor.flags?.["wraeclast-npc-gen"]?.npc?.species
+    ?? actor._source?.flags?.["wraeclast-npc-gen"]?.npc?.species;
   if (!species) return null;
   const match = Object.entries(SPECIES_PROFILES)
     .find(([_key, profile]) => profile.label.toLowerCase() === String(species).toLowerCase());

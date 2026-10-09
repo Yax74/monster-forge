@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.1
+
+- Fixed the Monster Forge button failing to open when Wraeclast NPC Generator was inactive. Optional legacy species metadata is now read directly from the actor's stored flags without requiring the source module to be active.
+- Added regression coverage for inactive legacy flag scopes.
+
 ## 1.4.0
 
 - Added a live six-attribute preview with separate suggested and final scores plus visible per-ability overrides.

@@ -38,6 +38,23 @@ import {
   resolveBoostSources,
   selectBoosts
 } from "../scripts/boosts.js";
+import { generatorSpecies } from "../scripts/app.js";
+
+test("reads legacy NPC Generator species without requiring that module to be active", () => {
+  const actor = {
+    flags: {
+      "wraeclast-npc-gen": {
+        npc: { species: "Drow" }
+      }
+    },
+    getFlag() {
+      throw new Error("Flag scope is not valid or not currently active");
+    }
+  };
+
+  assert.deepEqual(generatorSpecies(actor), { key: "drow", label: "Drow" });
+  assert.equal(generatorSpecies({ flags: {} }), null);
+});
 
 test("normalizes fractional and numeric CR values", () => {
   assert.equal(normalizeCr("1/8"), "1/8");
