@@ -1,6 +1,6 @@
 export const MODULE_ID = "monster-forge";
 export const MODULE_TITLE = "Monster Forge";
-export const MODULE_VERSION = "1.2.0";
+export const MODULE_VERSION = "1.3.0";
 
 /**
  * Baseline statistics from the published Forge of Foes monster statistics
@@ -150,6 +150,7 @@ export const COMBAT_ROLES = Object.freeze({
     speed: 0,
     attackAbility: "int",
     saveAbility: "int",
+    castingMode: "save",
     abilities: { str: 8, dex: 12, con: 12, int: 16, wis: 14, cha: 12 }
   },
   support: {
@@ -163,6 +164,7 @@ export const COMBAT_ROLES = Object.freeze({
     speed: 0,
     attackAbility: "wis",
     saveAbility: "wis",
+    castingMode: "save",
     abilities: { str: 10, dex: 10, con: 14, int: 12, wis: 16, cha: 14 }
   },
   caster: {
@@ -176,6 +178,7 @@ export const COMBAT_ROLES = Object.freeze({
     speed: 0,
     attackAbility: "int",
     saveAbility: "int",
+    castingMode: "both",
     abilities: { str: 8, dex: 12, con: 12, int: 16, wis: 14, cha: 14 }
   },
   leader: {
@@ -189,6 +192,7 @@ export const COMBAT_ROLES = Object.freeze({
     speed: 0,
     attackAbility: "cha",
     saveAbility: "cha",
+    castingMode: "save",
     abilities: { str: 12, dex: 10, con: 14, int: 12, wis: 14, cha: 16 }
   }
 });
@@ -272,6 +276,15 @@ const ranged = (overrides = {}) => ({
   rangeType: "ranged",
   classification: "weapon",
   properties: ["amm", "two"],
+  ...overrides
+});
+
+const spellAttack = (overrides = {}) => ({
+  rangeType: "ranged",
+  classification: "spell",
+  weaponType: "natural",
+  properties: [],
+  range: { value: 120, long: null, units: "ft" },
   ...overrides
 });
 
@@ -363,6 +376,30 @@ export const WEAPONS = Object.freeze({
     ability: "str",
     img: "icons/creatures/claws/claw-curved-jagged-gray.webp"
   }),
+  arcaneBolt: spellAttack({
+    name: "Arcane Bolt",
+    baseDice: 1,
+    die: 8,
+    damageType: "force",
+    ability: "int",
+    img: "icons/magic/light/projectile-beam-blue.webp"
+  }),
+  divineBolt: spellAttack({
+    name: "Divine Bolt",
+    baseDice: 1,
+    die: 8,
+    damageType: "radiant",
+    ability: "wis",
+    img: "icons/magic/holy/projectiles-blades-salvo-yellow.webp"
+  }),
+  occultBolt: spellAttack({
+    name: "Occult Bolt",
+    baseDice: 1,
+    die: 10,
+    damageType: "necrotic",
+    ability: "cha",
+    img: "icons/magic/unholy/projectile-missile-green.webp"
+  }),
   karuiChopper: melee({
     name: "Karui Chopper",
     baseDice: 1,
@@ -414,6 +451,7 @@ export const DEFAULTS = Object.freeze({
     role: "balanced",
     species: "preserve",
     tier: "standard",
+    castingAbility: "auto",
     hpPolicy: "ratio",
     manage: {
       hp: true,
@@ -432,6 +470,9 @@ export const DEFAULTS = Object.freeze({
       size: "",
       abilities: { str: "", dex: "", con: "", int: "", wis: "", cha: "" }
     }
+  },
+  boosts: {
+    selected: []
   },
   roleModifier: 0,
   followCrAttacks: true,

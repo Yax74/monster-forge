@@ -187,6 +187,93 @@
   padding: 0.55rem;
 }
 
+.monster-forge .mf-casting-control {
+  align-items: end;
+  background: rgba(0, 0, 0, 0.035);
+  border-radius: 5px;
+  display: grid;
+  gap: 0.7rem;
+  grid-template-columns: minmax(12rem, 0.35fr) 1fr;
+  margin-top: 0.65rem;
+  padding: 0.55rem;
+}
+
+.monster-forge .mf-casting-control .mf-help {
+  margin: 0 0 0.15rem;
+}
+
+.monster-forge .mf-ability-editor {
+  border-top: 1px solid var(--color-border-light-tertiary, #999);
+  margin-top: 0.65rem;
+  padding-top: 0.2rem;
+}
+
+.monster-forge .mf-ability-editor > .mf-help {
+  margin-top: 0;
+}
+
+.monster-forge .mf-ability-grid {
+  display: grid;
+  gap: 0.45rem;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  margin-top: 0.5rem;
+}
+
+.monster-forge .mf-ability-grid label {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid transparent;
+  border-radius: 5px;
+  padding: 0.45rem;
+}
+
+.monster-forge .mf-ability-grid label.is-overridden {
+  background: var(--mf-accent-soft);
+  border-color: var(--mf-accent);
+}
+
+.monster-forge .mf-ability-grid small,
+.monster-forge .mf-boost-grid small,
+.monster-forge .mf-source-count {
+  font-size: 0.66rem;
+  font-weight: 400;
+  opacity: 0.75;
+}
+
+.monster-forge .mf-boost-grid {
+  display: grid;
+  gap: 0.55rem 0.7rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.monster-forge .mf-boost-preview {
+  margin-top: 0.65rem;
+}
+
+.monster-forge .mf-boost-details {
+  display: grid;
+  gap: 0.4rem;
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+}
+
+.monster-forge .mf-boost-details[hidden] {
+  display: none;
+}
+
+.monster-forge .mf-boost-details li {
+  background: rgba(0, 0, 0, 0.04);
+  border-left: 3px solid var(--mf-accent);
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.45rem 0.55rem;
+}
+
+.monster-forge .mf-boost-details span {
+  font-size: 0.72rem;
+  opacity: 0.8;
+}
+
 .monster-forge .mf-overrides {
   border-top: 1px solid var(--color-border-light-tertiary, #999);
   margin-top: 0.65rem;
@@ -368,6 +455,9 @@
   .monster-forge .mf-grid-5,
   .monster-forge .mf-grid-6,
   .monster-forge .mf-foundation-controls,
+  .monster-forge .mf-casting-control,
+  .monster-forge .mf-ability-grid,
+  .monster-forge .mf-boost-grid,
   .monster-forge .mf-attack-columns {
     grid-template-columns: 1fr;
   }

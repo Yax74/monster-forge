@@ -61,6 +61,14 @@
         </select>
       </label>
     </div>
+    <div class="mf-casting-control" data-casting-ability>
+      <label>Spellcasting ability
+        <select name="foundation.castingAbility">
+          {{#each foundation.castingAbilityOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+        </select>
+      </label>
+      <p class="mf-help">Caster uses this for spell attacks and save DCs. Controller, Support, and Leader use it for their role-led save DC.</p>
+    </div>
 
     <div class="mf-foundation-controls" data-foundation-apply>
       <div class="mf-check-grid" aria-label="Managed actor fields">
@@ -87,8 +95,23 @@
       <div><strong>Tier</strong><span data-preview="foundation-tier">—</span></div>
       <div><strong>Species/body</strong><span data-preview="foundation-species">—</span></div>
       <div><strong>Abilities</strong><span data-preview="foundation-abilities">—</span></div>
+      <div><strong>Spellcasting</strong><span data-preview="foundation-casting">—</span></div>
       <div><strong>Body result</strong><span data-preview="foundation-body">—</span></div>
       <div><strong>Sources</strong><span data-preview="foundation-source">—</span></div>
+    </div>
+
+    <div class="mf-ability-editor">
+      <div class="mf-mini-heading">Suggested attributes and overrides</div>
+      <p class="mf-help">Each suggested score updates with CR, role, species, attack profile, and spellcasting ability. Enter a value only where you want to lock an override.</p>
+      <div class="mf-ability-grid">
+        {{#each foundation.abilityFields}}
+        <label data-ability="{{key}}">
+          <span>{{label}}</span>
+          <input type="number" name="foundation.overrides.abilities.{{key}}" min="1" max="30" value="{{value}}" placeholder="Auto">
+          <small>Suggested <b data-preview="ability-{{key}}-suggested">—</b> · Final <b data-preview="ability-{{key}}-final">—</b></small>
+        </label>
+        {{/each}}
+      </div>
     </div>
 
     <details class="mf-overrides">
@@ -99,15 +122,6 @@
         <label>Attack bonus <input type="number" name="foundation.overrides.attackBonus" min="-5" max="30" value="{{foundation.overrides.attackBonus}}" placeholder="Auto"></label>
         <label>Save DC <input type="number" name="foundation.overrides.saveDc" min="5" max="40" value="{{foundation.overrides.saveDc}}" placeholder="Auto"></label>
         <label>DPR <input type="number" name="foundation.overrides.dpr" min="0" max="2000" step="0.5" value="{{foundation.overrides.dpr}}" placeholder="Auto"></label>
-      </div>
-      <p class="mf-mini-heading">Ability scores</p>
-      <div class="mf-grid mf-grid-6">
-        <label>STR <input type="number" name="foundation.overrides.abilities.str" min="1" max="30" value="{{foundation.overrides.abilities.str}}" placeholder="Auto"></label>
-        <label>DEX <input type="number" name="foundation.overrides.abilities.dex" min="1" max="30" value="{{foundation.overrides.abilities.dex}}" placeholder="Auto"></label>
-        <label>CON <input type="number" name="foundation.overrides.abilities.con" min="1" max="30" value="{{foundation.overrides.abilities.con}}" placeholder="Auto"></label>
-        <label>INT <input type="number" name="foundation.overrides.abilities.int" min="1" max="30" value="{{foundation.overrides.abilities.int}}" placeholder="Auto"></label>
-        <label>WIS <input type="number" name="foundation.overrides.abilities.wis" min="1" max="30" value="{{foundation.overrides.abilities.wis}}" placeholder="Auto"></label>
-        <label>CHA <input type="number" name="foundation.overrides.abilities.cha" min="1" max="30" value="{{foundation.overrides.abilities.cha}}" placeholder="Auto"></label>
       </div>
       <p class="mf-mini-heading">Body</p>
       <div class="mf-grid mf-grid-3">
@@ -123,6 +137,40 @@
     <div class="mf-section-heading">
       <div>
         <span class="mf-step">2</span>
+        <h3>NPC boosts</h3>
+      </div>
+      <span class="mf-source-count">{{boosts.found}} selectable from {{boosts.sources}} compendium(s)</span>
+    </div>
+    {{#if boosts.hasGroups}}
+    <div class="mf-boost-grid">
+      {{#each boosts.groups}}
+      <label>{{label}}
+        <select name="boosts.selected" title="Source: {{packLabel}}">
+          <option value="">None</option>
+          {{#each options}}<option value="{{value}}" {{#if selected}}selected{{/if}} title="{{summary}}">{{label}}</option>{{/each}}
+        </select>
+        <small>{{packLabel}}{{#if rankNote}} · {{rankNote}}{{/if}}</small>
+      </label>
+      {{/each}}
+    </div>
+    {{else}}
+    <p class="mf-callout"><i class="fa-solid fa-box-open"></i> No boost items were found. Add Item documents to a compendium folder named <strong>NPC Boosts</strong>, or flag an item as a Monster Forge boost.</p>
+    {{/if}}
+    {{#if boosts.blockedCount}}
+    <p class="mf-callout mf-callout-warning"><i class="fa-solid fa-shield-halved"></i> {{boosts.blockedCount}} legacy source item(s) were blocked because they replace CR, HP, or DPR already controlled by the FoF foundation.</p>
+    {{/if}}
+    {{#each boosts.warnings}}
+    <p class="mf-callout mf-callout-warning">{{this}}</p>
+    {{/each}}
+    <div class="mf-preview-grid mf-boost-preview"><div><strong>Selected</strong><span data-preview="boosts">—</span></div></div>
+    <ul class="mf-boost-details" data-preview="boost-details" hidden></ul>
+    <p class="mf-help">Ranked items such as Tough I–III are grouped into one choice. Boosts are copied from their source compendium by <strong>Forge NPC</strong>, retain their effects and automation, and participate in Replace and Undo. Foundation-only does not import them.</p>
+  </section>
+
+  <section class="mf-section">
+    <div class="mf-section-heading">
+      <div>
+        <span class="mf-step">3</span>
         <h3>Damage budget</h3>
       </div>
       <div class="mf-heading-actions">
@@ -169,7 +217,7 @@
 
   <section class="mf-section">
     <div class="mf-section-heading">
-      <div><span class="mf-step">3</span><h3>Attacks</h3></div>
+      <div><span class="mf-step">4</span><h3>Attacks</h3></div>
       <label class="mf-switch"><input type="checkbox" name="secondaryEnabled" {{#if config.secondaryEnabled}}checked{{/if}}> Secondary attack</label>
     </div>
     <label data-field="split">Damage split
@@ -301,7 +349,7 @@
 
   <section class="mf-section">
     <div class="mf-section-heading">
-      <div><span class="mf-step">4</span><h3>Tertiary on-hit feature</h3></div>
+      <div><span class="mf-step">5</span><h3>Tertiary on-hit feature</h3></div>
       <label class="mf-switch"><input type="checkbox" name="tertiary.enabled" {{#if tertiary.enabled}}checked{{/if}}> Include feature</label>
     </div>
     <div class="mf-grid mf-grid-3" data-panel="tertiary">

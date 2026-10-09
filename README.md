@@ -25,11 +25,12 @@ D&D5e 6.x itself requires Foundry V14. Monster Forge uses the attack/save activi
 
 1. Select exactly one NPC token, or open an NPC actor sheet.
 2. Click the hammer in Token Controls, use the NPC sheet header control, or press **Alt+M**.
-3. Choose CR, combat role, creature tier, and species. Choose **Preview only** if actor statistics should not be written.
-4. Select the actor fields Monster Forge may manage, or open **Manual overrides** to replace any recommendation.
-5. Choose attack profiles, condition automation, and any tertiary feature.
-6. Review the foundation sources, before/after statistics, live DPR, and warnings.
-7. Click **Apply foundation only** to stop after the core statistics, or **Forge NPC** to apply the foundation and create attacks together. **Undo last** restores the actor statistics and generated items from that operation.
+3. Choose CR, combat role, creature tier, and species. Spell-led roles also expose an Intelligence, Wisdom, or Charisma selector. Choose **Preview only** if actor statistics should not be written.
+4. Review the live suggested/final ability scores and enter only the overrides you want to lock. Role and build changes recalculate every blank score immediately.
+5. Optionally choose one rank from each discovered NPC-boost family.
+6. Choose attack profiles, condition automation, and any tertiary feature.
+7. Review the foundation sources, before/after statistics, live DPR, selected boosts, and warnings.
+8. Click **Apply foundation only** to stop after the core statistics, or **Forge NPC** to apply the foundation, import the selected boosts, and create attacks together. **Undo last** restores the actor statistics and generated items from that operation.
 
 Foundation apply mode always writes the selected CR. HP, AC, ability scores, and body data each have separate management controls. HP can preserve the actor's current health percentage or be set to full. Preview-only mode still uses the selected role/tier DPR benchmark for generated attacks, but it does not change the actor's statistics.
 
@@ -40,14 +41,26 @@ game.monsterForge.open();
 game.monsterForge.undo();
 game.monsterForge.removeGenerated();
 game.monsterForge.getFoundation();
+await game.monsterForge.getBoostCatalog();
 ```
+
+## Compendium boosts
+
+Monster Forge discovers Item documents in any compendium folder named **NPC Boost** or **NPC Boosts**, including all of that folder's descendants. An item elsewhere can opt in with `flags.monster-forge.boost` set to `true` (or `{ "enabled": true }`). The existing **NPC Quarter Caster**, **NPC Half Caster**, and **NPC Full Caster** items are also recognized by name so they can remain in their current folder.
+
+Names ending in `I`, `II`, `III`, `1`, `2`, or `3` are grouped into one ranked selector per family and source pack. Monster Forge imports the selected source Item only when **Forge NPC** is used, preserves its Active Effects and module flags, and marks the copy for Replace and Undo. **Apply foundation only** deliberately skips boosts.
+
+The legacy **NPC Hitpoints**, **Damage per Round**, **CR Boost**, and **Minion 15 HP Lock** items are shown as blocked because their changes would invalidate or duplicate the FoF foundation. Other boost effects apply after the foundation and may intentionally move the finished actor beyond the previewed benchmark.
 
 ## What changed from the macro
 
 - Builds a complete NPC foundation before allocating attacks: CR, HP, AC, attack bonus, save DC, DPR, proficiency, abilities, size, speed, and darkvision.
 - Keeps published *Forge of Foes* values separate from Monster Forge's role, tier, species, and manual adjustments, and shows those sources in the dialog.
 - Offers Balanced, Brute, Soldier, Skirmisher, Sniper, Controller, Support, Caster, and Leader roles.
+- Recalculates and displays suggested and final ability scores whenever CR, role, species, attacks, or spellcasting ability changes; any score can be explicitly overridden.
+- Gives spell-led roles a configurable mental ability and includes Intelligence-, Wisdom-, and Charisma-based spell-attack presets.
 - Treats Minion, Standard, Elite, and Boss as a separate layer from combat role.
+- Discovers and applies ranked NPC boosts from Item compendia without bundling or duplicating the campaign compendium itself.
 - Uses the same Human, Half-Elf, Dwarf, Halfling, Gnome, Elf, Tiefling, Half-Orc, Orc, Goliath, Drow, Duergar, and Deep Gnome species vocabulary as Wraeclast NPC Generator.
 - Reads species from Wraeclast NPC Generator actors when available, without turning culture or faction into mechanical statistics.
 - Applies actor statistics and generated items as one rollback-safe operation, with a one-step undo for both.
@@ -71,7 +84,7 @@ game.monsterForge.getFoundation();
 
 ## Rules limits
 
-Monster Forge is a transparent **starting-stat and attack-budgeting** tool, not a complete CR calculator. Role, tier, species ability tendencies, and derived ability arrays are Monster Forge recommendations rather than additional *Forge of Foes* tables. Generated DPR assumes attacks hit and failed saves, matching the damage side of the benchmark; it does not calculate hit probability. Area attacks expected to hit multiple targets, recharge powers, legendary actions, reactions, and off-turn damage need separate judgment. In particular, Minion and Boss tier multipliers do not solve action economy.
+Monster Forge is a transparent **starting-stat and attack-budgeting** tool, not a complete CR calculator. Role, tier, species ability tendencies, derived ability arrays, spell-led role handling, and compendium boost effects are Monster Forge or campaign recommendations rather than additional *Forge of Foes* tables. Generated DPR assumes attacks hit and failed saves, matching the damage side of the benchmark; it does not calculate hit probability. Area attacks expected to hit multiple targets, recharge powers, legendary actions, reactions, and off-turn damage need separate judgment. In particular, Minion and Boss tier multipliers do not solve action economy.
 
 Status riders always create a native Save activity, an embedded condition effect, and clickable save/condition links. In **Midi-QOL** mode, the attack also receives a Midi triggered-activity link. With Midi-QOL and DAE active—and Midi-QOL configured to apply item effects—the save is triggered for hit targets and the condition is applied to failed-save targets. Manual mode leaves the save and effect application under GM control through the native D&D5e chat card.
 
@@ -92,7 +105,7 @@ npm test
 npm run check
 ```
 
-Release tags must match `module.json`, for example `v1.2.0`.
+Release tags must match `module.json`, for example `v1.3.0`.
 
 ## License
 

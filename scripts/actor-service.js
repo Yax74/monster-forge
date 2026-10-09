@@ -1,6 +1,7 @@
 import { ABILITIES, MODULE_ID, MODULE_VERSION } from "./constants.js";
 import { buildMultiattackItem, buildTertiaryItem, buildWeaponItem } from "./item-builder.js";
 import { crToNumber } from "./engine.js";
+import { prepareBoostItemData } from "./boosts.js";
 
 const LAST_OPERATION_FLAG = "lastOperation";
 const FOUNDATION_FLAG = "foundation";
@@ -99,9 +100,11 @@ function foundationFlagData(foundation) {
     config: clone(foundation.config),
     derived: clone(foundation.derived),
     final: clone(foundation.final),
+    recommendedAbilities: clone(foundation.recommendedAbilities),
     abilities: clone(foundation.abilities),
     attackAbilities: clone(foundation.attackAbilities),
     saveAbilities: clone(foundation.saveAbilities),
+    casting: clone(foundation.casting),
     body: clone(foundation.body),
     sources: clone(foundation.sources)
   };
@@ -262,7 +265,7 @@ async function restoreItems(actor, itemData) {
   }
 }
 
-export async function applyPlan(actor, plan) {
+export async function applyPlan(actor, plan, { boostSources = [] } = {}) {
   assertWritableNpc(actor);
   const replacing = plan.config.applyMode === "replace";
   const priorItems = replacing ? getGeneratedItems(actor) : [];
@@ -300,6 +303,7 @@ export async function applyPlan(actor, plan) {
     const tertiary = buildTertiaryItem(plan, buildOptions);
     if (tertiary) featureData.push(tertiary);
     featureData.push(buildMultiattackItem(plan, weapons, buildOptions));
+    featureData.push(...boostSources.map((source) => prepareBoostItemData(source, { setId })));
 
     const features = await actor.createEmbeddedDocuments("Item", featureData);
     createdIds.push(...features.map((item) => item.id));
@@ -330,7 +334,8 @@ export async function applyPlan(actor, plan) {
     return {
       created: [...weapons, ...features],
       replaced: priorItems.length,
-      actorUpdated: Object.keys(foundationUpdate).length > 0
+      actorUpdated: Object.keys(foundationUpdate).length > 0,
+      boosts: boostSources.length
     };
   } catch (error) {
     const survivingCreatedIds = createdIds.filter((id) => actor.items.get(id));

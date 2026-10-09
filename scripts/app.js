@@ -28,6 +28,13 @@ import {
   getEffectiveActorProfile,
   normalizeFoundationConfig
 } from "./foundation.js";
+import {
+  buildBoostGroups,
+  discoverBoostCatalog,
+  normalizeBoostConfig,
+  resolveBoostSources,
+  selectBoosts
+} from "./boosts.js";
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -89,13 +96,16 @@ function attackContext(attack) {
   };
 }
 
-function buildContext(actor, config) {
+function buildContext(actor, config, boostCatalog) {
   const generated = getGeneratedItems(actor);
   const existingOffense = getExistingOffensiveItems(actor);
   const midiActive = Boolean(game.modules?.get?.("midi-qol")?.active);
   const daeActive = Boolean(game.modules?.get?.("dae")?.active);
   const importedSpecies = generatorSpecies(actor);
   const hasFoundation = Boolean(actor.getFlag(MODULE_ID, "foundation"));
+  const boostConfig = normalizeBoostConfig(config.boosts);
+  const boostGroups = buildBoostGroups(boostCatalog, boostConfig.selected);
+  const selectableBoosts = (boostCatalog.entries ?? []).filter((entry) => entry.selectable);
   return {
     actor: {
       name: actor.name,
@@ -141,7 +151,28 @@ function buildContext(actor, config) {
       sizeOptions: options([
         ["", "Use species / preserve actor"],
         ...Object.entries(ACTOR_SIZES)
-      ], config.foundation.overrides.size)
+      ], config.foundation.overrides.size),
+      castingAbilityOptions: options([
+        ["auto", "Auto (role default)"],
+        ["int", "Intelligence"],
+        ["wis", "Wisdom"],
+        ["cha", "Charisma"]
+      ], config.foundation.castingAbility),
+      abilityFields: ABILITIES.map((ability) => ({
+        key: ability,
+        label: ability.toUpperCase(),
+        value: config.foundation.overrides.abilities[ability]
+      }))
+    },
+    boosts: {
+      ...boostConfig,
+      groups: boostGroups.groups,
+      hasGroups: boostGroups.groups.length > 0,
+      found: selectableBoosts.length,
+      sources: new Set(selectableBoosts.map((entry) => entry.packId)).size,
+      blocked: boostGroups.blocked,
+      blockedCount: boostGroups.blocked.length,
+      warnings: boostCatalog.warnings ?? []
     },
     damageAdjustmentOptions: options([
       [-20, "−20% DPR"],
@@ -235,6 +266,7 @@ export function parseForgeForm(form) {
       role: field(data, "foundation.role", "balanced"),
       tier: field(data, "foundation.tier", "standard"),
       species: field(data, "foundation.species", "preserve"),
+      castingAbility: field(data, "foundation.castingAbility", "auto"),
       hpPolicy: field(data, "foundation.hpPolicy", "ratio"),
       manage: {
         hp: data.has("foundation.manage.hp"),
@@ -256,6 +288,9 @@ export function parseForgeForm(form) {
           optionalNumberField(data, `foundation.overrides.abilities.${ability}`)
         ]))
       }
+    },
+    boosts: {
+      selected: data.getAll("boosts.selected").map(String).filter(Boolean)
     },
     roleModifier: numberField(data, "roleModifier", 0),
     followCrAttacks: data.has("followCrAttacks"),
@@ -295,7 +330,7 @@ function signed(value) {
   return `${value >= 0 ? "+" : ""}${value}`;
 }
 
-function buildForgePlan(config, actor) {
+function buildForgePlan(config, actor, boostCatalog) {
   const actorProfile = getActorCombatProfile(actor);
   const foundation = buildFoundationPlan(config, actorProfile);
   const effectiveProfile = getEffectiveActorProfile(foundation, actorProfile);
@@ -304,6 +339,7 @@ function buildForgePlan(config, actor) {
     foundation: foundation.config
   }, effectiveProfile, foundation.final);
   plan.foundation = foundation;
+  plan.boosts = selectBoosts(plan.config.boosts, boostCatalog);
   return { actorProfile, effectiveProfile, foundation, plan };
 }
 
@@ -320,10 +356,37 @@ function bodySummary(body) {
   return `${size} · ${speed} · ${vision}`;
 }
 
-function updatePreview(root, actor) {
+function castingSummary(casting) {
+  if (!casting.enabled) return "Not a spell-led role";
+  const parts = [casting.ability.toUpperCase()];
+  if (casting.attackBonus !== null) parts.push(`spell attack ${signed(casting.attackBonus)}`);
+  if (casting.saveDc !== null) parts.push(`save DC ${casting.saveDc}`);
+  return parts.join(" · ");
+}
+
+function updateBoostDetails(root, entries) {
+  const list = root.querySelector("[data-preview='boost-details']");
+  if (!list) return;
+  list.replaceChildren();
+  list.hidden = entries.length === 0;
+  for (const entry of entries) {
+    const item = document.createElement("li");
+    const name = document.createElement("strong");
+    name.textContent = entry.name;
+    item.append(name);
+    if (entry.summary) {
+      const summary = document.createElement("span");
+      summary.textContent = entry.summary;
+      item.append(summary);
+    }
+    list.append(item);
+  }
+}
+
+function updatePreview(root, actor, boostCatalog) {
   const form = root.querySelector("form") ?? root.closest("form") ?? root;
   const config = parseForgeForm(form);
-  const { actorProfile: profile, foundation, plan } = buildForgePlan(config, actor);
+  const { actorProfile: profile, foundation, plan } = buildForgePlan(config, actor, boostCatalog);
   const existingOffense = getExistingOffensiveItems(actor);
   const midiReady = Boolean(game.modules?.get?.("midi-qol")?.active && game.modules?.get?.("dae")?.active);
 
@@ -336,6 +399,7 @@ function updatePreview(root, actor) {
   toggle(root, "[data-rider-save='secondary']", config.secondary.rider !== "none");
   toggle(root, "[data-tertiary-dc]", config.tertiary.saveAbility !== "none" && config.saveDcMode === "actor");
   toggle(root, "[data-foundation-apply]", foundation.config.mode === "apply");
+  toggle(root, "[data-casting-ability]", foundation.casting.enabled);
 
   setText(root, "[data-preview='baseline']", plan.stats.dpr);
   setText(root, "[data-preview='target']", plan.target);
@@ -377,11 +441,25 @@ function updatePreview(root, actor) {
   setText(root, "[data-preview='foundation-species']", foundation.sources.species);
   setText(root, "[data-preview='foundation-source']", `${foundation.sources.baseline} · ${foundation.sources.role} · ${foundation.sources.tier}`);
   setText(root, "[data-preview='foundation-abilities']", abilitySummary(foundation.abilities));
+  setText(root, "[data-preview='foundation-casting']", castingSummary(foundation.casting));
   setText(root, "[data-preview='foundation-body']", bodySummary(foundation.body));
   setText(root, "[data-preview='foundation-cr']", `${profile.cr ?? "—"} → ${foundation.stats.cr}`);
   setText(root, "[data-preview='foundation-hp']", `${profile.hp || "—"} → ${foundation.final.hp}`);
   setText(root, "[data-preview='foundation-ac']", `${profile.ac || "—"} → ${foundation.final.ac}`);
   setText(root, "[data-preview='foundation-offense']", `${signed(foundation.final.attackBonus)} / DC ${foundation.final.saveDc} / ${plan.target} DPR`);
+  for (const ability of ABILITIES) {
+    const suggested = foundation.recommendedAbilities[ability];
+    const final = foundation.abilities[ability];
+    setText(root, `[data-preview='ability-${ability}-suggested']`, suggested);
+    setText(root, `[data-preview='ability-${ability}-final']`, final);
+    const input = form.elements.namedItem(`foundation.overrides.abilities.${ability}`);
+    if (input) input.placeholder = `Auto: ${suggested}`;
+    root.querySelector(`[data-ability='${ability}']`)?.classList
+      .toggle("is-overridden", foundation.config.overrides.abilities[ability] !== "");
+  }
+  const selectedBoostNames = plan.boosts.selected.map((entry) => entry.name);
+  setText(root, "[data-preview='boosts']", selectedBoostNames.length ? selectedBoostNames.join(" · ") : "None selected");
+  updateBoostDetails(root, plan.boosts.selected);
 
   const varianceCard = root.querySelector("[data-metric='achieved']");
   varianceCard?.classList.toggle("is-warning", Math.abs(plan.variance) > Math.max(2, plan.target * 0.1));
@@ -389,7 +467,7 @@ function updatePreview(root, actor) {
   const warnings = root.querySelector("[data-preview='warnings']");
   if (warnings) {
     warnings.replaceChildren();
-    const previewWarnings = [...foundation.warnings, ...plan.warnings];
+    const previewWarnings = [...foundation.warnings, ...plan.warnings, ...plan.boosts.warnings];
     if (foundation.config.mode === "audit") {
       previewWarnings.push("Foundation mode is Preview only: actor CR, defenses, abilities, and body data will not be changed, and actor-derived attacks will continue to use the current actor profile.");
     }
@@ -402,6 +480,12 @@ function updatePreview(root, actor) {
     const hasRider = config.primary.rider !== "none" || (config.secondaryEnabled && config.secondary.rider !== "none");
     if (config.riderAutomation === "midi" && hasRider && !midiReady) {
       previewWarnings.push("Midi-QOL rider automation is selected, but both Midi-QOL and DAE must be active for automatic save chaining and condition application.");
+    }
+    if (foundation.config.role === "caster" && !plan.boosts.selected.some((entry) => entry.kind === "caster")) {
+      previewWarnings.push("Caster role has no caster-progression boost selected. This is valid, but spellcasting level and spells must then be managed separately.");
+    }
+    if (plan.boosts.selected.length) {
+      previewWarnings.push("Selected boosts are layered after the FoF foundation. Their Active Effects can intentionally move the final actor beyond the previewed benchmark.");
     }
     if (!previewWarnings.length) {
       const item = document.createElement("li");
@@ -438,11 +522,11 @@ async function confirmAction({ title, content }) {
   });
 }
 
-function attachListeners(_event, dialog, actor) {
+function attachListeners(_event, dialog, actor, boostCatalog) {
   const root = dialog.element;
   const form = dialog.form ?? root.querySelector("form");
   if (!form) return;
-  const preview = () => updatePreview(root, actor);
+  const preview = () => updatePreview(root, actor, boostCatalog);
   const syncRecommendation = () => {
     const recommended = applyRecommendedAttacks(parseForgeForm(form));
     const secondary = form.elements.namedItem("secondaryEnabled");
@@ -533,8 +617,10 @@ export async function openForge(targetActor = null) {
       : saved;
     let config = mergeDefaults(remembered, actorCr(actor));
     config.foundation = normalizeFoundationConfig(config);
+    config.boosts = normalizeBoostConfig(config.boosts);
     if (config.followCrAttacks) config = applyRecommendedAttacks(config, config.cr);
-    const context = buildContext(actor, config);
+    const boostCatalog = await discoverBoostCatalog();
+    const context = buildContext(actor, config, boostCatalog);
     const render = foundry.applications.handlebars?.renderTemplate ?? globalThis.renderTemplate;
     const content = await render(`modules/${MODULE_ID}/templates/forge-dialog.hbs`, context);
 
@@ -544,7 +630,7 @@ export async function openForge(targetActor = null) {
       position: { width: 920, height: "auto" },
       content,
       rejectClose: false,
-      render: (event, dialog) => attachListeners(event, dialog, actor),
+      render: (event, dialog) => attachListeners(event, dialog, actor, boostCatalog),
       buttons: [
         {
           action: "foundation",
@@ -553,7 +639,7 @@ export async function openForge(targetActor = null) {
           callback: async (_event, button) => {
             try {
               const parsed = parseForgeForm(button.form);
-              const { foundation, plan } = buildForgePlan(parsed, actor);
+              const { foundation, plan } = buildForgePlan(parsed, actor, boostCatalog);
               await game.settings.set(MODULE_ID, "defaults", plan.config);
               const result = await applyFoundationPlan(actor, foundation);
               ui.notifications.info(`Monster Forge applied ${result.updatedFields} foundation field(s) to ${actor.name}.`);
@@ -573,11 +659,13 @@ export async function openForge(targetActor = null) {
           callback: async (_event, button) => {
             try {
               const parsed = parseForgeForm(button.form);
-              const { plan } = buildForgePlan(parsed, actor);
+              const { plan } = buildForgePlan(parsed, actor, boostCatalog);
               await game.settings.set(MODULE_ID, "defaults", plan.config);
-              const result = await applyPlan(actor, plan);
+              const boostSources = await resolveBoostSources(plan.boosts.selected);
+              const result = await applyPlan(actor, plan, { boostSources });
               const actorText = result.actorUpdated ? " and applied its NPC foundation" : "";
-              ui.notifications.info(`Monster Forge added ${result.created.length} item(s) to ${actor.name}${actorText}${result.replaced ? ` and replaced ${result.replaced}` : ""}.`);
+              const boostText = result.boosts ? `, including ${result.boosts} boost${result.boosts === 1 ? "" : "s"}` : "";
+              ui.notifications.info(`Monster Forge added ${result.created.length} item(s)${boostText} to ${actor.name}${actorText}${result.replaced ? ` and replaced ${result.replaced}` : ""}.`);
               return true;
             } catch (error) {
               console.error(`${MODULE_ID} | Failed to forge attacks.`, error);

@@ -1,9 +1,9 @@
 {
   "name": "monster-forge",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "private": true,
   "type": "module",
-  "description": "FoF-first NPC foundation and attack builder for Foundry VTT's D&D5e system.",
+  "description": "FoF-first NPC foundation, ranked boost, and attack builder for Foundry VTT's D&D5e system.",
   "scripts": {
     "test": "node --test",
     "validate": "node tools/validate-release.mjs",

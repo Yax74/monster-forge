@@ -58,6 +58,9 @@ export function normalizeFoundationConfig(input = {}) {
     role: selectedKey(source.role, COMBAT_ROLES, defaults.role),
     species: selectedKey(source.species, SPECIES_PROFILES, defaults.species),
     tier: selectedKey(source.tier, CREATURE_TIERS, defaults.tier),
+    castingAbility: ["auto", "int", "wis", "cha"].includes(source.castingAbility)
+      ? source.castingAbility
+      : defaults.castingAbility,
     hpPolicy: source.hpPolicy === "full" ? "full" : "ratio",
     manage: {
       hp: manage.hp !== false,
@@ -82,7 +85,21 @@ export function normalizeFoundationConfig(input = {}) {
   };
 }
 
-function configuredAbilities(config, role) {
+function resolvedCastingAbility(foundation, role) {
+  if (!role.castingMode) return null;
+  return foundation.castingAbility === "auto" ? role.attackAbility : foundation.castingAbility;
+}
+
+function roleAbilitySeeds(role, castingAbility) {
+  const abilities = { ...role.abilities };
+  if (!castingAbility || castingAbility === role.attackAbility) return abilities;
+  const defaultScore = abilities[role.attackAbility];
+  abilities[role.attackAbility] = abilities[castingAbility];
+  abilities[castingAbility] = defaultScore;
+  return abilities;
+}
+
+function configuredAbilities(config, role, foundation) {
   const attackAbilities = [];
   const saveAbilities = [];
   const attacks = [config.primary];
@@ -98,9 +115,14 @@ function configuredAbilities(config, role) {
     saveAbilities.push(config.tertiary.dcAbility);
   }
 
+  const castingAbility = resolvedCastingAbility(foundation, role);
+  if (role.castingMode === "both" && castingAbility) attackAbilities.push(castingAbility);
+  if (["both", "save"].includes(role.castingMode) && castingAbility) saveAbilities.push(castingAbility);
+
   return {
-    attackAbilities: uniqueAbilities(attackAbilities.length ? attackAbilities : [role.attackAbility]),
-    saveAbilities: uniqueAbilities(saveAbilities.length ? saveAbilities : [role.saveAbility])
+    castingAbility,
+    attackAbilities: uniqueAbilities(attackAbilities.length ? attackAbilities : [castingAbility ?? role.attackAbility]),
+    saveAbilities: uniqueAbilities(saveAbilities.length ? saveAbilities : [castingAbility ?? role.saveAbility])
   };
 }
 
@@ -149,12 +171,14 @@ export function buildFoundationPlan(inputConfig = {}, actorProfile = {}) {
     dpr: finalNumber(foundation.overrides.dpr, derived.dpr, roundHalf)
   };
 
+  const castingAbility = resolvedCastingAbility(foundation, role);
+  const roleAbilities = roleAbilitySeeds(role, castingAbility);
   const abilityScores = Object.fromEntries(ABILITIES.map((ability) => {
-    const seed = Number(role.abilities[ability]) || 10;
+    const seed = Number(roleAbilities[ability]) || 10;
     const adjustment = Number(species.abilities?.[ability]) || 0;
     return [ability, Math.round(clamp(seed + adjustment, 1, 30, 10))];
   }));
-  const { attackAbilities, saveAbilities } = configuredAbilities(inputConfig, role);
+  const { attackAbilities, saveAbilities } = configuredAbilities(inputConfig, role, foundation);
   const requiredModifiers = {};
   const attackModifier = final.attackBonus - proficiency;
   const saveModifier = final.saveDc - 8 - proficiency;
@@ -166,6 +190,7 @@ export function buildFoundationPlan(inputConfig = {}, actorProfile = {}) {
   for (const [ability, modifier] of Object.entries(requiredModifiers)) {
     abilityScores[ability] = scoreForModifier(modifier);
   }
+  const recommendedAbilities = { ...abilityScores };
   for (const ability of ABILITIES) {
     const override = foundation.overrides.abilities[ability];
     if (override !== "") abilityScores[ability] = override;
@@ -204,6 +229,12 @@ export function buildFoundationPlan(inputConfig = {}, actorProfile = {}) {
   if (foundation.species !== "preserve" && Object.keys(species.abilities ?? {}).length) {
     warnings.push("Species ability tendencies are Monster Forge recommendations based on the campaign's 2014-style species assumptions, not Forge of Foes rules.");
   }
+  const selectedAttacks = [inputConfig.primary, inputConfig.secondaryEnabled ? inputConfig.secondary : null]
+    .filter(Boolean)
+    .map((attack) => resolveWeapon(attack));
+  if (foundation.role === "caster" && selectedAttacks.length && selectedAttacks.every((attack) => attack.classification !== "spell")) {
+    warnings.push("Caster is using only weapon attack profiles. Choose Arcane Bolt, Divine Bolt, Occult Bolt, or a custom spell attack if this is not intended to be a gish.");
+  }
 
   return {
     config: foundation,
@@ -220,6 +251,7 @@ export function buildFoundationPlan(inputConfig = {}, actorProfile = {}) {
       dpr: roundHalf(derived.dpr)
     },
     final,
+    recommendedAbilities,
     abilities: abilityScores,
     abilityMods,
     attackAbilities,
@@ -227,9 +259,20 @@ export function buildFoundationPlan(inputConfig = {}, actorProfile = {}) {
     achievedAttackBonuses,
     achievedSaveDcs,
     body,
+    casting: {
+      enabled: Boolean(role.castingMode),
+      mode: role.castingMode ?? "none",
+      ability: castingAbility,
+      attackBonus: castingAbility && ["attack", "both"].includes(role.castingMode)
+        ? proficiency + abilityMods[castingAbility]
+        : null,
+      saveDc: castingAbility && ["save", "both"].includes(role.castingMode)
+        ? 8 + proficiency + abilityMods[castingAbility]
+        : null
+    },
     sources: {
       baseline: `Forge of Foes CR ${stats.cr}`,
-      role: `Monster Forge ${role.label}: ${roleSource(role)}`,
+      role: `Monster Forge ${role.label}: ${roleSource(role)}${castingAbility ? `; ${castingAbility.toUpperCase()} key ability` : ""}`,
       tier: `Monster Forge ${tier.label}: ${tierSource(tier)}`,
       species: foundation.species === "preserve"
         ? "Species/body: preserve the actor"

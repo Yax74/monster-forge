@@ -8,6 +8,7 @@ import {
   RIDERS,
   WEAPONS
 } from "./constants.js";
+import { normalizeBoostConfig } from "./boosts.js";
 
 const FRACTION_BY_NUMBER = new Map([
   [0, "0"],
@@ -90,6 +91,11 @@ export function mergeDefaults(saved = {}, actorCr = DEFAULTS.cr) {
           ...(savedFoundation.overrides?.abilities ?? {})
         }
       }
+    },
+    boosts: {
+      ...DEFAULTS.boosts,
+      ...(saved.boosts ?? {}),
+      selected: [...(saved.boosts?.selected ?? DEFAULTS.boosts.selected)]
     },
     primary: { ...DEFAULTS.primary, ...(saved.primary ?? {}) },
     secondary: { ...DEFAULTS.secondary, ...(saved.secondary ?? {}) },
@@ -235,6 +241,7 @@ export function normalizeConfig(config = {}) {
     saveDcMode: current.saveDcMode === "actor" ? "actor" : "cr",
     riderAutomation: current.riderAutomation === "manual" ? "manual" : "midi",
     applyMode: current.applyMode === "append" ? "append" : "replace",
+    boosts: normalizeBoostConfig(current.boosts),
     splitPrimary: clamp(current.splitPrimary, 5, 95, DEFAULTS.splitPrimary),
     secondaryEnabled: Boolean(current.secondaryEnabled),
     primary: normalizeAttack(current.primary, DEFAULTS.primary),

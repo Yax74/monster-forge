@@ -1,6 +1,7 @@
 import { MODULE_ID, MODULE_TITLE } from "./constants.js";
 import { getGeneratedItems, removeGeneratedItems, resolveTargetActor, undoLastOperation } from "./actor-service.js";
 import { openForge } from "./app.js";
+import { discoverBoostCatalog } from "./boosts.js";
 
 function actorFromSheet(app) {
   const document = app?.document ?? app?.actor;
@@ -62,7 +63,8 @@ Hooks.once("ready", () => {
     undo: async (actor = null) => undoLastOperation(actor ?? resolveTargetActor()),
     removeGenerated: async (actor = null) => removeGeneratedItems(actor ?? resolveTargetActor()),
     getGenerated: (actor = null) => getGeneratedItems(actor ?? resolveTargetActor()),
-    getFoundation: (actor = null) => (actor ?? resolveTargetActor()).getFlag(MODULE_ID, "foundation") ?? null
+    getFoundation: (actor = null) => (actor ?? resolveTargetActor()).getFlag(MODULE_ID, "foundation") ?? null,
+    getBoostCatalog: () => discoverBoostCatalog()
   });
 
   if (game.system.version && !/^5\.|^6\./.test(game.system.version)) {

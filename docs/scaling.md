@@ -31,7 +31,15 @@ Tier is applied after the role HP/DPR adjustment. It does not change bounded-acc
 
 Species is a separate body-and-ability recommendation. Its vocabulary matches Wraeclast NPC Generator, but it never implies a culture, faction, or profession. Manual overrides are applied last.
 
-Recommended proficiency follows the standard CR progression. For each ability actually used by a configured attack, Monster Forge derives the required modifier as `attack bonus − proficiency bonus`. For each configured save DC ability, it derives `save DC − 8 − proficiency bonus`. It converts that modifier to a score with `10 + 2 × modifier`, capped at 30. The rest of the array starts from the selected role and species recommendations. This ability-array derivation is a Monster Forge convenience, not a *Forge of Foes* table.
+Recommended proficiency follows the standard CR progression. For each ability actually used by a configured attack, Monster Forge derives the required modifier as `attack bonus − proficiency bonus`. For each configured save DC ability, it derives `save DC − 8 − proficiency bonus`. It converts that modifier to a score with `10 + 2 × modifier`, capped at 30. The rest of the array starts from the selected role and species recommendations. The dialog shows this result as **Suggested** before applying any explicit per-score override, then shows the post-override **Final** value. This ability-array derivation is a Monster Forge convenience, not a *Forge of Foes* table.
+
+Caster treats the selected Intelligence, Wisdom, or Charisma score as both its spell-attack and spell-save ability. Controller, Support, and Leader use the selected mental score for their role-led save DC but do not automatically gain a spell attack. Actual configured attack and rider abilities remain part of the calculation, so a weapon-using caster can intentionally become a multi-ability gish.
+
+## Compendium boost layer
+
+Selected NPC boosts are imported only after the foundation and generated attack plan have been calculated. Their source Item data, Active Effects, and third-party automation flags are retained. Consequently, a boost can intentionally change a final score beyond the foundation preview; Monster Forge reports this rather than trying to reverse-engineer arbitrary Active Effects.
+
+Only one item from a ranked family can be selected at once. Source items named **NPC Hitpoints**, **Damage per Round**, **CR Boost**, and **Minion 15 HP Lock** are blocked because they duplicate or invalidate the foundation calculation. Boosts participate in the same Replace and Undo transaction as generated attacks.
 
 ## Published baseline
 

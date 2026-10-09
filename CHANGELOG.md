@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.3.0
+
+- Added a live six-attribute preview with separate suggested and final scores plus visible per-ability overrides.
+- Role, CR, species, attack profile, and spellcasting-ability changes now immediately recalculate the suggested array.
+- Added explicit spell-led role handling. Caster can derive both spell attack and save DC from Intelligence, Wisdom, or Charisma; Controller, Support, and Leader can derive their role-led save DC from the selected mental ability.
+- Added Arcane Bolt, Divine Bolt, and Occult Bolt spell-attack presets and a warning when a Caster uses only weapon attacks.
+- Added dynamic Item-compendium boost discovery through an **NPC Boost**/**NPC Boosts** folder hierarchy or the `flags.monster-forge.boost` opt-in flag.
+- Grouped `I`/`II`/`III` and `1`/`2`/`3` source items as ranked choices, including the existing quarter-, half-, and full-caster progression items.
+- Boosts are copied from their source compendium with effects and automation intact, marked as generated, and included in Replace and Undo transactions.
+- Blocked legacy CR, HP, DPR, and minion-HP items that would conflict with the FoF foundation.
+- Added console boost-catalog inspection and expanded regression coverage for role switching, nested compendium folders, rank conflicts, source resolution, and boost rollback.
+
 ## 1.2.0
 
 - Added a FoF-first NPC foundation stage before attack generation.
