@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.3.0
+## 1.4.0
 
 - Added a live six-attribute preview with separate suggested and final scores plus visible per-ability overrides.
 - Role, CR, species, attack profile, and spellcasting-ability changes now immediately recalculate the suggested array.
