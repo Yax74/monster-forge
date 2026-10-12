@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.5.0
+
+- Replaced the scrolling workflow with Build, Foundation, Boosts, Attacks, and Review tabs, including persistent per-section apply controls and an exact Review summary.
+- Added attacks-only, foundation-only, and boosts-without-attacks workflows. Replace and Undo now affect only the enabled actor fields and generated item groups.
+- Added combined (**and**) versus alternative (**or**) attack routines. Alternatives receive separate full-round DPR budgets and are compared rather than added together.
+- Rewrote generated Multiattack text in standard stat-block language for single, combined, equal-count alternative, and unequal-count alternative routines.
+- Expanded regression coverage for saved section states, actor-profile selection, section-scoped replacement and undo, alternative DPR, attack cadence, and Multiattack wording.
+
 ## 1.4.1
 
 - Fixed the Monster Forge button failing to open when Wraeclast NPC Generator was inactive. Optional legacy species metadata is now read directly from the actor's stored flags without requiring the source module to be active.

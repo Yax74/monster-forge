@@ -25,14 +25,14 @@ D&D5e 6.x itself requires Foundry V14. Monster Forge uses the attack/save activi
 
 1. Select exactly one NPC token, or open an NPC actor sheet.
 2. Click the hammer in Token Controls, use the NPC sheet header control, or press **Alt+M**.
-3. Choose CR, combat role, creature tier, and species. Spell-led roles also expose an Intelligence, Wisdom, or Charisma selector. Choose **Preview only** if actor statistics should not be written.
-4. Review the live suggested/final ability scores and enter only the overrides you want to lock. Role and build changes recalculate every blank score immediately.
-5. Optionally choose one rank from each discovered NPC-boost family.
-6. Choose attack profiles, condition automation, and any tertiary feature.
-7. Review the foundation sources, before/after statistics, live DPR, selected boosts, and warnings.
-8. Click **Apply foundation only** to stop after the core statistics, or **Forge NPC** to apply the foundation, import the selected boosts, and create attacks together. **Undo last** restores the actor statistics and generated items from that operation.
+3. Work through the **Build**, **Foundation**, **Boosts**, and **Attacks** tabs, then check the exact enabled-section summary on **Review**.
+4. Clear a tab's apply checkbox to leave that part of the actor untouched. Choices are retained for the next use; Build choices remain available as planning inputs even when CR writing is off.
+5. Choose CR, combat role, creature tier, and species. Spell-led roles also expose an Intelligence, Wisdom, or Charisma selector. Choose **Preview only** if no build or foundation actor fields should be written.
+6. Review the live suggested/final ability scores and enter only the overrides you want to lock. Role and build changes recalculate every blank score immediately.
+7. Optionally choose one rank from each discovered NPC-boost family, then choose a single, combined (**and**), or alternative (**or**) attack routine and any tertiary feature.
+8. Click **Apply build & foundation** for actor fields only, or **Forge NPC** to apply exactly the enabled sections. **Undo last** restores only the actor fields and generated item groups changed by that operation.
 
-Foundation apply mode always writes the selected CR. HP, AC, ability scores, and body data each have separate management controls. HP can preserve the actor's current health percentage or be set to full. Preview-only mode still uses the selected role/tier DPR benchmark for generated attacks, but it does not change the actor's statistics.
+With Build enabled, Foundation apply mode writes the selected CR. HP, AC, ability scores, and body data are independently gated by the Foundation tab and its field controls. HP can preserve the actor's current health percentage or be set to full. Preview-only mode still uses the selected role/tier DPR benchmark for generated attacks, but it does not change the actor's statistics. An attacks-only run can use the selected CR budget and the actor's current ability scores/proficiency without writing foundation data.
 
 The console API is also available:
 
@@ -48,7 +48,7 @@ await game.monsterForge.getBoostCatalog();
 
 Monster Forge discovers Item documents in any compendium folder named **NPC Boost** or **NPC Boosts**, including all of that folder's descendants. An item elsewhere can opt in with `flags.monster-forge.boost` set to `true` (or `{ "enabled": true }`). The existing **NPC Quarter Caster**, **NPC Half Caster**, and **NPC Full Caster** items are also recognized by name so they can remain in their current folder.
 
-Names ending in `I`, `II`, `III`, `1`, `2`, or `3` are grouped into one ranked selector per family and source pack. Monster Forge imports the selected source Item only when **Forge NPC** is used, preserves its Active Effects and module flags, and marks the copy for Replace and Undo. **Apply foundation only** deliberately skips boosts.
+Names ending in `I`, `II`, `III`, `1`, `2`, or `3` are grouped into one ranked selector per family and source pack. Monster Forge imports the selected source Item only when **Forge NPC** is used with Boosts enabled, preserves its Active Effects and module flags, and marks the copy for Replace and Undo. **Apply build & foundation** deliberately skips boosts.
 
 The legacy **NPC Hitpoints**, **Damage per Round**, **CR Boost**, and **Minion 15 HP Lock** items are shown as blocked because their changes would invalidate or duplicate the FoF foundation. Other boost effects apply after the foundation and may intentionally move the finished actor beyond the previewed benchmark.
 
@@ -64,10 +64,12 @@ The legacy **NPC Hitpoints**, **Damage per Round**, **CR Boost**, and **Minion 1
 - Uses the same Human, Half-Elf, Dwarf, Halfling, Gnome, Elf, Tiefling, Half-Orc, Orc, Goliath, Drow, Duergar, and Deep Gnome species vocabulary as Wraeclast NPC Generator.
 - Reads species from Wraeclast NPC Generator actors when available, without turning culture or faction into mechanical statistics.
 - Applies actor statistics and generated items as one rollback-safe operation, with a one-step undo for both.
+- Separates Build, Foundation, Boosts, and Attacks into independently optional tabs; Replace and Undo are scoped to only the enabled generated-item groups.
 - Uses the published *Forge of Foes* total DPR, proficient ability bonus, and AC/DC values for every CR from 0 to 30.
 - Recalculates damage from total DPR whenever the attack count changes; it never multiplies the table's rounded per-attack examples.
 - Uses a table-friendly attack schedule of 1 attack through CR 1/2, 2 at CR 1–4, 3 at CR 5–25, and 4 at CR 26–30, while showing the published count for comparison.
 - Keeps attack count fully editable, can follow CR changes automatically, and does not force multiple weapon profiles for multiple attacks.
+- Supports combined attack routines that split DPR and use both profiles, plus alternative routines that give each profile the full round budget and produce standard **or** wording without double-counting DPR.
 - Uses D&D5e's current activity schema for melee/ranged and weapon/spell attacks.
 - Replaces only items flagged by Monster Forge; unrelated actor items are never deleted.
 - Provides explicit **Undo last** and **Remove generated** actions instead of treating every rerun as a revert.
@@ -105,7 +107,7 @@ npm test
 npm run check
 ```
 
-Release tags must match `module.json`, for example `v1.4.1`.
+Release tags must match `module.json`, for example `v1.5.0`.
 
 ## License
 

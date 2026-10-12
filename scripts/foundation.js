@@ -286,18 +286,20 @@ export function buildFoundationPlan(inputConfig = {}, actorProfile = {}) {
  * Return the profile attacks will have after the selected foundation fields
  * are applied. Audit mode deliberately retains the live actor profile.
  */
-export function getEffectiveActorProfile(plan, actorProfile = {}) {
+export function getEffectiveActorProfile(plan, actorProfile = {}, sections = DEFAULTS.sections) {
   if (plan.config.mode !== "apply") return actorProfile;
-  const abilities = plan.config.manage.abilities ? plan.abilityMods : actorProfile.abilityMods;
+  const active = { ...DEFAULTS.sections, ...(sections ?? {}) };
+  const applyFoundation = active.foundation !== false;
+  const abilities = applyFoundation && plan.config.manage.abilities ? plan.abilityMods : actorProfile.abilityMods;
   return {
     ...actorProfile,
     abilityMods: { ...(actorProfile.abilityMods ?? {}), ...(abilities ?? {}) },
-    abilityScores: plan.config.manage.abilities ? plan.abilities : actorProfile.abilityScores,
-    proficiency: plan.proficiency,
-    hp: plan.config.manage.hp ? plan.final.hp : actorProfile.hp,
-    ac: plan.config.manage.ac ? plan.final.ac : actorProfile.ac,
-    speed: plan.config.manage.body && plan.body.speed !== null ? plan.body.speed : actorProfile.speed,
-    darkvision: plan.config.manage.body && plan.body.darkvision !== null ? plan.body.darkvision : actorProfile.darkvision,
-    size: plan.config.manage.body && plan.body.size ? plan.body.size : actorProfile.size
+    abilityScores: applyFoundation && plan.config.manage.abilities ? plan.abilities : actorProfile.abilityScores,
+    proficiency: active.build !== false ? plan.proficiency : actorProfile.proficiency,
+    hp: applyFoundation && plan.config.manage.hp ? plan.final.hp : actorProfile.hp,
+    ac: applyFoundation && plan.config.manage.ac ? plan.final.ac : actorProfile.ac,
+    speed: applyFoundation && plan.config.manage.body && plan.body.speed !== null ? plan.body.speed : actorProfile.speed,
+    darkvision: applyFoundation && plan.config.manage.body && plan.body.darkvision !== null ? plan.body.darkvision : actorProfile.darkvision,
+    size: applyFoundation && plan.config.manage.body && plan.body.size ? plan.body.size : actorProfile.size
   };
 }

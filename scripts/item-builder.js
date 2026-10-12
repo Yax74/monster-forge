@@ -246,11 +246,22 @@ export function buildMultiattackItem(plan, createdWeapons, { idFactory, setId })
   const id = idFactory();
   const primary = createdWeapons[0];
   const secondary = createdWeapons[1];
-  let sentence = `The creature makes ${plan.primary.count} @UUID[${primary.uuid}]{${escapeHtml(primary.name)}} attack${plan.primary.count === 1 ? "" : "s"}`;
-  if (secondary) {
-    sentence += ` and ${plan.secondary.count} @UUID[${secondary.uuid}]{${escapeHtml(secondary.name)}} attack${plan.secondary.count === 1 ? "" : "s"}`;
+  const countLabel = (count) => [
+    "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"
+  ][count] ?? String(count);
+  const link = (item) => `@UUID[${item.uuid}]{${escapeHtml(item.name)}}`;
+  const clause = (item, count) => `${countLabel(count)} attack${count === 1 ? "" : "s"} with its ${link(item)}`;
+  let sentence;
+
+  if (secondary && plan.config.secondaryMode === "alternative") {
+    sentence = plan.primary.count === plan.secondary.count
+      ? `The creature makes ${countLabel(plan.primary.count)} attack${plan.primary.count === 1 ? "" : "s"} with either its ${link(primary)} or its ${link(secondary)}.`
+      : `The creature makes ${clause(primary, plan.primary.count)} or ${clause(secondary, plan.secondary.count)}.`;
+  } else {
+    sentence = `The creature makes ${clause(primary, plan.primary.count)}`;
+    if (secondary) sentence += ` and ${clause(secondary, plan.secondary.count)}`;
+    sentence += ".";
   }
-  sentence += ".";
 
   if (plan.config.tertiary.enabled) {
     const tertiaryName = plan.config.tertiary.name?.trim()

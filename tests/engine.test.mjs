@@ -13,7 +13,7 @@ import {
   suggestedSaveDc,
   targetDpr
 } from "../scripts/engine.js";
-import { buildWeaponItem } from "../scripts/item-builder.js";
+import { buildMultiattackItem, buildWeaponItem } from "../scripts/item-builder.js";
 import {
   applyFoundationPlan,
   applyPlan,
@@ -348,6 +348,40 @@ test("audit mode keeps the live actor profile", () => {
   assert.equal(normalizeFoundationConfig({ mode: "invalid" }).mode, "apply");
 });
 
+test("disabled build and foundation sections retain the live combat profile", () => {
+  const foundation = buildFoundationPlan({
+    cr: "10",
+    foundation: { mode: "apply", role: "brute" },
+    primary: { weaponKey: "longsword" }
+  });
+  const actor = {
+    abilityMods: { str: 1, dex: 2 },
+    abilityScores: { str: 12, dex: 14 },
+    proficiency: 2,
+    hp: 20,
+    ac: 12
+  };
+  const attacksOnly = getEffectiveActorProfile(foundation, actor, {
+    build: false,
+    foundation: false,
+    boosts: false,
+    attacks: true
+  });
+  assert.equal(attacksOnly.proficiency, 2);
+  assert.deepEqual(attacksOnly.abilityMods, actor.abilityMods);
+  assert.equal(attacksOnly.hp, 20);
+  assert.equal(attacksOnly.ac, 12);
+
+  const crOnly = getEffectiveActorProfile(foundation, actor, {
+    build: true,
+    foundation: false,
+    boosts: false,
+    attacks: true
+  });
+  assert.equal(crOnly.proficiency, foundation.proficiency);
+  assert.deepEqual(crOnly.abilityMods, actor.abilityMods);
+});
+
 test("uses the agreed compressed attack-count schedule", () => {
   assert.equal(getCrStats("1/2").recommendedAttacks, 1);
   assert.equal(getCrStats(1).recommendedAttacks, 2);
@@ -371,6 +405,28 @@ test("recommended counts preserve one or two attack profiles", () => {
   const fractional = applyRecommendedAttacks({ cr: "1/2", secondaryEnabled: true });
   assert.equal(fractional.secondaryEnabled, false);
   assert.equal(fractional.primary.count, 1);
+});
+
+test("recommended counts treat alternative profiles as complete routines", () => {
+  const alternative = applyRecommendedAttacks({
+    cr: "5",
+    secondaryEnabled: true,
+    secondaryMode: "alternative",
+    primary: { count: 1 },
+    secondary: { count: 1 }
+  });
+  assert.equal(alternative.secondaryEnabled, true);
+  assert.equal(alternative.primary.count, 3);
+  assert.equal(alternative.secondary.count, 3);
+
+  const fractional = applyRecommendedAttacks({
+    cr: "1/2",
+    secondaryEnabled: true,
+    secondaryMode: "alternative"
+  });
+  assert.equal(fractional.secondaryEnabled, true);
+  assert.equal(fractional.primary.count, 1);
+  assert.equal(fractional.secondary.count, 1);
 });
 
 test("normalizes stale or invalid saved form values", () => {
@@ -399,6 +455,8 @@ test("normalizes stale or invalid saved form values", () => {
   assert.equal(config.foundation.role, "balanced");
   assert.equal(config.foundation.manage.hp, true);
   assert.equal(config.foundation.overrides.abilities.str, "");
+  assert.deepEqual(config.sections, { build: true, foundation: true, boosts: true, attacks: true });
+  assert.equal(config.secondaryMode, "combined");
   assert.equal(config.splitPrimary, 95);
   assert.equal(config.primary.count, 20);
   assert.equal(config.primary.weaponKey, "longsword");
@@ -410,6 +468,15 @@ test("normalizes stale or invalid saved form values", () => {
   assert.equal(config.tertiary.die, 6);
   assert.equal(config.tertiary.usesPerRound, 20);
   assert.equal(config.tertiary.damageType, "poison");
+});
+
+test("preserves independently disabled section defaults", () => {
+  const config = normalizeConfig({
+    sections: { foundation: false, attacks: false },
+    secondaryMode: "alternative"
+  });
+  assert.deepEqual(config.sections, { build: true, foundation: false, boosts: true, attacks: false });
+  assert.equal(config.secondaryMode, "alternative");
 });
 
 test("ability overrides drive exact actor attack bonuses and save DCs", () => {
@@ -458,6 +525,98 @@ test("builds a close CR 5 damage plan using actor modifiers", () => {
   assert.equal(plan.primary.formula, "3d8 + @abilities.str.mod");
   assert.equal(plan.achieved, 35);
   assert.equal(plan.variance, 0);
+});
+
+test("budgets alternative attacks separately instead of adding their DPR", () => {
+  const alternative = buildDamagePlan({
+    cr: "5",
+    secondaryEnabled: true,
+    secondaryMode: "alternative",
+    primary: { count: 3, weaponKey: "longsword", extraType: "none", rider: "prone" },
+    secondary: { count: 3, weaponKey: "longbow", extraType: "none", rider: "restrained" }
+  }, { abilityMods: { str: 4, dex: 4 }, proficiency: 3 });
+
+  assert.equal(alternative.alternative, true);
+  assert.equal(alternative.totalAttacks, 3);
+  assert.equal(alternative.primary.weapon.rangeType, "melee");
+  assert.equal(alternative.secondary.weapon.rangeType, "ranged");
+  assert.equal(alternative.primary.weapon.ability, "str");
+  assert.equal(alternative.secondary.weapon.ability, "dex");
+  assert.equal(alternative.primary.rider, "prone");
+  assert.equal(alternative.secondary.rider, "restrained");
+  assert.equal(alternative.primary.averagePerRound, alternative.secondary.averagePerRound);
+  assert.equal(
+    alternative.achieved,
+    Math.max(alternative.primary.averagePerRound, alternative.secondary.averagePerRound)
+  );
+  assert.notEqual(
+    alternative.achieved,
+    alternative.primary.averagePerRound + alternative.secondary.averagePerRound
+  );
+
+  const withTertiary = buildDamagePlan({
+    ...alternative.config,
+    tertiary: {
+      ...alternative.config.tertiary,
+      enabled: true,
+      dice: 2,
+      die: 6,
+      usesPerRound: 1
+    }
+  }, { abilityMods: { str: 4, dex: 4 }, proficiency: 3 });
+  assert.equal(
+    withTertiary.achieved,
+    Math.max(withTertiary.primary.averagePerRound, withTertiary.secondary.averagePerRound)
+      + withTertiary.tertiaryAverage
+  );
+
+  const combined = buildDamagePlan({
+    ...alternative.config,
+    secondaryMode: "combined",
+    primary: { ...alternative.config.primary, count: 2 },
+    secondary: { ...alternative.config.secondary, count: 1 }
+  }, { abilityMods: { str: 4, dex: 4 }, proficiency: 3 });
+  assert.equal(combined.alternative, false);
+  assert.equal(combined.totalAttacks, 3);
+  assert.equal(
+    combined.achieved,
+    combined.primary.averagePerRound + combined.secondary.averagePerRound
+  );
+});
+
+test("writes standard Multiattack descriptions for combined and alternative routines", () => {
+  const createdWeapons = [
+    { uuid: "Actor.test.Item.sword", name: "Longsword" },
+    { uuid: "Actor.test.Item.bow", name: "Longbow" }
+  ];
+  const options = { setId: "set", idFactory: () => "activity" };
+  const alternativePlan = buildDamagePlan({
+    cr: "5",
+    secondaryEnabled: true,
+    secondaryMode: "alternative",
+    primary: { count: 3, weaponKey: "longsword" },
+    secondary: { count: 3, weaponKey: "longbow" }
+  }, { abilityMods: { str: 4, dex: 4 }, proficiency: 3 });
+  const alternative = buildMultiattackItem(alternativePlan, createdWeapons, options);
+  assert.match(alternative.system.description.value, /three attacks with either its .*Longsword.* or its .*Longbow/);
+
+  const mixedPlan = buildDamagePlan({
+    ...alternativePlan.config,
+    secondaryMode: "combined",
+    primary: { ...alternativePlan.config.primary, count: 2 },
+    secondary: { ...alternativePlan.config.secondary, count: 1 }
+  }, { abilityMods: { str: 4, dex: 4 }, proficiency: 3 });
+  const mixed = buildMultiattackItem(mixedPlan, createdWeapons, options);
+  assert.match(mixed.system.description.value, /two attacks with its .*Longsword.* and one attack with its .*Longbow/);
+  assert.doesNotMatch(mixed.system.description.value, / or /);
+
+  const unevenAlternativePlan = buildDamagePlan({
+    ...alternativePlan.config,
+    primary: { ...alternativePlan.config.primary, count: 2 },
+    secondary: { ...alternativePlan.config.secondary, count: 1 }
+  }, { abilityMods: { str: 4, dex: 4 }, proficiency: 3 });
+  const unevenAlternative = buildMultiattackItem(unevenAlternativePlan, createdWeapons, options);
+  assert.match(unevenAlternative.system.description.value, /two attacks with its .*Longsword.* or one attack with its .*Longbow/);
 });
 
 test("reports when tertiary damage exceeds the entire target", () => {
@@ -618,6 +777,31 @@ test("builds D&D5e 6 actor updates and preserves current HP percentage", () => {
   assert.equal(update["system.traits.size"], "med");
   assert.equal(update["system.attributes.movement.speeds.walk"], 40);
   assert.equal(update["system.attributes.senses.ranges.darkvision"], 120);
+
+  const crOnly = buildFoundationActorUpdate(actor, foundation, {
+    build: true,
+    foundation: false,
+    boosts: false,
+    attacks: true
+  });
+  assert.deepEqual(crOnly, { "system.details.cr": 5 });
+
+  const statsOnly = buildFoundationActorUpdate(actor, foundation, {
+    build: false,
+    foundation: true,
+    boosts: false,
+    attacks: true
+  });
+  assert.equal(Object.hasOwn(statsOnly, "system.details.cr"), false);
+  assert.equal(statsOnly["system.attributes.hp.max"], 86);
+
+  const attacksOnly = buildFoundationActorUpdate(actor, foundation, {
+    build: false,
+    foundation: false,
+    boosts: false,
+    attacks: true
+  });
+  assert.deepEqual(attacksOnly, {});
 });
 
 test("builds legacy D&D5e 5 actor paths when nested v6 fields are absent", () => {
@@ -765,6 +949,130 @@ test("replace and undo touch only generated items", async () => {
   assert.equal(getGeneratedItems(actor).length, 1);
 });
 
+test("section-scoped replace and undo preserve disabled generated item groups", async () => {
+  let generatedId = 0;
+  globalThis.foundry = {
+    utils: {
+      deepClone: structuredClone,
+      randomID: () => `scoped-${++generatedId}`
+    }
+  };
+
+  class ItemCollection extends Map {
+    filter(predicate) {
+      return [...this.values()].filter(predicate);
+    }
+  }
+
+  const wrapItem = (source, actor) => ({
+    id: source._id,
+    name: source.name,
+    uuid: `Actor.scoped.Item.${source._id}`,
+    getFlag: (scope, key) => source.flags?.[scope]?.[key],
+    toObject: () => structuredClone(source),
+    actor
+  });
+  const actor = {
+    name: "Scoped NPC",
+    type: "npc",
+    isOwner: true,
+    system: { abilities: { str: { mod: 3 }, dex: { mod: 2 } } },
+    items: new ItemCollection(),
+    flags: {},
+    getFlag(scope, key) {
+      return this.flags?.[scope]?.[key];
+    },
+    async setFlag(scope, key, value) {
+      this.flags[scope] ??= {};
+      this.flags[scope][key] = structuredClone(value);
+    },
+    async unsetFlag(scope, key) {
+      if (this.flags[scope]) delete this.flags[scope][key];
+    },
+    async createEmbeddedDocuments(_type, data, options = {}) {
+      return data.map((raw) => {
+        const source = structuredClone(raw);
+        source._id = options.keepId && source._id ? source._id : `item-${++generatedId}`;
+        const item = wrapItem(source, this);
+        this.items.set(item.id, item);
+        return item;
+      });
+    },
+    async deleteEmbeddedDocuments(_type, ids) {
+      for (const id of ids) this.items.delete(id);
+    }
+  };
+
+  const oldAttack = {
+    _id: "old-attack",
+    name: "Old Attack",
+    flags: { [MODULE_ID]: { generated: true, kind: "attack" } }
+  };
+  const oldBoost = {
+    _id: "old-boost",
+    name: "Old Boost",
+    flags: { [MODULE_ID]: { generated: true, kind: "boost" } }
+  };
+  actor.items.set(oldAttack._id, wrapItem(oldAttack, actor));
+  actor.items.set(oldBoost._id, wrapItem(oldBoost, actor));
+  actor.flags[MODULE_ID] = { foundation: { sentinel: "unchanged" } };
+
+  const attacksOnly = buildDamagePlan({
+    cr: "2",
+    applyMode: "replace",
+    sections: { build: false, foundation: false, boosts: false, attacks: true },
+    primary: { count: 2, weaponKey: "longsword" }
+  }, { abilityMods: { str: 3, dex: 2 }, proficiency: 2 });
+  const attackResult = await applyPlan(actor, attacksOnly);
+  assert.equal(attackResult.replaced, 1);
+  assert.equal(attackResult.actorUpdated, false);
+  assert.equal(actor.items.has("old-attack"), false);
+  assert.equal(actor.items.has("old-boost"), true);
+  assert.equal(getGeneratedItems(actor).filter((item) => item.getFlag(MODULE_ID, "kind") === "boost").length, 1);
+
+  await undoLastOperation(actor);
+  assert.equal(actor.items.has("old-attack"), true);
+  assert.equal(actor.items.has("old-boost"), true);
+  assert.equal(getGeneratedItems(actor).length, 2);
+  assert.deepEqual(actor.getFlag(MODULE_ID, "foundation"), { sentinel: "unchanged" });
+
+  const legacyOperation = { originalItemsData: [], generatedItemIds: ["legacy"] };
+  actor.flags.world = { monsterForgeData: structuredClone(legacyOperation) };
+  const boostsOnly = buildDamagePlan({
+    cr: "2",
+    applyMode: "replace",
+    sections: { build: false, foundation: false, boosts: true, attacks: false },
+    primary: { count: 2, weaponKey: "longsword" }
+  }, { abilityMods: { str: 3, dex: 2 }, proficiency: 2 });
+  const boostResult = await applyPlan(actor, boostsOnly, {
+    boostSources: [{
+      uuid: "Compendium.test.boosts.Item.quick",
+      data: {
+        _id: "source-boost",
+        name: "Quickness II",
+        type: "feat",
+        flags: {},
+        effects: [],
+        system: { description: { value: "<p>Initiative boost.</p>" } }
+      }
+    }]
+  });
+  assert.equal(boostResult.replaced, 1);
+  assert.equal(boostResult.attacks, 0);
+  assert.equal(boostResult.boosts, 1);
+  assert.equal(boostResult.actorUpdated, false);
+  assert.equal(actor.items.has("old-attack"), true);
+  assert.equal(actor.items.has("old-boost"), false);
+  assert.deepEqual(actor.getFlag("world", "monsterForgeData"), legacyOperation);
+
+  await undoLastOperation(actor);
+  assert.equal(actor.items.has("old-attack"), true);
+  assert.equal(actor.items.has("old-boost"), true);
+  assert.equal(getGeneratedItems(actor).length, 2);
+  assert.deepEqual(actor.getFlag("world", "monsterForgeData"), legacyOperation);
+  assert.deepEqual(actor.getFlag(MODULE_ID, "foundation"), { sentinel: "unchanged" });
+});
+
 test("foundation application and undo restore actor data as one transaction", async () => {
   let generatedId = 0;
   globalThis.foundry = {
@@ -880,5 +1188,17 @@ test("foundation application and undo restore actor data as one transaction", as
   assert.equal(getGeneratedItems(actor).length, 0);
   const foundationUndo = await undoLastOperation(actor);
   assert.equal(foundationUndo.actorRestored, true);
+  assert.deepEqual(actor.system, originalSystem);
+
+  const statsOnly = await applyFoundationPlan(actor, foundation, {
+    build: false,
+    foundation: true,
+    boosts: false,
+    attacks: false
+  });
+  assert.equal(statsOnly.actorUpdated, true);
+  assert.equal(actor.system.details.cr, 2);
+  assert.equal(actor.system.attributes.hp.max, 114);
+  await undoLastOperation(actor);
   assert.deepEqual(actor.system, originalSystem);
 });

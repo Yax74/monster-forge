@@ -72,12 +72,126 @@
   padding: 0.8rem;
 }
 
+.monster-forge .mf-tabs {
+  background: var(--color-bg, #eee);
+  border: 1px solid var(--color-border-light-tertiary, #999);
+  border-radius: 8px;
+  display: grid;
+  gap: 0.25rem;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  padding: 0.3rem;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.monster-forge .mf-tab {
+  align-items: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  display: grid;
+  font-size: 0.72rem;
+  gap: 0.1rem 0.35rem;
+  grid-template-columns: auto 1fr auto;
+  min-height: 2.25rem;
+  padding: 0.35rem 0.45rem;
+  text-align: left;
+}
+
+.monster-forge .mf-tab:hover,
+.monster-forge .mf-tab:focus-visible {
+  background: var(--mf-accent-soft);
+}
+
+.monster-forge .mf-tab.is-active {
+  background: var(--mf-accent);
+  border-color: color-mix(in srgb, var(--mf-accent) 70%, #111);
+  color: #fff;
+}
+
+.monster-forge .mf-tab small {
+  background: color-mix(in srgb, #3f8b45 25%, transparent);
+  border-radius: 999px;
+  font-size: 0.58rem;
+  font-weight: 700;
+  padding: 0.12rem 0.35rem;
+  text-transform: uppercase;
+}
+
+.monster-forge .mf-tab small.is-off {
+  background: color-mix(in srgb, #777 25%, transparent);
+  opacity: 0.75;
+}
+
+.monster-forge .mf-tab-panel:not(.is-active),
+.monster-forge .mf-tab-panel[hidden] {
+  display: none !important;
+}
+
+.monster-forge .mf-section-toggle {
+  align-items: center;
+  background: var(--mf-accent-soft);
+  border: 1px solid color-mix(in srgb, var(--mf-accent) 50%, transparent);
+  border-radius: 999px;
+  display: flex;
+  font-size: 0.7rem;
+  gap: 0.4rem;
+  padding: 0.3rem 0.55rem;
+  white-space: nowrap;
+}
+
+.monster-forge .mf-section-toggle input {
+  min-height: auto;
+  width: auto;
+}
+
+.monster-forge .is-section-disabled [data-section-body]:not([data-planning-body]) {
+  filter: grayscale(0.6);
+  opacity: 0.46;
+}
+
+.monster-forge [data-planning-body].is-planning-only::before {
+  background: color-mix(in srgb, #c57a1f 14%, transparent);
+  border-left: 3px solid #c57a1f;
+  content: "Planning only — these choices still drive previews, but CR will not be written.";
+  display: block;
+  font-size: 0.7rem;
+  margin-bottom: 0.65rem;
+  padding: 0.4rem 0.55rem;
+}
+
 .monster-forge .mf-preview {
   border-left: 4px solid var(--mf-accent);
 }
 
 .monster-forge .mf-section-heading {
   margin-bottom: 0.65rem;
+}
+
+.monster-forge .mf-subheading-row {
+  align-items: center;
+  border-bottom: 1px solid var(--color-border-light-tertiary, #999);
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  margin: 0 0 0.65rem;
+  padding-bottom: 0.4rem;
+}
+
+.monster-forge .mf-subheading-row h4 {
+  font-size: 0.82rem;
+  margin: 0;
+}
+
+.monster-forge .mf-attack-heading,
+.monster-forge .mf-tertiary-heading {
+  margin-top: 0.85rem;
+}
+
+.monster-forge .mf-build-options,
+.monster-forge .mf-routine-controls {
+  margin-top: 0.65rem;
 }
 
 .monster-forge .mf-section-heading > div {
@@ -372,6 +486,22 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+.monster-forge .mf-review-sections {
+  display: grid;
+  gap: 0.45rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 0.65rem;
+}
+
+.monster-forge .mf-review-sections > div {
+  background: var(--mf-accent-soft);
+  border-radius: 5px;
+  display: grid;
+  font-size: 0.7rem;
+  gap: 0.12rem;
+  padding: 0.45rem 0.55rem;
+}
+
 .monster-forge .mf-metrics > div {
   background: rgba(0, 0, 0, 0.08);
   border-radius: 5px;
@@ -471,7 +601,18 @@
   }
 
   .monster-forge .mf-foundation-preview,
-  .monster-forge .mf-check-grid {
+  .monster-forge .mf-check-grid,
+  .monster-forge .mf-review-sections {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .monster-forge .mf-tabs {
+    display: flex;
+    overflow-x: auto;
+  }
+
+  .monster-forge .mf-tab {
+    flex: 0 0 auto;
+    min-width: 7.5rem;
   }
 }

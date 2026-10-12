@@ -16,7 +16,7 @@
   </header>
 
   {{#if actor.hasLegacyData}}
-  <p class="mf-callout"><i class="fa-solid fa-wand-magic-sparkles"></i> Legacy macro data was detected. Replace mode will adopt and replace only items marked by the old Monster Forge macro.</p>
+  <p class="mf-callout" data-attacks-only><i class="fa-solid fa-wand-magic-sparkles"></i> Legacy macro data was detected. Replace mode will adopt and replace only legacy attack items when Attacks is enabled.</p>
   {{/if}}
 
   {{#if actor.importedSpecies}}
@@ -24,383 +24,291 @@
   {{/if}}
 
   {{#if actor.existingOffense}}
-  <p class="mf-callout mf-callout-warning"><i class="fa-solid fa-triangle-exclamation"></i> This actor already has {{actor.existingOffense}} ungenerated offensive item(s): {{actor.existingOffenseNames}}{{#if actor.existingOffenseMore}}, plus {{actor.existingOffenseMore}} more{{/if}}. Their damage is not included in the generated DPR budget.</p>
+  <p class="mf-callout mf-callout-warning" data-attacks-only><i class="fa-solid fa-triangle-exclamation"></i> This actor already has {{actor.existingOffense}} ungenerated offensive item(s): {{actor.existingOffenseNames}}{{#if actor.existingOffenseMore}}, plus {{actor.existingOffenseMore}} more{{/if}}. Their damage is not included in the generated DPR budget.</p>
   {{/if}}
 
-  <section class="mf-section">
-    <div class="mf-section-heading">
-      <div>
-        <span class="mf-step">1</span>
-        <h3>NPC foundation</h3>
-      </div>
-      <label>Foundation behavior
-        <select name="foundation.mode">
-          {{#each foundation.modeOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
-        </select>
-      </label>
-    </div>
-    <div class="mf-grid mf-grid-4">
-      <label>Challenge rating
-        <select name="cr">
-          {{#each crOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
-        </select>
-      </label>
-      <label>Combat role
-        <select name="foundation.role">
-          {{#each foundation.roleOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
-        </select>
-      </label>
-      <label>Creature tier
-        <select name="foundation.tier">
-          {{#each foundation.tierOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
-        </select>
-      </label>
-      <label>Species
-        <select name="foundation.species">
-          {{#each foundation.speciesOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
-        </select>
-      </label>
-    </div>
-    <div class="mf-casting-control" data-casting-ability>
-      <label>Spellcasting ability
-        <select name="foundation.castingAbility">
-          {{#each foundation.castingAbilityOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
-        </select>
-      </label>
-      <p class="mf-help">Caster uses this for spell attacks and save DCs. Controller, Support, and Leader use it for their role-led save DC.</p>
-    </div>
+  <nav class="mf-tabs" role="tablist" aria-label="Monster Forge sections">
+    <button type="button" role="tab" class="mf-tab is-active" id="mf-tab-build" aria-controls="mf-panel-build" aria-selected="true" data-tab-target="build">
+      <i class="fa-solid fa-compass-drafting"></i><span>Build</span><small data-tab-status="build">{{#if config.sections.build}}On{{else}}Off{{/if}}</small>
+    </button>
+    <button type="button" role="tab" class="mf-tab" id="mf-tab-foundation" aria-controls="mf-panel-foundation" aria-selected="false" tabindex="-1" data-tab-target="foundation">
+      <i class="fa-solid fa-shield-halved"></i><span>Foundation</span><small data-tab-status="foundation">{{#if config.sections.foundation}}On{{else}}Off{{/if}}</small>
+    </button>
+    <button type="button" role="tab" class="mf-tab" id="mf-tab-boosts" aria-controls="mf-panel-boosts" aria-selected="false" tabindex="-1" data-tab-target="boosts">
+      <i class="fa-solid fa-bolt"></i><span>Boosts</span><small data-tab-status="boosts">{{#if config.sections.boosts}}On{{else}}Off{{/if}}</small>
+    </button>
+    <button type="button" role="tab" class="mf-tab" id="mf-tab-attacks" aria-controls="mf-panel-attacks" aria-selected="false" tabindex="-1" data-tab-target="attacks">
+      <i class="fa-solid fa-swords"></i><span>Attacks</span><small data-tab-status="attacks">{{#if config.sections.attacks}}On{{else}}Off{{/if}}</small>
+    </button>
+    <button type="button" role="tab" class="mf-tab" id="mf-tab-review" aria-controls="mf-panel-review" aria-selected="false" tabindex="-1" data-tab-target="review">
+      <i class="fa-solid fa-clipboard-check"></i><span>Review</span>
+    </button>
+  </nav>
 
-    <div class="mf-foundation-controls" data-foundation-apply>
-      <div class="mf-check-grid" aria-label="Managed actor fields">
-        <label class="mf-switch"><input type="checkbox" name="foundation.manage.hp" {{#if foundation.manage.hp}}checked{{/if}}> Hit points</label>
-        <label class="mf-switch"><input type="checkbox" name="foundation.manage.ac" {{#if foundation.manage.ac}}checked{{/if}}> Armor class</label>
-        <label class="mf-switch"><input type="checkbox" name="foundation.manage.abilities" {{#if foundation.manage.abilities}}checked{{/if}}> Ability scores</label>
-        <label class="mf-switch"><input type="checkbox" name="foundation.manage.body" {{#if foundation.manage.body}}checked{{/if}}> Size, speed & vision</label>
+  <div class="mf-tab-stack">
+    <section class="mf-section mf-tab-panel is-active" id="mf-panel-build" role="tabpanel" aria-labelledby="mf-tab-build" data-tab-panel="build" data-section-panel="build">
+      <div class="mf-section-heading">
+        <div><span class="mf-step">1</span><h3>Build</h3></div>
+        <label class="mf-section-toggle"><input type="checkbox" name="sections.build" {{#if config.sections.build}}checked{{/if}}> Write selected CR</label>
       </div>
-      <label>Current HP after apply
-        <select name="foundation.hpPolicy">
-          {{#each foundation.hpPolicyOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
-        </select>
-      </label>
-    </div>
-
-    <div class="mf-foundation-preview">
-      <div><strong data-preview="foundation-mode">—</strong><span data-preview="foundation-cr">—</span></div>
-      <div><strong>HP</strong><span data-preview="foundation-hp">—</span></div>
-      <div><strong>AC</strong><span data-preview="foundation-ac">—</span></div>
-      <div><strong>Attack / DC / DPR</strong><span data-preview="foundation-offense">—</span></div>
-    </div>
-    <div class="mf-preview-grid mf-foundation-detail">
-      <div><strong>Role</strong><span data-preview="foundation-role">—</span></div>
-      <div><strong>Tier</strong><span data-preview="foundation-tier">—</span></div>
-      <div><strong>Species/body</strong><span data-preview="foundation-species">—</span></div>
-      <div><strong>Abilities</strong><span data-preview="foundation-abilities">—</span></div>
-      <div><strong>Spellcasting</strong><span data-preview="foundation-casting">—</span></div>
-      <div><strong>Body result</strong><span data-preview="foundation-body">—</span></div>
-      <div><strong>Sources</strong><span data-preview="foundation-source">—</span></div>
-    </div>
-
-    <div class="mf-ability-editor">
-      <div class="mf-mini-heading">Suggested attributes and overrides</div>
-      <p class="mf-help">Each suggested score updates with CR, role, species, attack profile, and spellcasting ability. Enter a value only where you want to lock an override.</p>
-      <div class="mf-ability-grid">
-        {{#each foundation.abilityFields}}
-        <label data-ability="{{key}}">
-          <span>{{label}}</span>
-          <input type="number" name="foundation.overrides.abilities.{{key}}" min="1" max="30" value="{{value}}" placeholder="Auto">
-          <small>Suggested <b data-preview="ability-{{key}}-suggested">—</b> · Final <b data-preview="ability-{{key}}-final">—</b></small>
-        </label>
-        {{/each}}
-      </div>
-    </div>
-
-    <details class="mf-overrides">
-      <summary>Manual overrides <small>Blank fields stay automatic</small></summary>
-      <div class="mf-grid mf-grid-5">
-        <label>HP <input type="number" name="foundation.overrides.hp" min="1" max="10000" value="{{foundation.overrides.hp}}" placeholder="Auto"></label>
-        <label>AC <input type="number" name="foundation.overrides.ac" min="1" max="40" value="{{foundation.overrides.ac}}" placeholder="Auto"></label>
-        <label>Attack bonus <input type="number" name="foundation.overrides.attackBonus" min="-5" max="30" value="{{foundation.overrides.attackBonus}}" placeholder="Auto"></label>
-        <label>Save DC <input type="number" name="foundation.overrides.saveDc" min="5" max="40" value="{{foundation.overrides.saveDc}}" placeholder="Auto"></label>
-        <label>DPR <input type="number" name="foundation.overrides.dpr" min="0" max="2000" step="0.5" value="{{foundation.overrides.dpr}}" placeholder="Auto"></label>
-      </div>
-      <p class="mf-mini-heading">Body</p>
-      <div class="mf-grid mf-grid-3">
-        <label>Walk speed <input type="number" name="foundation.overrides.speed" min="0" max="300" value="{{foundation.overrides.speed}}" placeholder="Auto"></label>
-        <label>Darkvision <input type="number" name="foundation.overrides.darkvision" min="0" max="1000" value="{{foundation.overrides.darkvision}}" placeholder="Auto"></label>
-        <label>Size <select name="foundation.overrides.size">{{#each foundation.sizeOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
-      </div>
-    </details>
-    <p class="mf-help">CR supplies the published <em>Forge of Foes</em> baseline. Role, tier, species/body data, and ability arrays are transparent Monster Forge recommendations—not additional Forge of Foes tables. Species remains separate from culture and faction. Apply mode always sets the selected CR; the field checkboxes control the other actor data.</p>
-  </section>
-
-  <section class="mf-section">
-    <div class="mf-section-heading">
-      <div>
-        <span class="mf-step">2</span>
-        <h3>NPC boosts</h3>
-      </div>
-      <span class="mf-source-count">{{boosts.found}} selectable from {{boosts.sources}} compendium(s)</span>
-    </div>
-    {{#if boosts.hasGroups}}
-    <div class="mf-boost-grid">
-      {{#each boosts.groups}}
-      <label>{{label}}
-        <select name="boosts.selected" title="Source: {{packLabel}}">
-          <option value="">None</option>
-          {{#each options}}<option value="{{value}}" {{#if selected}}selected{{/if}} title="{{summary}}">{{label}}</option>{{/each}}
-        </select>
-        <small>{{packLabel}}{{#if rankNote}} · {{rankNote}}{{/if}}</small>
-      </label>
-      {{/each}}
-    </div>
-    {{else}}
-    <p class="mf-callout"><i class="fa-solid fa-box-open"></i> No boost items were found. Add Item documents to a compendium folder named <strong>NPC Boosts</strong>, or flag an item as a Monster Forge boost.</p>
-    {{/if}}
-    {{#if boosts.blockedCount}}
-    <p class="mf-callout mf-callout-warning"><i class="fa-solid fa-shield-halved"></i> {{boosts.blockedCount}} legacy source item(s) were blocked because they replace CR, HP, or DPR already controlled by the FoF foundation.</p>
-    {{/if}}
-    {{#each boosts.warnings}}
-    <p class="mf-callout mf-callout-warning">{{this}}</p>
-    {{/each}}
-    <div class="mf-preview-grid mf-boost-preview"><div><strong>Selected</strong><span data-preview="boosts">—</span></div></div>
-    <ul class="mf-boost-details" data-preview="boost-details" hidden></ul>
-    <p class="mf-help">Ranked items such as Tough I–III are grouped into one choice. Boosts are copied from their source compendium by <strong>Forge NPC</strong>, retain their effects and automation, and participate in Replace and Undo. Foundation-only does not import them.</p>
-  </section>
-
-  <section class="mf-section">
-    <div class="mf-section-heading">
-      <div>
-        <span class="mf-step">3</span>
-        <h3>Damage budget</h3>
-      </div>
-      <div class="mf-heading-actions">
-        <label class="mf-switch"><input type="checkbox" name="followCrAttacks" {{#if config.followCrAttacks}}checked{{/if}}> Follow CR count</label>
-        <button type="button" class="mf-link-button" data-action="recommend-attacks">
-          <i class="fa-solid fa-wand-magic-sparkles"></i> Use suggested count now
-        </button>
-      </div>
-    </div>
-    <div class="mf-grid mf-grid-3">
-      <label>Fine DPR adjustment
-        <select name="roleModifier">
-          {{#each damageAdjustmentOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
-        </select>
-      </label>
-      <label>Attack accuracy
-        <select name="accuracyMode">
-          {{#each accuracyOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
-        </select>
-      </label>
-      <label>Saving throw DC
-        <select name="saveDcMode">
-          {{#each saveDcOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
-        </select>
-      </label>
-      <label>Condition automation
-        <select name="riderAutomation">
-          {{#each riderAutomationOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
-        </select>
-      </label>
-      <label>Generated item behavior
-        <select name="applyMode">
-          {{#each applyModeOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
-        </select>
-      </label>
-    </div>
-    <p class="mf-help">The selected foundation DPR feeds this budget. The optional fine adjustment is applied after role and tier. The attack-count suggestion remains deliberately compressed for faster play, while the number of distinct attack profiles remains your choice. Editing either Uses field turns off Follow CR count.</p>
-    {{#if integration.ready}}
-    <p class="mf-help mf-integration-ready"><i class="fa-solid fa-link"></i> Midi-QOL and DAE are active. Automated riders will trigger their save after a hit and apply the embedded condition on a failed save when Midi-QOL item-effect automation is enabled.</p>
-    {{else}}
-    <p class="mf-help"><i class="fa-solid fa-circle-info"></i> Automated rider data can still be generated, but automatic save chaining and condition application require active Midi-QOL and DAE modules.</p>
-    {{/if}}
-  </section>
-
-  <section class="mf-section">
-    <div class="mf-section-heading">
-      <div><span class="mf-step">4</span><h3>Attacks</h3></div>
-      <label class="mf-switch"><input type="checkbox" name="secondaryEnabled" {{#if config.secondaryEnabled}}checked{{/if}}> Secondary attack</label>
-    </div>
-    <label data-field="split">Damage split
-      <select name="splitPrimary">
-        {{#each splitOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
-      </select>
-    </label>
-
-    <div class="mf-attack-columns">
-      <fieldset>
-        <legend>Primary</legend>
-        <div class="mf-grid mf-grid-2">
-          <label>Attack profile
-            <select name="primary.weaponKey">
-              {{#each primary.weaponOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
-            </select>
+      <div data-section-body="build" data-planning-body>
+        <div class="mf-grid mf-grid-4">
+          <label>Challenge rating
+            <select name="cr">{{#each crOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
           </label>
-          <label>Uses in Multiattack
-            <input type="number" name="primary.count" min="1" max="20" step="1" value="{{primary.count}}">
+          <label>Combat role
+            <select name="foundation.role">{{#each foundation.roleOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
           </label>
-          <label>Rename (optional)
-            <input type="text" name="primary.name" maxlength="80" value="{{primary.name}}" placeholder="Keep preset name">
+          <label>Creature tier
+            <select name="foundation.tier">{{#each foundation.tierOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
           </label>
-          <label>Ability override
-            <select name="primary.abilityOverride">
-              {{#each primary.abilityOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
-            </select>
-          </label>
-          <label>Extra damage type
-            <select name="primary.extraType">
-              {{#each primary.extraTypeOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
-            </select>
-          </label>
-          <label>Extra damage die
-            <select name="primary.extraDie">
-              {{#each primary.extraDieOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
-            </select>
-          </label>
-          <label>Status rider
-            <select name="primary.rider">
-              {{#each primary.riderOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
-            </select>
-          </label>
-          <label data-rider-save="primary">Rider save
-            <select name="primary.saveAbility">
-              {{#each primary.saveOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
-            </select>
+          <label>Species
+            <select name="foundation.species">{{#each foundation.speciesOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
           </label>
         </div>
-        <div class="mf-custom" data-custom="primary">
-          <strong>Custom profile</strong>
-          <div class="mf-grid mf-grid-2">
-            <label>Action type
-              <select name="primary.customAction">{{#each primary.customActionOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
+        <div class="mf-grid mf-grid-2 mf-build-options">
+          <label>Actor write mode
+            <select name="foundation.mode">{{#each foundation.modeOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
+          </label>
+          <label data-casting-ability>Spellcasting ability
+            <select name="foundation.castingAbility">{{#each foundation.castingAbilityOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
+          </label>
+        </div>
+        <div class="mf-foundation-preview">
+          <div><strong data-preview="foundation-mode">—</strong><span data-preview="foundation-cr">—</span></div>
+          <div><strong>HP</strong><span data-preview="foundation-hp">—</span></div>
+          <div><strong>AC</strong><span data-preview="foundation-ac">—</span></div>
+          <div><strong>Attack / DC / DPR</strong><span data-preview="foundation-offense">—</span></div>
+        </div>
+        <div class="mf-preview-grid mf-foundation-detail">
+          <div><strong>Role</strong><span data-preview="foundation-role">—</span></div>
+          <div><strong>Tier</strong><span data-preview="foundation-tier">—</span></div>
+          <div><strong>Species/body</strong><span data-preview="foundation-species">—</span></div>
+          <div><strong>Spellcasting</strong><span data-preview="foundation-casting">—</span></div>
+          <div><strong>Sources</strong><span data-preview="foundation-source">—</span></div>
+        </div>
+        <p class="mf-help">The build choices always drive the live recommendations and attack budget. Turning this section off prevents Monster Forge from writing CR, while keeping the selected CR available for attacks-only work.</p>
+      </div>
+    </section>
+
+    <section class="mf-section mf-tab-panel" id="mf-panel-foundation" role="tabpanel" aria-labelledby="mf-tab-foundation" data-tab-panel="foundation" data-section-panel="foundation" hidden>
+      <div class="mf-section-heading">
+        <div><span class="mf-step">2</span><h3>Foundation &amp; attributes</h3></div>
+        <label class="mf-section-toggle"><input type="checkbox" name="sections.foundation" {{#if config.sections.foundation}}checked{{/if}}> Apply this section</label>
+      </div>
+      <div data-section-body="foundation">
+        <div class="mf-foundation-controls" data-foundation-apply>
+          <div class="mf-check-grid" aria-label="Managed actor fields">
+            <label class="mf-switch"><input type="checkbox" name="foundation.manage.hp" {{#if foundation.manage.hp}}checked{{/if}}> Hit points</label>
+            <label class="mf-switch"><input type="checkbox" name="foundation.manage.ac" {{#if foundation.manage.ac}}checked{{/if}}> Armor class</label>
+            <label class="mf-switch"><input type="checkbox" name="foundation.manage.abilities" {{#if foundation.manage.abilities}}checked{{/if}}> Ability scores</label>
+            <label class="mf-switch"><input type="checkbox" name="foundation.manage.body" {{#if foundation.manage.body}}checked{{/if}}> Size, speed &amp; vision</label>
+          </div>
+          <label>Current HP after apply
+            <select name="foundation.hpPolicy">{{#each foundation.hpPolicyOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
+          </label>
+        </div>
+
+        <div class="mf-ability-editor">
+          <div class="mf-mini-heading">Suggested attributes and overrides</div>
+          <p class="mf-help">Suggestions recalculate with CR, role, species, attacks, and spellcasting ability. Enter only the scores you want to lock.</p>
+          <div class="mf-ability-grid">
+            {{#each foundation.abilityFields}}
+            <label data-ability="{{key}}">
+              <span>{{label}}</span>
+              <input type="number" name="foundation.overrides.abilities.{{key}}" min="1" max="30" value="{{value}}" placeholder="Auto">
+              <small>Suggested <b data-preview="ability-{{key}}-suggested">—</b> · Final <b data-preview="ability-{{key}}-final">—</b></small>
             </label>
-            <label>Ability
-              <select name="primary.customAbility">{{#each primary.customAbilityOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
-            </label>
-            <label>Base die
-              <select name="primary.customDie">{{#each primary.customDieOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
-            </label>
-            <label>Base type
-              <select name="primary.customDamageType">{{#each primary.customDamageOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
-            </label>
+            {{/each}}
           </div>
         </div>
-      </fieldset>
 
-      <fieldset data-panel="secondary">
-        <legend>Secondary</legend>
-        <div class="mf-grid mf-grid-2">
-          <label>Attack profile
-            <select name="secondary.weaponKey">
-              {{#each secondary.weaponOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
-            </select>
-          </label>
-          <label>Uses in Multiattack
-            <input type="number" name="secondary.count" min="1" max="20" step="1" value="{{secondary.count}}">
-          </label>
-          <label>Rename (optional)
-            <input type="text" name="secondary.name" maxlength="80" value="{{secondary.name}}" placeholder="Keep preset name">
-          </label>
-          <label>Ability override
-            <select name="secondary.abilityOverride">
-              {{#each secondary.abilityOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
-            </select>
-          </label>
-          <label>Extra damage type
-            <select name="secondary.extraType">
-              {{#each secondary.extraTypeOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
-            </select>
-          </label>
-          <label>Extra damage die
-            <select name="secondary.extraDie">
-              {{#each secondary.extraDieOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
-            </select>
-          </label>
-          <label>Status rider
-            <select name="secondary.rider">
-              {{#each secondary.riderOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
-            </select>
-          </label>
-          <label data-rider-save="secondary">Rider save
-            <select name="secondary.saveAbility">
-              {{#each secondary.saveOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
-            </select>
-          </label>
+        <details class="mf-overrides">
+          <summary>Manual overrides <small>Blank fields stay automatic</small></summary>
+          <div class="mf-grid mf-grid-5">
+            <label>HP <input type="number" name="foundation.overrides.hp" min="1" max="10000" value="{{foundation.overrides.hp}}" placeholder="Auto"></label>
+            <label>AC <input type="number" name="foundation.overrides.ac" min="1" max="40" value="{{foundation.overrides.ac}}" placeholder="Auto"></label>
+            <label>Attack bonus <input type="number" name="foundation.overrides.attackBonus" min="-5" max="30" value="{{foundation.overrides.attackBonus}}" placeholder="Auto"></label>
+            <label>Save DC <input type="number" name="foundation.overrides.saveDc" min="5" max="40" value="{{foundation.overrides.saveDc}}" placeholder="Auto"></label>
+            <label>DPR <input type="number" name="foundation.overrides.dpr" min="0" max="2000" step="0.5" value="{{foundation.overrides.dpr}}" placeholder="Auto"></label>
+          </div>
+          <p class="mf-mini-heading">Body</p>
+          <div class="mf-grid mf-grid-3">
+            <label>Walk speed <input type="number" name="foundation.overrides.speed" min="0" max="300" value="{{foundation.overrides.speed}}" placeholder="Auto"></label>
+            <label>Darkvision <input type="number" name="foundation.overrides.darkvision" min="0" max="1000" value="{{foundation.overrides.darkvision}}" placeholder="Auto"></label>
+            <label>Size <select name="foundation.overrides.size">{{#each foundation.sizeOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+          </div>
+        </details>
+        <div class="mf-preview-grid mf-foundation-detail">
+          <div><strong>Final abilities</strong><span data-preview="foundation-abilities">—</span></div>
+          <div><strong>Body result</strong><span data-preview="foundation-body">—</span></div>
         </div>
-        <div class="mf-custom" data-custom="secondary">
-          <strong>Custom profile</strong>
-          <div class="mf-grid mf-grid-2">
-            <label>Action type
-              <select name="secondary.customAction">{{#each secondary.customActionOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
-            </label>
-            <label>Ability
-              <select name="secondary.customAbility">{{#each secondary.customAbilityOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
-            </label>
-            <label>Base die
-              <select name="secondary.customDie">{{#each secondary.customDieOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
-            </label>
-            <label>Base type
-              <select name="secondary.customDamageType">{{#each secondary.customDamageOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
-            </label>
+        <p class="mf-help">CR supplies the published <em>Forge of Foes</em> baseline. Role, tier, species/body data, and ability arrays are transparent Monster Forge recommendations. Turning this section off preserves all actor statistics other than CR, if Build remains enabled.</p>
+      </div>
+    </section>
+
+    <section class="mf-section mf-tab-panel" id="mf-panel-boosts" role="tabpanel" aria-labelledby="mf-tab-boosts" data-tab-panel="boosts" data-section-panel="boosts" hidden>
+      <div class="mf-section-heading">
+        <div><span class="mf-step">3</span><h3>NPC boosts</h3></div>
+        <label class="mf-section-toggle"><input type="checkbox" name="sections.boosts" {{#if config.sections.boosts}}checked{{/if}}> Apply this section</label>
+      </div>
+      <div data-section-body="boosts">
+        <p class="mf-source-count">{{boosts.found}} selectable from {{boosts.sources}} compendium(s)</p>
+        {{#if boosts.hasGroups}}
+        <div class="mf-boost-grid">
+          {{#each boosts.groups}}
+          <label>{{label}}
+            <select name="boosts.selected" title="Source: {{packLabel}}">
+              <option value="">None</option>
+              {{#each options}}<option value="{{value}}" {{#if selected}}selected{{/if}} title="{{summary}}">{{label}}</option>{{/each}}
+            </select>
+            <small>{{packLabel}}{{#if rankNote}} · {{rankNote}}{{/if}}</small>
+          </label>
+          {{/each}}
+        </div>
+        {{else}}
+        <p class="mf-callout"><i class="fa-solid fa-box-open"></i> No boost items were found. Add Item documents to a compendium folder named <strong>NPC Boosts</strong>, or flag an item as a Monster Forge boost.</p>
+        {{/if}}
+        {{#if boosts.blockedCount}}
+        <p class="mf-callout mf-callout-warning"><i class="fa-solid fa-shield-halved"></i> {{boosts.blockedCount}} legacy source item(s) were blocked because they replace CR, HP, or DPR already controlled by the FoF foundation.</p>
+        {{/if}}
+        {{#each boosts.warnings}}<p class="mf-callout mf-callout-warning">{{this}}</p>{{/each}}
+        <div class="mf-preview-grid mf-boost-preview"><div><strong>Selected</strong><span data-preview="boosts">—</span></div></div>
+        <ul class="mf-boost-details" data-preview="boost-details" hidden></ul>
+        <p class="mf-help">Ranked items such as Tough I–III are grouped into one choice. A disabled Boosts section retains these selections, imports nothing, and leaves existing generated boosts untouched.</p>
+      </div>
+    </section>
+
+    <section class="mf-section mf-tab-panel" id="mf-panel-attacks" role="tabpanel" aria-labelledby="mf-tab-attacks" data-tab-panel="attacks" data-section-panel="attacks" hidden>
+      <div class="mf-section-heading">
+        <div><span class="mf-step">4</span><h3>Attacks &amp; riders</h3></div>
+        <label class="mf-section-toggle"><input type="checkbox" name="sections.attacks" {{#if config.sections.attacks}}checked{{/if}}> Apply this section</label>
+      </div>
+      <div data-section-body="attacks">
+        <div class="mf-subheading-row">
+          <h4>Damage budget</h4>
+          <div class="mf-heading-actions">
+            <label class="mf-switch"><input type="checkbox" name="followCrAttacks" {{#if config.followCrAttacks}}checked{{/if}}> Follow CR count</label>
+            <button type="button" class="mf-link-button" data-action="recommend-attacks"><i class="fa-solid fa-wand-magic-sparkles"></i> Use suggested count now</button>
           </div>
         </div>
-      </fieldset>
-    </div>
-  </section>
+        <div class="mf-grid mf-grid-3">
+          <label>Fine DPR adjustment <select name="roleModifier">{{#each damageAdjustmentOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+          <label>Attack accuracy <select name="accuracyMode">{{#each accuracyOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+          <label>Saving throw DC <select name="saveDcMode">{{#each saveDcOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+          <label>Condition automation <select name="riderAutomation">{{#each riderAutomationOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+          <label>Generated item behavior <select name="applyMode">{{#each applyModeOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+        </div>
+        {{#if integration.ready}}
+        <p class="mf-help mf-integration-ready"><i class="fa-solid fa-link"></i> Midi-QOL and DAE are active. Automated riders can trigger their save after a hit and apply the condition on failure.</p>
+        {{else}}
+        <p class="mf-help"><i class="fa-solid fa-circle-info"></i> Automated rider data can still be generated, but save chaining and condition application require active Midi-QOL and DAE modules.</p>
+        {{/if}}
 
-  <section class="mf-section">
-    <div class="mf-section-heading">
-      <div><span class="mf-step">5</span><h3>Tertiary on-hit feature</h3></div>
-      <label class="mf-switch"><input type="checkbox" name="tertiary.enabled" {{#if tertiary.enabled}}checked{{/if}}> Include feature</label>
-    </div>
-    <div class="mf-grid mf-grid-3" data-panel="tertiary">
-      <label>Preset
-        <select name="tertiary.preset">{{#each tertiary.presetOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
-      </label>
-      <label>Rename (optional)
-        <input type="text" name="tertiary.name" maxlength="80" value="{{tertiary.name}}">
-      </label>
-      <label>Uses budgeted per round
-        <input type="number" name="tertiary.usesPerRound" min="1" max="20" value="{{tertiary.usesPerRound}}">
-      </label>
-      <label>Dice
-        <input type="number" name="tertiary.dice" min="1" max="100" value="{{tertiary.dice}}">
-      </label>
-      <label>Die
-        <select name="tertiary.die">{{#each tertiary.dieOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
-      </label>
-      <label>Damage type
-        <select name="tertiary.damageType">{{#each tertiary.damageTypeOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
-      </label>
-      <label>Saving throw
-        <select name="tertiary.saveAbility">{{#each tertiary.saveOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
-      </label>
-      <label data-tertiary-dc>Actor DC ability
-        <select name="tertiary.dcAbility">{{#each tertiary.dcAbilityOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
-      </label>
-    </div>
-  </section>
+        <div class="mf-subheading-row mf-attack-heading">
+          <h4>Attack profiles</h4>
+          <label class="mf-switch"><input type="checkbox" name="secondaryEnabled" {{#if config.secondaryEnabled}}checked{{/if}}> Secondary attack</label>
+        </div>
+        <div class="mf-grid mf-grid-2 mf-routine-controls">
+          <label data-field="secondary-mode">Relationship <select name="secondaryMode">{{#each secondaryModeOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+          <label data-field="split">Combined damage split <select name="splitPrimary">{{#each splitOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+        </div>
 
-  <section class="mf-preview" aria-live="polite">
-    <div class="mf-section-heading"><div><span class="mf-step"><i class="fa-solid fa-chart-line"></i></span><h3>Live sanity check</h3></div></div>
-    <div class="mf-metrics">
-      <div><span>FoF baseline</span><strong data-preview="baseline">—</strong></div>
-      <div><span>Target DPR</span><strong data-preview="target">—</strong></div>
-      <div data-metric="achieved"><span>Generated DPR</span><strong data-preview="achieved">—</strong><small data-preview="variance"></small></div>
-      <div><span>Attack count</span><strong data-preview="attacks">—</strong></div>
-    </div>
-    <div class="mf-preview-grid">
-      <div><strong>Primary</strong><span data-preview="primary">—</span></div>
-      <div><strong>Secondary</strong><span data-preview="secondary">—</span></div>
-      <div><strong>Tertiary</strong><span data-preview="tertiary">—</span></div>
-      <div><strong>Accuracy / DC</strong><span><span data-preview="accuracy">—</span> · <span data-preview="save-dc">—</span></span></div>
-    </div>
-    <h4 class="mf-audit-title">Actor versus selected foundation</h4>
-    <div class="mf-audit-grid">
-      <div><strong>Hit points</strong><span>Actor <b data-preview="actor-hp">—</b> · Target <b data-preview="fof-hp">—</b></span></div>
-      <div><strong>Armor class</strong><span>Actor <b data-preview="actor-ac">—</b> · Target <b data-preview="fof-ac">—</b></span></div>
-      <div><strong>Attack bonus</strong><span>Generated <b data-preview="actor-attack">—</b> · Target <b data-preview="fof-attack">—</b></span></div>
-      <div><strong>Save DC</strong><span>Generated <b data-preview="actor-dc">—</b> · Target <b data-preview="fof-dc">—</b></span></div>
-    </div>
-    <ul class="mf-warnings" data-preview="warnings"></ul>
-  </section>
+        <div class="mf-attack-columns">
+          <fieldset>
+            <legend>Primary</legend>
+            <div class="mf-grid mf-grid-2">
+              <label>Attack profile <select name="primary.weaponKey">{{#each primary.weaponOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+              <label>Uses in Multiattack <input type="number" name="primary.count" min="1" max="20" step="1" value="{{primary.count}}"></label>
+              <label>Rename (optional) <input type="text" name="primary.name" maxlength="80" value="{{primary.name}}" placeholder="Keep preset name"></label>
+              <label>Ability override <select name="primary.abilityOverride">{{#each primary.abilityOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+              <label>Extra damage type <select name="primary.extraType">{{#each primary.extraTypeOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+              <label>Extra damage die <select name="primary.extraDie">{{#each primary.extraDieOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+              <label>Status rider <select name="primary.rider">{{#each primary.riderOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+              <label data-rider-save="primary">Rider save <select name="primary.saveAbility">{{#each primary.saveOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+            </div>
+            <div class="mf-custom" data-custom="primary">
+              <strong>Custom profile</strong>
+              <div class="mf-grid mf-grid-2">
+                <label>Action type <select name="primary.customAction">{{#each primary.customActionOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+                <label>Ability <select name="primary.customAbility">{{#each primary.customAbilityOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+                <label>Base die <select name="primary.customDie">{{#each primary.customDieOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+                <label>Base type <select name="primary.customDamageType">{{#each primary.customDamageOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset data-panel="secondary">
+            <legend>Secondary</legend>
+            <div class="mf-grid mf-grid-2">
+              <label>Attack profile <select name="secondary.weaponKey">{{#each secondary.weaponOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+              <label>Uses in Multiattack <input type="number" name="secondary.count" min="1" max="20" step="1" value="{{secondary.count}}"></label>
+              <label>Rename (optional) <input type="text" name="secondary.name" maxlength="80" value="{{secondary.name}}" placeholder="Keep preset name"></label>
+              <label>Ability override <select name="secondary.abilityOverride">{{#each secondary.abilityOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+              <label>Extra damage type <select name="secondary.extraType">{{#each secondary.extraTypeOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+              <label>Extra damage die <select name="secondary.extraDie">{{#each secondary.extraDieOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+              <label>Status rider <select name="secondary.rider">{{#each secondary.riderOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+              <label data-rider-save="secondary">Rider save <select name="secondary.saveAbility">{{#each secondary.saveOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+            </div>
+            <div class="mf-custom" data-custom="secondary">
+              <strong>Custom profile</strong>
+              <div class="mf-grid mf-grid-2">
+                <label>Action type <select name="secondary.customAction">{{#each secondary.customActionOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+                <label>Ability <select name="secondary.customAbility">{{#each secondary.customAbilityOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+                <label>Base die <select name="secondary.customDie">{{#each secondary.customDieOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+                <label>Base type <select name="secondary.customDamageType">{{#each secondary.customDamageOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+              </div>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="mf-subheading-row mf-tertiary-heading">
+          <h4>Tertiary on-hit feature</h4>
+          <label class="mf-switch"><input type="checkbox" name="tertiary.enabled" {{#if tertiary.enabled}}checked{{/if}}> Include feature</label>
+        </div>
+        <div class="mf-grid mf-grid-3" data-panel="tertiary">
+          <label>Preset <select name="tertiary.preset">{{#each tertiary.presetOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+          <label>Rename (optional) <input type="text" name="tertiary.name" maxlength="80" value="{{tertiary.name}}"></label>
+          <label>Uses budgeted per round <input type="number" name="tertiary.usesPerRound" min="1" max="20" value="{{tertiary.usesPerRound}}"></label>
+          <label>Dice <input type="number" name="tertiary.dice" min="1" max="100" value="{{tertiary.dice}}"></label>
+          <label>Die <select name="tertiary.die">{{#each tertiary.dieOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+          <label>Damage type <select name="tertiary.damageType">{{#each tertiary.damageTypeOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+          <label>Saving throw <select name="tertiary.saveAbility">{{#each tertiary.saveOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+          <label data-tertiary-dc>Actor DC ability <select name="tertiary.dcAbility">{{#each tertiary.dcAbilityOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+        </div>
+        <p class="mf-help">Combined routines divide the round budget and use both profiles. Alternative routines give each profile the complete weapon budget and join them with <strong>or</strong>; their DPR is never added together.</p>
+      </div>
+    </section>
+
+    <section class="mf-preview mf-tab-panel" id="mf-panel-review" role="tabpanel" aria-labelledby="mf-tab-review" data-tab-panel="review" hidden>
+      <div class="mf-section-heading"><div><span class="mf-step"><i class="fa-solid fa-chart-line"></i></span><h3>Review &amp; sanity check</h3></div></div>
+      <div class="mf-review-sections">
+        <div><strong>Build</strong><span data-preview="section-build">—</span></div>
+        <div><strong>Foundation</strong><span data-preview="section-foundation">—</span></div>
+        <div><strong>Boosts</strong><span data-preview="section-boosts">—</span></div>
+        <div><strong>Attacks</strong><span data-preview="section-attacks">—</span></div>
+      </div>
+      <div class="mf-metrics">
+        <div><span>FoF baseline</span><strong data-preview="baseline">—</strong></div>
+        <div><span>Target DPR</span><strong data-preview="target">—</strong></div>
+        <div data-metric="achieved"><span>Generated DPR</span><strong data-preview="achieved">—</strong><small data-preview="variance"></small></div>
+        <div><span>Attack count</span><strong data-preview="attacks">—</strong></div>
+      </div>
+      <div class="mf-preview-grid">
+        <div><strong>Routine</strong><span data-preview="routine">—</span></div>
+        <div><strong>Primary</strong><span data-preview="primary">—</span></div>
+        <div><strong>Secondary</strong><span data-preview="secondary">—</span></div>
+        <div><strong>Tertiary</strong><span data-preview="tertiary">—</span></div>
+        <div><strong>Accuracy / DC</strong><span><span data-preview="accuracy">—</span> · <span data-preview="save-dc">—</span></span></div>
+      </div>
+      <h4 class="mf-audit-title">Actor versus selected foundation</h4>
+      <div class="mf-audit-grid">
+        <div><strong>Hit points</strong><span>Actor <b data-preview="actor-hp">—</b> · Target <b data-preview="fof-hp">—</b></span></div>
+        <div><strong>Armor class</strong><span>Actor <b data-preview="actor-ac">—</b> · Target <b data-preview="fof-ac">—</b></span></div>
+        <div><strong>Attack bonus</strong><span>Generated <b data-preview="actor-attack">—</b> · Target <b data-preview="fof-attack">—</b></span></div>
+        <div><strong>Save DC</strong><span>Generated <b data-preview="actor-dc">—</b> · Target <b data-preview="fof-dc">—</b></span></div>
+      </div>
+      <ul class="mf-warnings" data-preview="warnings"></ul>
+    </section>
+  </div>
 </div>

@@ -79,6 +79,10 @@ export function mergeDefaults(saved = {}, actorCr = DEFAULTS.cr) {
     ...DEFAULTS,
     ...saved,
     cr: normalizeCr(actorCr ?? saved.cr ?? DEFAULTS.cr),
+    sections: {
+      ...DEFAULTS.sections,
+      ...(saved.sections ?? {})
+    },
     foundation: {
       ...DEFAULTS.foundation,
       ...savedFoundation,
@@ -111,11 +115,14 @@ export function mergeDefaults(saved = {}, actorCr = DEFAULTS.cr) {
 export function applyRecommendedAttacks(config = {}, rawCr = config.cr) {
   const recommendation = getCrStats(rawCr).recommendedAttacks;
   const merged = mergeDefaults(config, rawCr);
-  const useSecondary = Boolean(merged.secondaryEnabled) && recommendation > 1;
+  const alternative = merged.secondaryMode === "alternative";
+  const useSecondary = Boolean(merged.secondaryEnabled) && (alternative || recommendation > 1);
   let primaryCount = recommendation;
   let secondaryCount = merged.secondary?.count ?? 1;
 
-  if (useSecondary) {
+  if (useSecondary && alternative) {
+    secondaryCount = recommendation;
+  } else if (useSecondary) {
     const split = clamp(merged.splitPrimary, 5, 95, DEFAULTS.splitPrimary) / 100;
     primaryCount = Math.min(recommendation - 1, Math.max(1, Math.round(recommendation * split)));
     secondaryCount = recommendation - primaryCount;
@@ -235,6 +242,9 @@ export function normalizeConfig(config = {}) {
   return {
     ...current,
     cr: normalizeCr(current.cr),
+    sections: Object.fromEntries(
+      Object.keys(DEFAULTS.sections).map((section) => [section, current.sections?.[section] !== false])
+    ),
     roleModifier: clamp(current.roleModifier, -50, 50, 0),
     followCrAttacks: current.followCrAttacks !== false,
     accuracyMode: current.accuracyMode === "cr" ? "cr" : "actor",
@@ -244,6 +254,7 @@ export function normalizeConfig(config = {}) {
     boosts: normalizeBoostConfig(current.boosts),
     splitPrimary: clamp(current.splitPrimary, 5, 95, DEFAULTS.splitPrimary),
     secondaryEnabled: Boolean(current.secondaryEnabled),
+    secondaryMode: current.secondaryMode === "alternative" ? "alternative" : "combined",
     primary: normalizeAttack(current.primary, DEFAULTS.primary),
     secondary: normalizeAttack(current.secondary, DEFAULTS.secondary),
     tertiary: {
@@ -332,15 +343,21 @@ export function buildDamagePlan(inputConfig = {}, actorData = {}, foundationBenc
     ? roundHalf(tertiary.dice * dieAverage(tertiary.die) * tertiary.usesPerRound)
     : 0;
   const weaponBudget = Math.max(0, target - tertiaryAverage);
-  const primaryShare = config.secondaryEnabled ? config.splitPrimary / 100 : 1;
+  const alternative = config.secondaryEnabled && config.secondaryMode === "alternative";
+  const primaryShare = config.secondaryEnabled && !alternative ? config.splitPrimary / 100 : 1;
   const primary = planAttack(config.primary, weaponBudget * primaryShare, actorProfile);
   const secondary = config.secondaryEnabled
-    ? planAttack(config.secondary, weaponBudget * (1 - primaryShare), actorProfile)
+    ? planAttack(config.secondary, alternative ? weaponBudget : weaponBudget * (1 - primaryShare), actorProfile)
     : null;
-  const achieved = roundHalf(primary.averagePerRound + (secondary?.averagePerRound ?? 0) + tertiaryAverage);
+  const weaponAchieved = alternative
+    ? Math.max(primary.averagePerRound, secondary?.averagePerRound ?? 0)
+    : primary.averagePerRound + (secondary?.averagePerRound ?? 0);
+  const achieved = roundHalf(weaponAchieved + tertiaryAverage);
   const variance = roundHalf(achieved - target);
   const warnings = [];
-  const totalAttacks = primary.count + (secondary?.count ?? 0);
+  const totalAttacks = alternative
+    ? Math.max(primary.count, secondary?.count ?? 0)
+    : primary.count + (secondary?.count ?? 0);
 
   if (tertiaryAverage > target) {
     warnings.push("The tertiary feature alone exceeds the selected DPR target.");
@@ -350,6 +367,9 @@ export function buildDamagePlan(inputConfig = {}, actorData = {}, foundationBenc
   }
   if (totalAttacks !== stats.recommendedAttacks) {
     warnings.push(`This profile makes ${totalAttacks} attacks; Monster Forge recommends ${stats.recommendedAttacks} at CR ${stats.cr}.`);
+  }
+  if (alternative) {
+    warnings.push("Alternative attacks are each budgeted as a complete round option; their DPR is compared rather than added together.");
   }
   if (config.roleModifier !== 0) {
     warnings.push("The fine DPR adjustment intentionally moves the target away from the selected foundation benchmark.");
@@ -370,6 +390,8 @@ export function buildDamagePlan(inputConfig = {}, actorData = {}, foundationBenc
     achieved,
     variance,
     weaponBudget: roundHalf(weaponBudget),
+    weaponAchieved: roundHalf(weaponAchieved),
+    alternative,
     tertiaryAverage,
     primary,
     secondary,

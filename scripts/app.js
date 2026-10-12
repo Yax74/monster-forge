@@ -206,6 +206,10 @@ function buildContext(actor, config, boostCatalog) {
       [60, "60% primary / 40% secondary"],
       [75, "75% primary / 25% secondary"]
     ], config.splitPrimary),
+    secondaryModeOptions: options([
+      ["combined", "Combined routine (and)"],
+      ["alternative", "Alternative routine (or)"]
+    ], config.secondaryMode),
     primary: attackContext(config.primary),
     secondary: attackContext(config.secondary),
     tertiary: {
@@ -265,6 +269,12 @@ export function parseForgeForm(form) {
   const data = new FormData(form);
   return {
     cr: field(data, "cr", "0"),
+    sections: {
+      build: data.has("sections.build"),
+      foundation: data.has("sections.foundation"),
+      boosts: data.has("sections.boosts"),
+      attacks: data.has("sections.attacks")
+    },
     foundation: {
       mode: field(data, "foundation.mode", "apply"),
       role: field(data, "foundation.role", "balanced"),
@@ -303,6 +313,7 @@ export function parseForgeForm(form) {
     riderAutomation: field(data, "riderAutomation", "midi"),
     applyMode: field(data, "applyMode", "replace"),
     secondaryEnabled: data.has("secondaryEnabled"),
+    secondaryMode: field(data, "secondaryMode", "combined"),
     splitPrimary: numberField(data, "splitPrimary", 60),
     primary: parseAttack(data, "primary"),
     secondary: parseAttack(data, "secondary"),
@@ -330,6 +341,58 @@ function toggle(root, selector, visible) {
   if (element) element.hidden = !visible;
 }
 
+function setSectionStates(root, config, foundation, plan) {
+  const summaries = {
+    build: config.sections.build
+      ? foundation.config.mode === "apply" ? `On · write CR ${foundation.stats.cr}` : "Preview only · no CR write"
+      : "Off · selected CR remains a planning input",
+    foundation: config.sections.foundation
+      ? foundation.config.mode === "apply" ? "On · write enabled actor fields" : "Preview only · no actor fields"
+      : "Off · use the actor's current statistics",
+    boosts: config.sections.boosts
+      ? `On · ${plan.boosts.selected.length} selected`
+      : `Off · ${plan.boosts.selected.length} selection(s) retained`,
+    attacks: config.sections.attacks
+      ? `On · ${plan.alternative ? "alternative (or)" : plan.secondary ? "combined (and)" : "single"} routine`
+      : "Off · no attack items will change"
+  };
+
+  for (const section of ["build", "foundation", "boosts", "attacks"]) {
+    const enabled = Boolean(config.sections[section]);
+    const panel = root.querySelector(`[data-section-panel='${section}']`);
+    const body = root.querySelector(`[data-section-body='${section}']`);
+    const badge = root.querySelector(`[data-tab-status='${section}']`);
+    panel?.classList.toggle("is-section-disabled", !enabled);
+    if (body) {
+      const remainsInteractive = body.hasAttribute("data-planning-body");
+      body.inert = !enabled && !remainsInteractive;
+      body.setAttribute("aria-disabled", String(!enabled && !remainsInteractive));
+      body.classList.toggle("is-planning-only", !enabled && remainsInteractive);
+    }
+    if (badge) {
+      badge.textContent = foundation.config.mode === "audit" && ["build", "foundation"].includes(section) && enabled
+        ? "Preview"
+        : enabled ? "On" : "Off";
+      badge.classList.toggle("is-off", !enabled);
+    }
+    setText(root, `[data-preview='section-${section}']`, summaries[section]);
+  }
+}
+
+function activateTab(root, name) {
+  for (const button of root.querySelectorAll("[data-tab-target]")) {
+    const active = button.dataset.tabTarget === name;
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-selected", String(active));
+    button.tabIndex = active ? 0 : -1;
+  }
+  for (const panel of root.querySelectorAll("[data-tab-panel]")) {
+    const active = panel.dataset.tabPanel === name;
+    panel.classList.toggle("is-active", active);
+    panel.hidden = !active;
+  }
+}
+
 function signed(value) {
   return `${value >= 0 ? "+" : ""}${value}`;
 }
@@ -337,7 +400,7 @@ function signed(value) {
 function buildForgePlan(config, actor, boostCatalog) {
   const actorProfile = getActorCombatProfile(actor);
   const foundation = buildFoundationPlan(config, actorProfile);
-  const effectiveProfile = getEffectiveActorProfile(foundation, actorProfile);
+  const effectiveProfile = getEffectiveActorProfile(foundation, actorProfile, config.sections);
   const plan = buildDamagePlan({
     ...config,
     foundation: foundation.config
@@ -394,8 +457,12 @@ function updatePreview(root, actor, boostCatalog) {
   const existingOffense = getExistingOffensiveItems(actor);
   const midiReady = Boolean(game.modules?.get?.("midi-qol")?.active && game.modules?.get?.("dae")?.active);
 
+  setSectionStates(root, config, foundation, plan);
+  for (const element of root.querySelectorAll("[data-attacks-only]")) {
+    element.hidden = !config.sections.attacks;
+  }
   toggle(root, "[data-panel='secondary']", config.secondaryEnabled);
-  toggle(root, "[data-field='split']", config.secondaryEnabled);
+  toggle(root, "[data-field='split']", config.secondaryEnabled && config.secondaryMode === "combined");
   toggle(root, "[data-panel='tertiary']", config.tertiary.enabled);
   toggle(root, "[data-custom='primary']", config.primary.weaponKey === "custom");
   toggle(root, "[data-custom='secondary']", config.secondary.weaponKey === "custom");
@@ -428,6 +495,9 @@ function updatePreview(root, actor, boostCatalog) {
   setText(root, "[data-preview='secondary']", plan.secondary
     ? `${plan.secondary.weapon.name}: ${plan.secondary.formula} ≈ ${plan.secondary.averagePerHit}/hit × ${plan.secondary.count}`
     : "Disabled");
+  setText(root, "[data-preview='routine']", plan.alternative
+    ? "Alternative profiles (or): only one profile's round DPR is counted"
+    : plan.secondary ? "Combined profiles (and): both profiles count toward round DPR" : "Single attack profile");
   setText(root, "[data-preview='tertiary']", config.tertiary.enabled
     ? `${config.tertiary.dice}d${config.tertiary.die} ${config.tertiary.damageType} × ${config.tertiary.usesPerRound} = ${plan.tertiaryAverage} DPR`
     : "Disabled");
@@ -439,7 +509,8 @@ function updatePreview(root, actor, boostCatalog) {
   setText(root, "[data-preview='fof-attack']", signed(foundation.final.attackBonus));
   setText(root, "[data-preview='actor-dc']", saveDc);
   setText(root, "[data-preview='fof-dc']", `DC ${foundation.final.saveDc}`);
-  setText(root, "[data-preview='foundation-mode']", foundation.config.mode === "apply" ? "Will update actor" : "Preview only");
+  const actorSectionsEnabled = config.sections.build || config.sections.foundation;
+  setText(root, "[data-preview='foundation-mode']", foundation.config.mode === "apply" && actorSectionsEnabled ? "Selected fields enabled" : "Preview only");
   setText(root, "[data-preview='foundation-role']", `${foundation.role.label} · ${foundation.role.description}`);
   setText(root, "[data-preview='foundation-tier']", `${foundation.tier.label} · ${foundation.tier.description}`);
   setText(root, "[data-preview='foundation-species']", foundation.sources.species);
@@ -462,7 +533,9 @@ function updatePreview(root, actor, boostCatalog) {
       .toggle("is-overridden", foundation.config.overrides.abilities[ability] !== "");
   }
   const selectedBoostNames = plan.boosts.selected.map((entry) => entry.name);
-  setText(root, "[data-preview='boosts']", selectedBoostNames.length ? selectedBoostNames.join(" · ") : "None selected");
+  setText(root, "[data-preview='boosts']", config.sections.boosts
+    ? selectedBoostNames.length ? selectedBoostNames.join(" · ") : "None selected"
+    : "Disabled (selections retained)");
   updateBoostDetails(root, plan.boosts.selected);
 
   const varianceCard = root.querySelector("[data-metric='achieved']");
@@ -471,25 +544,35 @@ function updatePreview(root, actor, boostCatalog) {
   const warnings = root.querySelector("[data-preview='warnings']");
   if (warnings) {
     warnings.replaceChildren();
-    const previewWarnings = [...foundation.warnings, ...plan.warnings, ...plan.boosts.warnings];
-    if (foundation.config.mode === "audit") {
+    const previewWarnings = [
+      ...(config.sections.build || config.sections.foundation ? foundation.warnings : []),
+      ...(config.sections.attacks ? plan.warnings : []),
+      ...(config.sections.boosts ? plan.boosts.warnings : [])
+    ];
+    if (foundation.config.mode === "audit" && (config.sections.build || config.sections.foundation)) {
       previewWarnings.push("Foundation mode is Preview only: actor CR, defenses, abilities, and body data will not be changed, and actor-derived attacks will continue to use the current actor profile.");
     }
-    if (foundation.config.mode === "apply" && !foundation.config.manage.abilities && config.accuracyMode === "actor") {
+    if (config.sections.foundation && foundation.config.mode === "apply" && !foundation.config.manage.abilities && config.accuracyMode === "actor") {
       previewWarnings.push("Ability management is off, so actor-derived attack bonuses may not reach the selected foundation benchmark.");
     }
-    if (existingOffense.length) {
+    if (!config.sections.foundation && config.sections.attacks && config.accuracyMode === "actor") {
+      previewWarnings.push("Foundation & Attributes is off, so generated attacks use the actor's current ability scores.");
+    }
+    if (config.sections.attacks && existingOffense.length) {
       previewWarnings.push(`${existingOffense.length} existing offensive item(s) are not included in this generated DPR budget.`);
     }
     const hasRider = config.primary.rider !== "none" || (config.secondaryEnabled && config.secondary.rider !== "none");
-    if (config.riderAutomation === "midi" && hasRider && !midiReady) {
+    if (config.sections.attacks && config.riderAutomation === "midi" && hasRider && !midiReady) {
       previewWarnings.push("Midi-QOL rider automation is selected, but both Midi-QOL and DAE must be active for automatic save chaining and condition application.");
     }
-    if (foundation.config.role === "caster" && !plan.boosts.selected.some((entry) => entry.kind === "caster")) {
+    if (config.sections.boosts && foundation.config.role === "caster" && !plan.boosts.selected.some((entry) => entry.kind === "caster")) {
       previewWarnings.push("Caster role has no caster-progression boost selected. This is valid, but spellcasting level and spells must then be managed separately.");
     }
-    if (plan.boosts.selected.length) {
+    if (config.sections.boosts && plan.boosts.selected.length) {
       previewWarnings.push("Selected boosts are layered after the FoF foundation. Their Active Effects can intentionally move the final actor beyond the previewed benchmark.");
+    }
+    if (!Object.values(config.sections).some(Boolean)) {
+      previewWarnings.push("Every section is off. Enable at least one section before applying.");
     }
     if (!previewWarnings.length) {
       const item = document.createElement("li");
@@ -550,10 +633,27 @@ function attachListeners(_event, dialog, actor, boostCatalog) {
   });
   form.addEventListener("change", (event) => {
     const follow = form.elements.namedItem("followCrAttacks");
-    const shouldSync = follow?.checked && ["cr", "secondaryEnabled", "splitPrimary", "followCrAttacks"].includes(event.target?.name);
+    const shouldSync = follow?.checked && ["cr", "secondaryEnabled", "secondaryMode", "splitPrimary", "followCrAttacks"].includes(event.target?.name);
     if (shouldSync) syncRecommendation();
     preview();
   });
+
+  for (const button of root.querySelectorAll("[data-tab-target]")) {
+    button.addEventListener("click", () => activateTab(root, button.dataset.tabTarget));
+    button.addEventListener("keydown", (event) => {
+      if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+      const buttons = [...root.querySelectorAll("[data-tab-target]")];
+      const current = buttons.indexOf(button);
+      const next = event.key === "Home"
+        ? 0
+        : event.key === "End"
+          ? buttons.length - 1
+          : (current + (event.key === "ArrowRight" ? 1 : -1) + buttons.length) % buttons.length;
+      event.preventDefault();
+      activateTab(root, buttons[next].dataset.tabTarget);
+      buttons[next].focus();
+    });
+  }
 
   root.querySelector("[data-action='recommend-attacks']")?.addEventListener("click", () => {
     syncRecommendation();
@@ -598,6 +698,8 @@ function attachListeners(_event, dialog, actor, boostCatalog) {
     }
   });
 
+  const initialTab = root.querySelector("[data-tab-target].is-active")?.dataset.tabTarget ?? "build";
+  activateTab(root, initialTab);
   preview();
 }
 
@@ -638,15 +740,15 @@ export async function openForge(targetActor = null) {
       buttons: [
         {
           action: "foundation",
-          label: "Apply foundation only",
+          label: "Apply build & foundation",
           icon: "fa-solid fa-shield-halved",
           callback: async (_event, button) => {
             try {
               const parsed = parseForgeForm(button.form);
               const { foundation, plan } = buildForgePlan(parsed, actor, boostCatalog);
               await game.settings.set(MODULE_ID, "defaults", plan.config);
-              const result = await applyFoundationPlan(actor, foundation);
-              ui.notifications.info(`Monster Forge applied ${result.updatedFields} foundation field(s) to ${actor.name}.`);
+              const result = await applyFoundationPlan(actor, foundation, plan.config.sections);
+              ui.notifications.info(`Monster Forge applied ${result.updatedFields} enabled build/foundation field(s) to ${actor.name}.`);
               return true;
             } catch (error) {
               console.error(`${MODULE_ID} | Failed to apply the NPC foundation.`, error);
@@ -665,11 +767,20 @@ export async function openForge(targetActor = null) {
               const parsed = parseForgeForm(button.form);
               const { plan } = buildForgePlan(parsed, actor, boostCatalog);
               await game.settings.set(MODULE_ID, "defaults", plan.config);
-              const boostSources = await resolveBoostSources(plan.boosts.selected);
+              const boostSources = plan.config.sections.boosts
+                ? await resolveBoostSources(plan.boosts.selected)
+                : [];
               const result = await applyPlan(actor, plan, { boostSources });
-              const actorText = result.actorUpdated ? " and applied its NPC foundation" : "";
-              const boostText = result.boosts ? `, including ${result.boosts} boost${result.boosts === 1 ? "" : "s"}` : "";
-              ui.notifications.info(`Monster Forge added ${result.created.length} item(s)${boostText} to ${actor.name}${actorText}${result.replaced ? ` and replaced ${result.replaced}` : ""}.`);
+              const actions = [];
+              if (result.created.length) {
+                const boostText = result.boosts
+                  ? `, including ${result.boosts} boost${result.boosts === 1 ? "" : "s"}`
+                  : "";
+                actions.push(`added ${result.created.length} generated item(s)${boostText}`);
+              }
+              if (result.actorUpdated) actions.push("updated the enabled actor fields");
+              if (result.replaced) actions.push(`replaced ${result.replaced} prior generated item(s)`);
+              ui.notifications.info(`Monster Forge ${actions.join(" and ")} on ${actor.name}.`);
               return true;
             } catch (error) {
               console.error(`${MODULE_ID} | Failed to forge attacks.`, error);

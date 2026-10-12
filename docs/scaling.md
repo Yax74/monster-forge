@@ -39,7 +39,7 @@ Caster treats the selected Intelligence, Wisdom, or Charisma score as both its s
 
 Selected NPC boosts are imported only after the foundation and generated attack plan have been calculated. Their source Item data, Active Effects, and third-party automation flags are retained. Consequently, a boost can intentionally change a final score beyond the foundation preview; Monster Forge reports this rather than trying to reverse-engineer arbitrary Active Effects.
 
-Only one item from a ranked family can be selected at once. Source items named **NPC Hitpoints**, **Damage per Round**, **CR Boost**, and **Minion 15 HP Lock** are blocked because they duplicate or invalidate the foundation calculation. Boosts participate in the same Replace and Undo transaction as generated attacks.
+Only one item from a ranked family can be selected at once. Source items named **NPC Hitpoints**, **Damage per Round**, **CR Boost**, and **Minion 15 HP Lock** are blocked because they duplicate or invalidate the foundation calculation. Boosts can participate in the same Replace and Undo transaction as generated attacks, but a disabled Boosts section is excluded completely and its existing generated items are preserved.
 
 ## Published baseline
 
@@ -88,12 +88,12 @@ Only one item from a ranked family can be selected at once. Source items named *
 4. Apply any manual DPR override.
 5. Apply the optional fine DPR adjustment (−20% to +20%).
 6. Subtract the optional tertiary feature's average damage multiplied by its expected uses per round.
-7. Divide the remaining budget between primary and secondary profiles.
+7. For a combined routine, divide the remaining budget between primary and secondary profiles. For alternatives, give each profile the complete remaining budget because only one alternative is used in a round.
 8. Divide each profile's budget by its selected number of attacks.
 9. Subtract the relevant actor ability modifier from each per-hit target.
 10. Find the compact dice combination whose average is closest to that remaining target.
 
-This calculation always works backward from **total DPR**. It does not multiply the rounded damage-per-attack examples in the published table, so changing the number of attacks does not accidentally inflate total damage.
+This calculation always works backward from **total DPR**. It does not multiply the rounded damage-per-attack examples in the published table, so changing the number of attacks does not accidentally inflate total damage. Combined profiles are added when reporting achieved round DPR; alternative profiles are compared, and only the higher rounded profile is counted. Tertiary damage is then added once in either mode.
 
 At least one base weapon die is retained. When an extra damage type is selected, at least one extra die is retained as well. This can make very low-CR or high-ability attacks exceed their target, which the preview reports rather than hiding.
 

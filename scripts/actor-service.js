@@ -1,4 +1,4 @@
-import { ABILITIES, MODULE_ID, MODULE_VERSION } from "./constants.js";
+import { ABILITIES, DEFAULTS, MODULE_ID, MODULE_VERSION } from "./constants.js";
 import { buildMultiattackItem, buildTertiaryItem, buildWeaponItem } from "./item-builder.js";
 import { crToNumber } from "./engine.js";
 import { prepareBoostItemData } from "./boosts.js";
@@ -91,7 +91,13 @@ async function restoreFoundationFlag(actor, previous) {
   }
 }
 
-function foundationFlagData(foundation) {
+function activeSections(sections = {}) {
+  return Object.fromEntries(
+    Object.keys(DEFAULTS.sections).map((section) => [section, sections?.[section] !== false])
+  );
+}
+
+function foundationFlagData(foundation, sections = DEFAULTS.sections) {
   return {
     version: MODULE_VERSION,
     timestamp: Date.now(),
@@ -106,7 +112,8 @@ function foundationFlagData(foundation) {
     saveAbilities: clone(foundation.saveAbilities),
     casting: clone(foundation.casting),
     body: clone(foundation.body),
-    sources: clone(foundation.sources)
+    sources: clone(foundation.sources),
+    appliedSections: activeSections(sections)
   };
 }
 
@@ -116,6 +123,17 @@ export function isGeneratedItem(item) {
 
 export function getGeneratedItems(actor) {
   return actor.items.filter(isGeneratedItem);
+}
+
+function generatedItemsForSections(actor, sections) {
+  const active = activeSections(sections);
+  return getGeneratedItems(actor).filter((item) => {
+    const legacy = Boolean(item.getFlag?.("world", "monsterForge"));
+    const kind = item.getFlag?.(MODULE_ID, "kind");
+    if (kind === "boost") return active.boosts;
+    if (legacy || !kind || ["attack", "tertiary", "multiattack"].includes(kind)) return active.attacks;
+    return false;
+  });
 }
 
 export function getAbilityMods(actor) {
@@ -147,9 +165,14 @@ export function getActorCombatProfile(actor) {
 }
 
 /** Build a version-aware D&D5e actor update without mutating the actor. */
-export function buildFoundationActorUpdate(actor, foundation) {
+export function buildFoundationActorUpdate(actor, foundation, sections = DEFAULTS.sections) {
   if (!foundation || foundation.config.mode !== "apply") return {};
-  const update = { [crPath(actor)]: crToNumber(foundation.stats.cr) };
+  const active = activeSections(sections);
+  const update = {};
+
+  if (active.build) update[crPath(actor)] = crToNumber(foundation.stats.cr);
+
+  if (!active.foundation) return update;
 
   if (foundation.config.manage.hp) {
     const oldMax = Number(actor.system?.attributes?.hp?.max ?? actor.system?.attributes?.hp?.value) || 0;
@@ -186,12 +209,16 @@ export function buildFoundationActorUpdate(actor, foundation) {
   return update;
 }
 
-export async function applyFoundationPlan(actor, foundation) {
+export async function applyFoundationPlan(actor, foundation, sections = DEFAULTS.sections) {
   assertWritableNpc(actor);
   if (!foundation || foundation.config.mode !== "apply") {
     throw new Error("Switch Foundation behavior to Apply before applying foundation statistics.");
   }
-  const update = buildFoundationActorUpdate(actor, foundation);
+  const active = activeSections(sections);
+  const update = buildFoundationActorUpdate(actor, foundation, active);
+  if (!Object.keys(update).length) {
+    throw new Error("Enable Build or Foundation & Attributes before applying foundation statistics.");
+  }
   const previousActorValues = captureActorValues(actor, update);
   const previousFoundation = actor.getFlag(MODULE_ID, FOUNDATION_FLAG) ?? null;
   let actorUpdated = false;
@@ -200,7 +227,7 @@ export async function applyFoundationPlan(actor, foundation) {
   try {
     await actor.update(update);
     actorUpdated = true;
-    await actor.setFlag(MODULE_ID, FOUNDATION_FLAG, foundationFlagData(foundation));
+    await actor.setFlag(MODULE_ID, FOUNDATION_FLAG, foundationFlagData(foundation, active));
     foundationFlagUpdated = true;
     await actor.setFlag(MODULE_ID, LAST_OPERATION_FLAG, {
       timestamp: Date.now(),
@@ -210,7 +237,8 @@ export async function applyFoundationPlan(actor, foundation) {
       previousItems: [],
       previousLegacyOperation: null,
       previousActorValues,
-      previousFoundation
+      previousFoundation,
+      sections: active
     });
     return { actorUpdated: true, updatedFields: Object.keys(update).length };
   } catch (error) {
@@ -267,15 +295,30 @@ async function restoreItems(actor, itemData) {
 
 export async function applyPlan(actor, plan, { boostSources = [] } = {}) {
   assertWritableNpc(actor);
+  const sections = activeSections(plan.config.sections);
+  if (!Object.values(sections).some(Boolean)) {
+    throw new Error("Enable at least one section before forging the NPC.");
+  }
   const replacing = plan.config.applyMode === "replace";
-  const priorItems = replacing ? getGeneratedItems(actor) : [];
+  const priorItems = replacing ? generatedItemsForSections(actor, sections) : [];
   const priorData = priorItems.map((item) => item.toObject());
-  const previousLegacyOperation = replacing
+  const previousLegacyOperation = replacing && sections.attacks
     ? actor.getFlag("world", "monsterForgeData") ?? null
     : null;
-  const foundationUpdate = buildFoundationActorUpdate(actor, plan.foundation);
-  const previousActorValues = captureActorValues(actor, foundationUpdate);
-  const previousFoundation = actor.getFlag(MODULE_ID, FOUNDATION_FLAG) ?? null;
+  const foundationUpdate = buildFoundationActorUpdate(actor, plan.foundation, sections);
+  const includedBoostSources = sections.boosts ? boostSources : [];
+  const hasChanges = sections.attacks
+    || includedBoostSources.length > 0
+    || priorItems.length > 0
+    || Object.keys(foundationUpdate).length > 0;
+  if (!hasChanges) {
+    throw new Error("The enabled sections do not currently have anything to apply.");
+  }
+  const hasFoundationUpdate = Object.keys(foundationUpdate).length > 0;
+  const previousActorValues = hasFoundationUpdate ? captureActorValues(actor, foundationUpdate) : {};
+  const previousFoundation = hasFoundationUpdate
+    ? actor.getFlag(MODULE_ID, FOUNDATION_FLAG) ?? null
+    : undefined;
   const createdIds = [];
   let priorDeleted = false;
   let actorUpdated = false;
@@ -289,42 +332,53 @@ export async function applyPlan(actor, plan, { boostSources = [] } = {}) {
 
     const setId = randomId();
     const buildOptions = { idFactory: randomId, setId };
-    const weaponData = [
-      buildWeaponItem(plan.primary, plan, { ...buildOptions, role: "primary" })
-    ];
-    if (plan.secondary) {
-      weaponData.push(buildWeaponItem(plan.secondary, plan, { ...buildOptions, role: "secondary" }));
+    const weaponData = [];
+    if (sections.attacks) {
+      weaponData.push(buildWeaponItem(plan.primary, plan, { ...buildOptions, role: "primary" }));
+      if (plan.secondary) {
+        weaponData.push(buildWeaponItem(plan.secondary, plan, { ...buildOptions, role: "secondary" }));
+      }
     }
 
-    const weapons = await actor.createEmbeddedDocuments("Item", weaponData);
+    const weapons = weaponData.length
+      ? await actor.createEmbeddedDocuments("Item", weaponData)
+      : [];
     createdIds.push(...weapons.map((item) => item.id));
 
     const featureData = [];
-    const tertiary = buildTertiaryItem(plan, buildOptions);
-    if (tertiary) featureData.push(tertiary);
-    featureData.push(buildMultiattackItem(plan, weapons, buildOptions));
-    featureData.push(...boostSources.map((source) => prepareBoostItemData(source, { setId })));
+    if (sections.attacks) {
+      const tertiary = buildTertiaryItem(plan, buildOptions);
+      if (tertiary) featureData.push(tertiary);
+      featureData.push(buildMultiattackItem(plan, weapons, buildOptions));
+    }
+    featureData.push(...includedBoostSources.map((source) => prepareBoostItemData(source, { setId })));
 
-    const features = await actor.createEmbeddedDocuments("Item", featureData);
+    const features = featureData.length
+      ? await actor.createEmbeddedDocuments("Item", featureData)
+      : [];
     createdIds.push(...features.map((item) => item.id));
 
     if (Object.keys(foundationUpdate).length) {
       await actor.update(foundationUpdate);
       actorUpdated = true;
-      await actor.setFlag(MODULE_ID, FOUNDATION_FLAG, foundationFlagData(plan.foundation));
+      await actor.setFlag(MODULE_ID, FOUNDATION_FLAG, foundationFlagData(plan.foundation, sections));
       foundationFlagUpdated = true;
     }
 
-    await actor.setFlag(MODULE_ID, LAST_OPERATION_FLAG, {
+    const operation = {
       timestamp: Date.now(),
       action: "apply",
       mode: plan.config.applyMode,
       createdIds,
       previousItems: priorData,
-      previousLegacyOperation,
-      previousActorValues,
-      previousFoundation
-    });
+      sections
+    };
+    if (previousLegacyOperation) operation.previousLegacyOperation = previousLegacyOperation;
+    if (hasFoundationUpdate) {
+      operation.previousActorValues = previousActorValues;
+      operation.previousFoundation = previousFoundation;
+    }
+    await actor.setFlag(MODULE_ID, LAST_OPERATION_FLAG, operation);
     if (previousLegacyOperation) {
       await actor.unsetFlag("world", "monsterForgeData").catch((error) => {
         console.warn(`${MODULE_ID} | Generated items were migrated, but the old macro actor flag could not be cleared.`, error);
@@ -334,8 +388,10 @@ export async function applyPlan(actor, plan, { boostSources = [] } = {}) {
     return {
       created: [...weapons, ...features],
       replaced: priorItems.length,
-      actorUpdated: Object.keys(foundationUpdate).length > 0,
-      boosts: boostSources.length
+      actorUpdated: hasFoundationUpdate,
+      boosts: includedBoostSources.length,
+      attacks: sections.attacks ? weapons.length : 0,
+      sections
     };
   } catch (error) {
     const survivingCreatedIds = createdIds.filter((id) => actor.items.get(id));

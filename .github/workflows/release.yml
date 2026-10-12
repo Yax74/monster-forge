@@ -1,12 +1,13 @@
 name: Build release assets
 
 on:
-  release:
-    types: [published]
+  push:
+    branches: [main]
+    paths: [module.json]
   workflow_dispatch:
     inputs:
       tag:
-        description: Existing release tag to rebuild, such as v1.4.1
+        description: Existing release tag to rebuild, such as v1.5.0
         required: true
         type: string
 
@@ -17,18 +18,26 @@ jobs:
   release:
     runs-on: ubuntu-latest
     env:
-      RELEASE_TAG: ${{ github.event.release.tag_name || inputs.tag }}
+      RELEASE_TAG: ${{ inputs.tag }}
 
     steps:
-      - name: Check out the release tag
+      - name: Check out the release source
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.release.tag_name || inputs.tag }}
+          ref: ${{ inputs.tag || github.sha }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
+
+      - name: Resolve release tag
+        shell: bash
+        run: |
+          if [[ -z "$RELEASE_TAG" ]]; then
+            version="$(node -p "require('./module.json').version")"
+            echo "RELEASE_TAG=v${version}" >> "$GITHUB_ENV"
+          fi
 
       - name: Run tests and validate metadata
         run: npm run check
@@ -44,6 +53,16 @@ jobs:
           cp module.json dist/module.json
           (cd dist/package && zip -q -r ../monster-forge.zip .)
           (cd dist && sha256sum monster-forge.zip > monster-forge.zip.sha256)
+
+      - name: Create the GitHub release when needed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release view "$RELEASE_TAG" >/dev/null 2>&1 ||
+          gh release create "$RELEASE_TAG"
+          --target "$GITHUB_SHA"
+          --title "Monster Forge $RELEASE_TAG"
+          --generate-notes
 
       - name: Attach assets to the GitHub release
         env:
