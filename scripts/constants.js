@@ -1,6 +1,6 @@
 export const MODULE_ID = "monster-forge";
 export const MODULE_TITLE = "Monster Forge";
-export const MODULE_VERSION = "1.5.0";
+export const MODULE_VERSION = "1.6.0";
 
 /**
  * Baseline statistics from the published Forge of Foes monster statistics
@@ -478,7 +478,12 @@ export const DEFAULTS = Object.freeze({
     }
   },
   boosts: {
-    selected: []
+    selections: {},
+    names: {},
+    search: "",
+    selectedOnly: false,
+    openCategories: ["initiative", "movement", "defence"],
+    legacyCount: 0
   },
   roleModifier: 0,
   followCrAttacks: true,

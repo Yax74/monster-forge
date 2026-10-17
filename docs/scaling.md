@@ -35,11 +35,11 @@ Recommended proficiency follows the standard CR progression. For each ability ac
 
 Caster treats the selected Intelligence, Wisdom, or Charisma score as both its spell-attack and spell-save ability. Controller, Support, and Leader use the selected mental score for their role-led save DC but do not automatically gain a spell attack. Actual configured attack and rider abilities remain part of the calculation, so a weapon-using caster can intentionally become a multi-ability gish.
 
-## Compendium boost layer
+## Built-in boost layer
 
-Selected NPC boosts are imported only after the foundation and generated attack plan have been calculated. Their source Item data, Active Effects, and third-party automation flags are retained. Consequently, a boost can intentionally change a final score beyond the foundation preview; Monster Forge reports this rather than trying to reverse-engineer arbitrary Active Effects.
+Selected NPC boosts are generated only after the foundation and attack plan have been calculated. Numeric modifiers use version-aware Active Effects; actions, reactions, healing, recharge powers, and recovery features use native activities where practical and complete manual rule text otherwise. Consequently, a boost can intentionally change a final score beyond the foundation preview. Monster Forge reports calculable changes separately rather than folding them back into the published baseline.
 
-Only one item from a ranked family can be selected at once. Source items named **NPC Hitpoints**, **Damage per Round**, **CR Boost**, and **Minion 15 HP Lock** are blocked because they duplicate or invalidate the foundation calculation. Boosts can participate in the same Replace and Undo transaction as generated attacks, but a disabled Boosts section is excluded completely and its existing generated items are preserved.
+Only one choice from each exclusive family can be selected at once. Permanent proficiency-scaled AC and attack bonuses are deliberately absent because they outgrow the FoF bounded-accuracy bands; fixed ranks make that departure explicit. Recovery, reactions, command features, and other action-economy changes are shown as extra layers rather than treated as invisible DPR or HP adjustments. Boosts participate in the same Replace and Undo transaction as generated attacks, but a disabled Boosts section is excluded completely and its existing generated items are preserved.
 
 ## Published baseline
 

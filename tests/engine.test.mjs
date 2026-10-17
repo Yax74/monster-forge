@@ -30,12 +30,14 @@ import {
   normalizeFoundationConfig
 } from "../scripts/foundation.js";
 import {
-  buildBoostGroups,
-  discoverBoostCatalog,
+  buildBoostCategories,
+  calculateBoostImpact,
+  getBoostCatalog,
   normalizeBoostConfig,
   parseBoostVariant,
   prepareBoostItemData,
-  resolveBoostSources,
+  recommendBoosts,
+  restoreBoostConfig,
   selectBoosts
 } from "../scripts/boosts.js";
 import { generatorSpecies } from "../scripts/app.js";
@@ -230,115 +232,100 @@ test("recalculates attributes when the role changes without changing the attack 
   assert.equal(support.casting.saveDc, 15);
 });
 
-test("groups ranked compendium boosts and blocks foundation conflicts", () => {
+test("provides a categorized built-in boost catalog with stable exclusive selections", () => {
   assert.deepEqual(parseBoostVariant("Tough III"), {
     family: "Tough", rank: 3, rankLabel: "Rank III", kind: "boost"
   });
   assert.equal(parseBoostVariant("NPC Full Caster").family, "Caster Progression");
-  assert.deepEqual(normalizeBoostConfig({ selected: ["bad", "Compendium.test.boosts.Item.two", "Compendium.test.boosts.Item.two"] }), {
-    selected: ["Compendium.test.boosts.Item.two"]
-  });
-
-  const entries = [
-    { uuid: "Compendium.test.boosts.Item.one", packId: "test.boosts", packLabel: "Boosts", name: "Tough I", family: "Tough", rank: 1, rankLabel: "Rank I", kind: "boost", selectable: true, summary: "" },
-    { uuid: "Compendium.test.boosts.Item.two", packId: "test.boosts", packLabel: "Boosts", name: "Tough II", family: "Tough", rank: 2, rankLabel: "Rank II", kind: "boost", selectable: true, summary: "" },
-    { uuid: "Compendium.test.boosts.Item.three", packId: "test.boosts", packLabel: "Boosts", name: "Tough III", family: "Tough", rank: 3, rankLabel: "Rank III", kind: "boost", selectable: true, summary: "" },
-    { uuid: "Compendium.test.boosts.Item.hp", packId: "test.boosts", packLabel: "Boosts", name: "NPC Hitpoints", family: "NPC Hitpoints", rank: null, rankLabel: null, kind: "boost", selectable: false, conflictReason: "Conflicts" }
-  ];
-  const grouped = buildBoostGroups({ entries }, ["Compendium.test.boosts.Item.two"]);
-  assert.equal(grouped.groups.length, 1);
-  assert.equal(grouped.groups[0].options.length, 3);
-  assert.equal(grouped.groups[0].selectedValue, "Compendium.test.boosts.Item.two");
-  assert.equal(grouped.blocked.length, 1);
-
-  const selected = selectBoosts({ selected: ["Compendium.test.boosts.Item.two", "Compendium.test.boosts.Item.hp"] }, { entries, warnings: [] });
-  assert.deepEqual(selected.selected.map((entry) => entry.name), ["Tough II"]);
-  assert.equal(selected.warnings.length, 1);
-
-  const duplicateRanks = selectBoosts({
-    selected: ["Compendium.test.boosts.Item.one", "Compendium.test.boosts.Item.three"]
-  }, { entries, warnings: [] });
-  assert.deepEqual(duplicateRanks.selected.map((entry) => entry.name), ["Tough I"]);
-  assert.match(duplicateRanks.warnings[0], /another rank/i);
-});
-
-test("discovers boost descendants, explicit flags, and caster progression across Item packs", async () => {
-  const pack = {
-    collection: "test.boosts",
-    documentName: "Item",
-    metadata: { label: "Test Boosts", type: "Item" },
-    folders: new Map([
-      ["root", { id: "root", name: " NPC Boosts ", folder: null }],
-      ["child", { id: "child", name: "Mobility", folder: "root" }],
-      ["other", { id: "other", name: "Other Features", folder: null }]
-    ]),
-    async getIndex() {
-      return new Map([
-        ["quick", { _id: "quick", name: "Quickness II", folder: "child", system: { description: { value: "<p>Fast.</p>" } } }],
-        ["resist", { _id: "resist", name: "Explicit Resistance", folder: "other", flags: { [MODULE_ID]: { boost: true } } }],
-        ["caster", { _id: "caster", name: "NPC Full Caster", folder: "other" }],
-        ["hp", { _id: "hp", name: "NPC Hitpoints", folder: "root" }],
-        ["ignored", { _id: "ignored", name: "Ordinary Feature", folder: "other" }]
-      ]);
-    }
-  };
-  const unavailable = {
-    collection: "test.unavailable",
-    documentName: "Item",
-    metadata: { label: "Unavailable", type: "Item" },
-    async getIndex() {
-      throw new Error("permission denied");
-    }
-  };
-  const nonItemPack = {
-    collection: "test.actors",
-    documentName: "Actor",
-    metadata: { label: "Actors", type: "Actor" }
-  };
-
-  const catalog = await discoverBoostCatalog([pack, unavailable, nonItemPack]);
-  assert.deepEqual(catalog.entries.map((entry) => entry.name).sort(), [
-    "Explicit Resistance",
-    "NPC Full Caster",
-    "NPC Hitpoints",
-    "Quickness II"
+  const catalog = getBoostCatalog();
+  assert.equal(catalog.source, "built-in");
+  assert.ok(catalog.entries.length >= 45);
+  assert.deepEqual(catalog.categories.map((category) => category.id), [
+    "initiative", "movement", "defence", "resilience", "recovery", "accuracy", "spellcasting", "leadership"
   ]);
-  assert.equal(catalog.entries.find((entry) => entry.name === "Quickness II").uuid, "Compendium.test.boosts.Item.quick");
-  assert.equal(catalog.entries.find((entry) => entry.name === "NPC Hitpoints").selectable, false);
-  assert.match(catalog.warnings[0], /Unavailable could not be indexed: permission denied/);
+
+  const normalized = normalizeBoostConfig({
+    selections: { "initiative-bonus": "initiative.flat.2", "defence-ac": "movement.nimble-dash" },
+    names: { "initiative-bonus": "First into the Fray" },
+    selected: ["Compendium.test.boosts.Item.two", "Compendium.test.boosts.Item.two"]
+  });
+  assert.deepEqual(normalized.selections, { "initiative-bonus": "initiative.flat.2" });
+  assert.equal(normalized.names["initiative-bonus"], "First into the Fray");
+  assert.equal(normalized.legacyCount, 1);
+
+  const categories = buildBoostCategories(normalized, recommendBoosts({ role: "caster", tier: "elite" }));
+  const initiative = categories.find((category) => category.id === "initiative");
+  assert.equal(initiative.selectedCount, 1);
+  assert.equal(initiative.groups[0].selectedId, "initiative.flat.2");
+  assert.ok(recommendBoosts({ role: "caster", tier: "elite" }).includes("caster.full"));
 });
 
-test("resolves selected boosts as Item documents", async () => {
-  const entries = [{ uuid: "Compendium.test.boosts.Item.quick", name: "Quickness II" }];
-  const sources = await resolveBoostSources(entries, async (uuid) => ({
-    documentName: "Item",
-    toObject: () => ({ _id: "quick", name: "Quickness II", type: "feat", flags: { sourceUuid: uuid } })
-  }));
-
-  assert.equal(sources.length, 1);
-  assert.equal(sources[0].uuid, entries[0].uuid);
-  assert.equal(sources[0].data.name, "Quickness II");
+test("selects custom-named boosts and warns about equivalent actor features", () => {
+  const actor = {
+    items: [{ name: "Parry", flags: {}, getFlag: () => undefined }]
+  };
+  const result = selectBoosts({
+    selections: {
+      "initiative-bonus": "initiative.pb",
+      "defence-reaction": "reaction.parry"
+    },
+    names: { "initiative-bonus": "First into the Fray" }
+  }, { actor });
+  assert.deepEqual(result.selected.map((entry) => entry.displayName), ["First into the Fray", "Parry"]);
+  assert.match(result.warnings[0], /already present/i);
 });
 
-test("prepares compendium boosts without discarding their automation", () => {
-  const prepared = prepareBoostItemData({
-    uuid: "Compendium.test.boosts.Item.quick",
-    data: {
-      _id: "quick",
-      name: "Quickness II",
-      type: "feat",
-      flags: { dae: { stackable: "noneName" } },
-      effects: [{ _id: "effect", transfer: true, system: { changes: [{ key: "system.attributes.init.bonus", value: "4" }] } }],
-      system: { description: { value: "<p>Fast.</p>" } }
-    }
-  }, { setId: "set-one" });
+test("restores generated built-in and mapped legacy boost choices from an actor", () => {
+  const item = (name, flags = {}) => ({
+    name,
+    flags: { [MODULE_ID]: { generated: true, kind: "boost", ...flags } },
+    getFlag(scope, key) { return this.flags?.[scope]?.[key]; }
+  });
+  const restored = restoreBoostConfig({
+    items: [
+      item("First into the Fray", { boostId: "initiative.pb", customName: "First into the Fray" }),
+      item("NPC Full Caster", { sourceUuid: "Compendium.old.Item.caster" })
+    ]
+  });
+  assert.equal(restored.selections["initiative-bonus"], "initiative.pb");
+  assert.equal(restored.names["initiative-bonus"], "First into the Fray");
+  assert.equal(restored.selections["caster-progression"], "caster.full");
+  assert.equal(restored.legacyCount, 0);
+});
 
-  assert.equal(prepared._id, undefined);
-  assert.equal(prepared.flags.dae.stackable, "noneName");
-  assert.equal(prepared.flags[MODULE_ID].generated, true);
-  assert.equal(prepared.flags[MODULE_ID].kind, "boost");
-  assert.equal(prepared.flags[MODULE_ID].sourceUuid, "Compendium.test.boosts.Item.quick");
-  assert.equal(prepared.effects[0].system.changes[0].key, "system.attributes.init.bonus");
+test("generates native boost effects, activities, flags, and review impact", () => {
+  globalThis.game = { system: { version: "6.0.5" } };
+  const idFactory = (() => { let id = 0; return () => `boost-${++id}`; })();
+  const selected = selectBoosts({
+    selections: {
+      "initiative-bonus": "initiative.pb",
+      "defence-ac": "ac.2",
+      "recovery-feature": "recovery.second-wind"
+    },
+    names: { "initiative-bonus": "First into the Fray" }
+  }).selected;
+  const initiative = prepareBoostItemData(selected[0], { setId: "set-one", idFactory });
+  const recovery = prepareBoostItemData(selected[2], { setId: "set-one", idFactory });
+  assert.equal(initiative.name, "First into the Fray");
+  assert.equal(initiative.flags[MODULE_ID].boostId, "initiative.pb");
+  assert.equal(initiative.effects[0].system.changes[0].key, "system.attributes.init.bonus");
+  assert.equal(recovery.system.uses.max, "1");
+  assert.equal(Object.values(recovery.system.activities)[0].type, "heal");
+
+  globalThis.game.system.version = "5.1.0";
+  const legacyEffect = prepareBoostItemData(selected[1], { setId: "set-two", idFactory });
+  assert.equal(legacyEffect.effects[0].changes[0].key, "system.attributes.ac.bonus");
+  assert.equal(legacyEffect.effects[0].system, undefined);
+  globalThis.game.system.version = "6.0.5";
+
+  const impact = calculateBoostImpact(selected, {
+    actorProfile: { proficiency: 3, ac: 14, speed: 30 },
+    foundation: { proficiency: 3, config: { mode: "apply", manage: { ac: true, body: true } }, final: { ac: 15, attackBonus: 6, saveDc: 14 }, body: { speed: 30 }, casting: {} },
+    plan: { config: { sections: { foundation: true } }, primary: { attackBonus: 6 } }
+  });
+  assert.equal(impact.initiative, 3);
+  assert.equal(impact.ac, 2);
+  assert.ok(impact.rows.some((row) => row.key === "Armor class" && row.after === 17));
 });
 
 test("audit mode keeps the live actor profile", () => {
@@ -904,26 +891,15 @@ test("replace and undo touch only generated items", async () => {
     applyMode: "replace",
     primary: { count: 2, weaponKey: "longsword", extraType: "none" }
   }, { str: 3 });
+  plan.boosts = selectBoosts({ selections: { "initiative-bonus": "initiative.pb2" } });
 
-  const applied = await applyPlan(actor, plan, {
-    boostSources: [{
-      uuid: "Compendium.test.boosts.Item.quick",
-      data: {
-        _id: "source-boost",
-        name: "Quickness II",
-        type: "feat",
-        flags: {},
-        effects: [{ _id: "quick-effect", transfer: true, system: { changes: [] } }],
-        system: { description: { value: "<p>Initiative boost.</p>" } }
-      }
-    }]
-  });
+  const applied = await applyPlan(actor, plan);
   assert.equal(applied.replaced, 1);
   assert.equal(applied.boosts, 1);
   assert.ok(actor.items.has("user-item"));
   assert.equal(actor.items.has("old-forge"), false);
   assert.equal(getGeneratedItems(actor).length, 3);
-  assert.ok(getGeneratedItems(actor).some((item) => item.name === "Quickness II"));
+  assert.ok(getGeneratedItems(actor).some((item) => item.name === "Perfect Readiness"));
   assert.equal(actor.getFlag("world", "monsterForgeData"), undefined);
 
   const undone = await undoLastOperation(actor);
@@ -1044,19 +1020,8 @@ test("section-scoped replace and undo preserve disabled generated item groups", 
     sections: { build: false, foundation: false, boosts: true, attacks: false },
     primary: { count: 2, weaponKey: "longsword" }
   }, { abilityMods: { str: 3, dex: 2 }, proficiency: 2 });
-  const boostResult = await applyPlan(actor, boostsOnly, {
-    boostSources: [{
-      uuid: "Compendium.test.boosts.Item.quick",
-      data: {
-        _id: "source-boost",
-        name: "Quickness II",
-        type: "feat",
-        flags: {},
-        effects: [],
-        system: { description: { value: "<p>Initiative boost.</p>" } }
-      }
-    }]
-  });
+  boostsOnly.boosts = selectBoosts({ selections: { "initiative-bonus": "initiative.pb2" } });
+  const boostResult = await applyPlan(actor, boostsOnly);
   assert.equal(boostResult.replaced, 1);
   assert.equal(boostResult.attacks, 0);
   assert.equal(boostResult.boosts, 1);

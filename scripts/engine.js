@@ -99,7 +99,10 @@ export function mergeDefaults(saved = {}, actorCr = DEFAULTS.cr) {
     boosts: {
       ...DEFAULTS.boosts,
       ...(saved.boosts ?? {}),
-      selected: [...(saved.boosts?.selected ?? DEFAULTS.boosts.selected)]
+      selections: { ...DEFAULTS.boosts.selections, ...(saved.boosts?.selections ?? {}) },
+      names: { ...DEFAULTS.boosts.names, ...(saved.boosts?.names ?? {}) },
+      openCategories: [...(saved.boosts?.openCategories ?? DEFAULTS.boosts.openCategories)],
+      selected: Array.isArray(saved.boosts?.selected) ? [...saved.boosts.selected] : undefined
     },
     primary: { ...DEFAULTS.primary, ...(saved.primary ?? {}) },
     secondary: { ...DEFAULTS.secondary, ...(saved.secondary ?? {}) },

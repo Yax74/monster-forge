@@ -293,7 +293,7 @@ async function restoreItems(actor, itemData) {
   }
 }
 
-export async function applyPlan(actor, plan, { boostSources = [] } = {}) {
+export async function applyPlan(actor, plan) {
   assertWritableNpc(actor);
   const sections = activeSections(plan.config.sections);
   if (!Object.values(sections).some(Boolean)) {
@@ -306,9 +306,9 @@ export async function applyPlan(actor, plan, { boostSources = [] } = {}) {
     ? actor.getFlag("world", "monsterForgeData") ?? null
     : null;
   const foundationUpdate = buildFoundationActorUpdate(actor, plan.foundation, sections);
-  const includedBoostSources = sections.boosts ? boostSources : [];
+  const includedBoosts = sections.boosts ? plan.boosts?.selected ?? [] : [];
   const hasChanges = sections.attacks
-    || includedBoostSources.length > 0
+    || includedBoosts.length > 0
     || priorItems.length > 0
     || Object.keys(foundationUpdate).length > 0;
   if (!hasChanges) {
@@ -351,7 +351,7 @@ export async function applyPlan(actor, plan, { boostSources = [] } = {}) {
       if (tertiary) featureData.push(tertiary);
       featureData.push(buildMultiattackItem(plan, weapons, buildOptions));
     }
-    featureData.push(...includedBoostSources.map((source) => prepareBoostItemData(source, { setId })));
+    featureData.push(...includedBoosts.map((entry) => prepareBoostItemData(entry, { ...buildOptions, plan })));
 
     const features = featureData.length
       ? await actor.createEmbeddedDocuments("Item", featureData)
@@ -389,7 +389,7 @@ export async function applyPlan(actor, plan, { boostSources = [] } = {}) {
       created: [...weapons, ...features],
       replaced: priorItems.length,
       actorUpdated: hasFoundationUpdate,
-      boosts: includedBoostSources.length,
+      boosts: includedBoosts.length,
       attacks: sections.attacks ? weapons.length : 0,
       sections
     };

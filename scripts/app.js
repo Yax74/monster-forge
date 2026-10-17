@@ -29,10 +29,13 @@ import {
   normalizeFoundationConfig
 } from "./foundation.js";
 import {
-  buildBoostGroups,
-  discoverBoostCatalog,
+  buildBoostCategories,
+  calculateBoostImpact,
+  getBoostCatalog,
   normalizeBoostConfig,
-  resolveBoostSources,
+  parseBoostForm,
+  recommendBoosts,
+  restoreBoostConfig,
   selectBoosts
 } from "./boosts.js";
 
@@ -100,7 +103,7 @@ function attackContext(attack) {
   };
 }
 
-function buildContext(actor, config, boostCatalog) {
+function buildContext(actor, config) {
   const generated = getGeneratedItems(actor);
   const existingOffense = getExistingOffensiveItems(actor);
   const midiActive = Boolean(game.modules?.get?.("midi-qol")?.active);
@@ -108,8 +111,9 @@ function buildContext(actor, config, boostCatalog) {
   const importedSpecies = generatorSpecies(actor);
   const hasFoundation = Boolean(actor.getFlag(MODULE_ID, "foundation"));
   const boostConfig = normalizeBoostConfig(config.boosts);
-  const boostGroups = buildBoostGroups(boostCatalog, boostConfig.selected);
-  const selectableBoosts = (boostCatalog.entries ?? []).filter((entry) => entry.selectable);
+  const recommendedBoosts = recommendBoosts({ role: config.foundation.role, tier: config.foundation.tier });
+  const boostCategories = buildBoostCategories(boostConfig, recommendedBoosts);
+  const boostCatalog = getBoostCatalog();
   return {
     actor: {
       name: actor.name,
@@ -170,13 +174,13 @@ function buildContext(actor, config, boostCatalog) {
     },
     boosts: {
       ...boostConfig,
-      groups: boostGroups.groups,
-      hasGroups: boostGroups.groups.length > 0,
-      found: selectableBoosts.length,
-      sources: new Set(selectableBoosts.map((entry) => entry.packId)).size,
-      blocked: boostGroups.blocked,
-      blockedCount: boostGroups.blocked.length,
-      warnings: boostCatalog.warnings ?? []
+      categories: boostCategories,
+      found: boostCatalog.entries.length,
+      selectedCount: Object.keys(boostConfig.selections).length,
+      recommendations: recommendedBoosts,
+      warnings: boostConfig.legacyCount
+        ? [`${boostConfig.legacyCount} saved compendium boost selection(s) could not be migrated. Choose a built-in replacement below.`]
+        : []
     },
     damageAdjustmentOptions: options([
       [-20, "−20% DPR"],
@@ -303,9 +307,7 @@ export function parseForgeForm(form) {
         ]))
       }
     },
-    boosts: {
-      selected: data.getAll("boosts.selected").map(String).filter(Boolean)
-    },
+    boosts: parseBoostForm(data),
     roleModifier: numberField(data, "roleModifier", 0),
     followCrAttacks: data.has("followCrAttacks"),
     accuracyMode: field(data, "accuracyMode", "actor"),
@@ -397,7 +399,7 @@ function signed(value) {
   return `${value >= 0 ? "+" : ""}${value}`;
 }
 
-function buildForgePlan(config, actor, boostCatalog) {
+function buildForgePlan(config, actor) {
   const actorProfile = getActorCombatProfile(actor);
   const foundation = buildFoundationPlan(config, actorProfile);
   const effectiveProfile = getEffectiveActorProfile(foundation, actorProfile, config.sections);
@@ -406,7 +408,8 @@ function buildForgePlan(config, actor, boostCatalog) {
     foundation: foundation.config
   }, effectiveProfile, foundation.final);
   plan.foundation = foundation;
-  plan.boosts = selectBoosts(plan.config.boosts, boostCatalog);
+  plan.boosts = selectBoosts(plan.config.boosts, { actor });
+  plan.boosts.impact = calculateBoostImpact(plan.boosts.selected, { actorProfile, foundation, plan });
   return { actorProfile, effectiveProfile, foundation, plan };
 }
 
@@ -439,21 +442,41 @@ function updateBoostDetails(root, entries) {
   for (const entry of entries) {
     const item = document.createElement("li");
     const name = document.createElement("strong");
-    name.textContent = entry.name;
+    name.textContent = entry.displayName;
     item.append(name);
     if (entry.summary) {
       const summary = document.createElement("span");
-      summary.textContent = entry.summary;
+      summary.textContent = entry.description;
       item.append(summary);
     }
+    const badges = document.createElement("small");
+    badges.className = "mf-boost-badges";
+    badges.textContent = `${entry.categoryLabel} · ${entry.powerLabel} power · ${entry.actionLabel} · ${entry.automationLabel} · ${entry.impactLabel}`;
+    item.append(badges);
     list.append(item);
   }
 }
 
-function updatePreview(root, actor, boostCatalog) {
+function updateBoostImpact(root, impact) {
+  const list = root.querySelector("[data-preview='boost-impact']");
+  if (!list) return;
+  list.replaceChildren();
+  list.hidden = !impact.rows.length;
+  for (const row of impact.rows) {
+    const item = document.createElement("div");
+    const label = document.createElement("strong");
+    const value = document.createElement("span");
+    label.textContent = row.key;
+    value.textContent = `${row.before} → ${row.after}`;
+    item.append(label, value);
+    list.append(item);
+  }
+}
+
+function updatePreview(root, actor) {
   const form = root.querySelector("form") ?? root.closest("form") ?? root;
   const config = parseForgeForm(form);
-  const { actorProfile: profile, foundation, plan } = buildForgePlan(config, actor, boostCatalog);
+  const { actorProfile: profile, foundation, plan } = buildForgePlan(config, actor);
   const existingOffense = getExistingOffensiveItems(actor);
   const midiReady = Boolean(game.modules?.get?.("midi-qol")?.active && game.modules?.get?.("dae")?.active);
 
@@ -532,11 +555,12 @@ function updatePreview(root, actor, boostCatalog) {
     root.querySelector(`[data-ability='${ability}']`)?.classList
       .toggle("is-overridden", foundation.config.overrides.abilities[ability] !== "");
   }
-  const selectedBoostNames = plan.boosts.selected.map((entry) => entry.name);
+  const selectedBoostNames = plan.boosts.selected.map((entry) => entry.displayName);
   setText(root, "[data-preview='boosts']", config.sections.boosts
     ? selectedBoostNames.length ? selectedBoostNames.join(" · ") : "None selected"
     : "Disabled (selections retained)");
   updateBoostDetails(root, plan.boosts.selected);
+  updateBoostImpact(root, plan.boosts.impact);
 
   const varianceCard = root.querySelector("[data-metric='achieved']");
   varianceCard?.classList.toggle("is-warning", Math.abs(plan.variance) > Math.max(2, plan.target * 0.1));
@@ -569,7 +593,7 @@ function updatePreview(root, actor, boostCatalog) {
       previewWarnings.push("Caster role has no caster-progression boost selected. This is valid, but spellcasting level and spells must then be managed separately.");
     }
     if (config.sections.boosts && plan.boosts.selected.length) {
-      previewWarnings.push("Selected boosts are layered after the FoF foundation. Their Active Effects can intentionally move the final actor beyond the previewed benchmark.");
+      previewWarnings.push("Selected boosts are layered after the FoF foundation. Review shows their stat and action-economy impact separately from the FoF benchmark.");
     }
     if (!Object.values(config.sections).some(Boolean)) {
       previewWarnings.push("Every section is off. Enable at least one section before applying.");
@@ -609,11 +633,85 @@ async function confirmAction({ title, content }) {
   });
 }
 
-function attachListeners(_event, dialog, actor, boostCatalog) {
+function updateBoostControls(root, form) {
+  const search = String(form.elements.namedItem("boosts.search")?.value ?? "").trim().toLowerCase();
+  const selectedOnly = Boolean(form.elements.namedItem("boosts.selectedOnly")?.checked);
+  const recommended = new Set(recommendBoosts({
+    role: form.elements.namedItem("foundation.role")?.value,
+    tier: form.elements.namedItem("foundation.tier")?.value
+  }));
+  let selectedCount = 0;
+
+  for (const category of root.querySelectorAll("[data-boost-category]")) {
+    let visibleGroups = 0;
+    let categorySelected = 0;
+    for (const group of category.querySelectorAll("[data-boost-group]")) {
+      const select = group.querySelector("[data-boost-select]");
+      if (!select) continue;
+      for (const candidate of select.options) {
+        if (!candidate.value) continue;
+        candidate.textContent = `${candidate.dataset.label}${recommended.has(candidate.value) ? " ★" : ""}`;
+      }
+      const selected = select.value !== "";
+      const option = select.selectedOptions?.[0];
+      if (selected) {
+        selectedCount += 1;
+        categorySelected += 1;
+      }
+      const nameField = group.querySelector("[data-boost-name]");
+      if (nameField) nameField.hidden = !selected;
+      const summary = group.querySelector("[data-boost-summary]");
+      const power = group.querySelector("[data-boost-power]");
+      const automation = group.querySelector("[data-boost-automation]");
+      const action = group.querySelector("[data-boost-action]");
+      const impact = group.querySelector("[data-boost-impact-badge]");
+      if (summary) summary.textContent = selected ? option?.dataset.summary ?? "" : group.dataset.help ?? "";
+      if (power) {
+        power.textContent = option?.dataset.power ?? "";
+        power.hidden = !selected;
+      }
+      if (automation) {
+        automation.textContent = option?.dataset.automation ?? "";
+        automation.hidden = !selected;
+      }
+      if (action) {
+        action.textContent = option?.dataset.action ?? "";
+        action.hidden = !selected;
+      }
+      if (impact) {
+        impact.textContent = option?.dataset.impact ?? "";
+        impact.hidden = !selected;
+      }
+      const haystack = [group.dataset.label, ...[...select.options].map((entry) => `${entry.textContent} ${entry.dataset.summary ?? ""}`)]
+        .join(" ").toLowerCase();
+      const visible = (!selectedOnly || selected) && (!search || haystack.includes(search));
+      group.hidden = !visible;
+      if (visible) visibleGroups += 1;
+    }
+    category.hidden = visibleGroups === 0;
+    const count = category.querySelector("[data-category-count]");
+    if (count) count.textContent = categorySelected ? `${categorySelected} selected` : "None";
+  }
+  setText(root, "[data-boost-selected-count]", `${selectedCount} selected`);
+}
+
+function clearBoostSelects(root, categoryId = null) {
+  const scope = categoryId
+    ? root.querySelector(`[data-boost-category='${categoryId}']`)
+    : root;
+  if (!scope) return;
+  for (const select of scope.querySelectorAll("[data-boost-select]")) select.value = "";
+  for (const input of scope.querySelectorAll("[data-boost-name] input")) input.value = "";
+}
+
+function attachListeners(_event, dialog, actor) {
   const root = dialog.element;
   const form = dialog.form ?? root.querySelector("form");
   if (!form) return;
-  const preview = () => updatePreview(root, actor, boostCatalog);
+  const preview = () => {
+    updateBoostControls(root, form);
+    updatePreview(root, actor);
+  };
   const syncRecommendation = () => {
     const recommended = applyRecommendedAttacks(parseForgeForm(form));
     const secondary = form.elements.namedItem("secondaryEnabled");
@@ -637,6 +735,41 @@ function attachListeners(_event, dialog, actor, boostCatalog) {
     if (shouldSync) syncRecommendation();
     preview();
   });
+
+  for (const details of root.querySelectorAll("details[data-boost-category]")) {
+    details.addEventListener("toggle", () => {
+      const state = details.querySelector("[data-category-open]");
+      if (state) state.checked = details.open;
+    });
+  }
+
+  root.querySelector("[data-action='recommend-boosts']")?.addEventListener("click", () => {
+    clearBoostSelects(root);
+    const recommended = recommendBoosts({
+      role: form.elements.namedItem("foundation.role")?.value,
+      tier: form.elements.namedItem("foundation.tier")?.value
+    });
+    for (const id of recommended) {
+      for (const select of root.querySelectorAll("[data-boost-select]")) {
+        if ([...select.options].some((option) => option.value === id)) select.value = id;
+      }
+    }
+    preview();
+  });
+
+  root.querySelector("[data-action='clear-boosts']")?.addEventListener("click", () => {
+    clearBoostSelects(root);
+    preview();
+  });
+
+  for (const button of root.querySelectorAll("[data-action='clear-boost-category']")) {
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      clearBoostSelects(root, button.dataset.category);
+      preview();
+    });
+  }
 
   for (const button of root.querySelectorAll("[data-tab-target]")) {
     button.addEventListener("click", () => activateTab(root, button.dataset.tabTarget));
@@ -723,10 +856,9 @@ export async function openForge(targetActor = null) {
       : saved;
     let config = mergeDefaults(remembered, actorCr(actor));
     config.foundation = normalizeFoundationConfig(config);
-    config.boosts = normalizeBoostConfig(config.boosts);
+    config.boosts = restoreBoostConfig(actor, config.boosts);
     if (config.followCrAttacks) config = applyRecommendedAttacks(config, config.cr);
-    const boostCatalog = await discoverBoostCatalog();
-    const context = buildContext(actor, config, boostCatalog);
+    const context = buildContext(actor, config);
     const render = foundry.applications.handlebars?.renderTemplate ?? globalThis.renderTemplate;
     const content = await render(`modules/${MODULE_ID}/templates/forge-dialog.hbs`, context);
 
@@ -736,7 +868,7 @@ export async function openForge(targetActor = null) {
       position: { width: 920, height: "auto" },
       content,
       rejectClose: false,
-      render: (event, dialog) => attachListeners(event, dialog, actor, boostCatalog),
+      render: (event, dialog) => attachListeners(event, dialog, actor),
       buttons: [
         {
           action: "foundation",
@@ -745,7 +877,7 @@ export async function openForge(targetActor = null) {
           callback: async (_event, button) => {
             try {
               const parsed = parseForgeForm(button.form);
-              const { foundation, plan } = buildForgePlan(parsed, actor, boostCatalog);
+              const { foundation, plan } = buildForgePlan(parsed, actor);
               await game.settings.set(MODULE_ID, "defaults", plan.config);
               const result = await applyFoundationPlan(actor, foundation, plan.config.sections);
               ui.notifications.info(`Monster Forge applied ${result.updatedFields} enabled build/foundation field(s) to ${actor.name}.`);
@@ -765,12 +897,9 @@ export async function openForge(targetActor = null) {
           callback: async (_event, button) => {
             try {
               const parsed = parseForgeForm(button.form);
-              const { plan } = buildForgePlan(parsed, actor, boostCatalog);
+              const { plan } = buildForgePlan(parsed, actor);
               await game.settings.set(MODULE_ID, "defaults", plan.config);
-              const boostSources = plan.config.sections.boosts
-                ? await resolveBoostSources(plan.boosts.selected)
-                : [];
-              const result = await applyPlan(actor, plan, { boostSources });
+              const result = await applyPlan(actor, plan);
               const actions = [];
               if (result.created.length) {
                 const boostText = result.boosts

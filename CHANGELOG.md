@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.6.0
+
+- Replaced runtime compendium scanning with 55 built-in boost variants across Initiative, Movement, Defence, Saving Throws, Recovery, Weapon Accuracy, Spellcasting, and Leadership.
+- Added categorized, collapsible selectors with search, selected-only filtering, per-category and global clearing, selected counts, and role/tier recommendations.
+- Added optional custom actor-item names while preserving stable boost IDs, exclusive families, replacement behavior, and actor-state restoration.
+- Generated native D&D5e feat items, activities, healing rolls, item uses, and version-aware Active Effects for D&D5e 5.x and 6.x; conditional traits retain clear manual fallbacks and optional Midi-QOL/DAE enhancement.
+- Added power, action-economy, automation, and FoF-impact badges plus a live after-foundation impact review for AC, speed, initiative, saves, accuracy, spell DC, recovery, and special actions.
+- Added likely-duplicate actor-feature detection, strong-combination warnings, safe migration messaging for old compendium UUID selections, and name-based restoration for compatible legacy generated boosts.
+- Expanded regression coverage for built-in catalog structure, stable selection normalization, recommendations, custom names, actor restoration, cross-version effects, generated activities, impact math, Replace, and Undo.
+
 ## 1.5.0
 
 - Replaced the scrolling workflow with Build, Foundation, Boosts, Attacks, and Review tabs, including persistent per-section apply controls and an exact Review summary.

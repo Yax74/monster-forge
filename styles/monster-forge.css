@@ -356,7 +356,126 @@
 .monster-forge .mf-boost-grid {
   display: grid;
   gap: 0.55rem 0.7rem;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: 0.6rem;
+}
+
+.monster-forge .mf-boost-toolbar {
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.monster-forge .mf-boost-toolbar > div:first-child {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.monster-forge .mf-boost-toolbar small {
+  font-size: 0.7rem;
+  opacity: 0.75;
+}
+
+.monster-forge .mf-boost-filters {
+  align-items: end;
+  display: grid;
+  gap: 0.7rem;
+  grid-template-columns: minmax(12rem, 1fr) auto;
+  margin-bottom: 0.55rem;
+}
+
+.monster-forge .mf-boost-categories {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.monster-forge .mf-boost-category {
+  border: 1px solid var(--color-border-light-tertiary, #999);
+  border-radius: 6px;
+  overflow: clip;
+}
+
+.monster-forge .mf-boost-category > summary {
+  align-items: center;
+  background: rgba(0, 0, 0, 0.045);
+  cursor: pointer;
+  display: flex;
+  gap: 0.6rem;
+  justify-content: space-between;
+  padding: 0.55rem 0.65rem;
+}
+
+.monster-forge .mf-boost-category > summary > span:first-child {
+  align-items: baseline;
+  display: flex;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.monster-forge .mf-boost-category > summary small {
+  font-size: 0.68rem;
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+.monster-forge .mf-category-actions {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0.35rem;
+}
+
+.monster-forge .mf-category-actions b {
+  color: var(--mf-accent);
+  font-size: 0.66rem;
+  white-space: nowrap;
+}
+
+.monster-forge .mf-category-actions button {
+  border: 0;
+  height: 1.6rem;
+  line-height: 1;
+  margin: 0;
+  min-width: 1.7rem;
+  padding: 0.2rem;
+}
+
+.monster-forge .mf-boost-group {
+  background: rgba(0, 0, 0, 0.035);
+  border: 1px solid transparent;
+  border-radius: 5px;
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.5rem;
+}
+
+.monster-forge .mf-boost-group:has([data-boost-select] option:checked:not([value=""])) {
+  background: var(--mf-accent-soft);
+  border-color: var(--mf-accent);
+}
+
+.monster-forge .mf-boost-name {
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  padding-top: 0.35rem;
+}
+
+.monster-forge .mf-boost-meta {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.monster-forge .mf-boost-meta small {
+  flex: 1 1 100%;
+}
+
+.monster-forge .mf-boost-meta span,
+.monster-forge .mf-boost-badges {
+  background: rgba(0, 0, 0, 0.09);
+  border-radius: 999px;
+  font-size: 0.62rem;
+  line-height: 1.35;
+  padding: 0.08rem 0.35rem;
 }
 
 .monster-forge .mf-boost-preview {
@@ -386,6 +505,11 @@
 .monster-forge .mf-boost-details span {
   font-size: 0.72rem;
   opacity: 0.8;
+}
+
+.monster-forge .mf-boost-details .mf-boost-badges {
+  justify-self: start;
+  opacity: 0.72;
 }
 
 .monster-forge .mf-overrides {
@@ -587,9 +711,14 @@
   .monster-forge .mf-foundation-controls,
   .monster-forge .mf-casting-control,
   .monster-forge .mf-ability-grid,
+  .monster-forge .mf-boost-filters,
   .monster-forge .mf-boost-grid,
   .monster-forge .mf-attack-columns {
     grid-template-columns: 1fr;
+  }
+
+  .monster-forge .mf-boost-category > summary small {
+    display: none;
   }
 
   .monster-forge .mf-metrics {
