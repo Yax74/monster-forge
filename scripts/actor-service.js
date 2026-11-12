@@ -273,6 +273,43 @@ export function getExistingOffensiveItems(actor) {
   });
 }
 
+function averageDamagePart(part, abilityMod = 0) {
+  const number = Number(part?.number);
+  const denomination = Number(part?.denomination);
+  if (number > 0 && denomination > 0) {
+    const bonus = Number(part?.bonus) || 0;
+    const ability = /@abilities\.(str|dex|con|int|wis|cha)\.mod/.exec(String(part?.bonus ?? ""))?.[1];
+    return number * (denomination + 1) / 2 + bonus + (ability ? abilityMod : 0);
+  }
+  const formula = String(part?.custom?.formula ?? part?.formula ?? "");
+  if (!formula) return 0;
+  const dice = [...formula.matchAll(/(\d+)d(\d+)/gi)].reduce((sum, match) => sum + Number(match[1]) * (Number(match[2]) + 1) / 2, 0);
+  const constants = [...formula.matchAll(/(?:^|[+\-]\s*)(\d+(?:\.\d+)?)(?!\s*d)/gi)].reduce((sum, match) => sum + Number(match[1]), 0);
+  const ability = /@abilities\.(str|dex|con|int|wis|cha)\.mod/.exec(formula)?.[1];
+  return dice + constants + (ability ? abilityMod : 0);
+}
+
+/** A deliberately conservative estimate: each offensive item is assumed usable once per round. */
+export function estimateExistingDpr(actor) {
+  const abilityMods = getAbilityMods(actor);
+  return Math.round(getExistingOffensiveItems(actor).reduce((total, item) => {
+    const activities = activityValues(item).filter((activity) => activity.type === "attack" || hasDamageParts(activity));
+    const estimates = activities.map((activity) => {
+      const ability = activity.attack?.ability ?? item.system?.ability ?? "str";
+      const abilityMod = Number(abilityMods[ability]) || 0;
+      const parts = Array.isArray(activity.damage?.parts) ? activity.damage.parts : [];
+      const base = item.system?.damage?.base;
+      const baseAverage = activity.damage?.includeBase === false ? 0 : averageDamagePart(base, abilityMod);
+      return baseAverage + parts.reduce((sum, part) => sum + averageDamagePart(part, abilityMod), 0);
+    });
+    if (!activities.length) {
+      const base = item.system?.damage?.base;
+      return total + averageDamagePart(base, Number(abilityMods[item.system?.ability ?? "str"]) || 0);
+    }
+    return total + Math.max(0, ...estimates);
+  }, 0));
+}
+
 function assertWritableNpc(actor) {
   if (!actor) throw new Error("Select one NPC token or open an NPC sheet first.");
   if (actor.type !== "npc") throw new Error(`${actor.name} is not an NPC actor.`);

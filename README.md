@@ -32,6 +32,8 @@ D&D5e 6.x itself requires Foundry V14. Monster Forge uses the attack/save activi
 7. Optionally choose categorized built-in boosts. Search or filter them, apply role/tier suggestions, and give any selected boost a custom actor-item name. Then choose a single, combined (**and**), or alternative (**or**) attack routine and any tertiary feature.
 8. Click **Apply build & foundation** for actor fields only, or **Forge NPC** to apply exactly the enabled sections. **Undo last** restores only the actor fields and generated item groups changed by that operation.
 
+The dialog can save named client-side build profiles for reuse on another NPC. **Quick build view** hides the Foundation and Boosts tabs; it does not change their apply checkboxes, which remain visible in the Review summary. Custom attacks expose editable reach or normal/long range. When an actor has existing offensive items, **Reserve existing item damage** estimates one use of each item per round and subtracts that amount from the generated attack budget; adjust the estimate for Multiattack, recharge, or limited-use features.
+
 With Build enabled, Foundation apply mode writes the selected CR. HP, AC, ability scores, and body data are independently gated by the Foundation tab and its field controls. HP can preserve the actor's current health percentage or be set to full. Preview-only mode still uses the selected role/tier DPR benchmark for generated attacks, but it does not change the actor's statistics. An attacks-only run can use the selected CR budget and the actor's current ability scores/proficiency without writing foundation data.
 
 The console API is also available:
@@ -61,6 +63,9 @@ Boosts apply after the FoF foundation and may intentionally move the finished ac
 - Gives spell-led roles a configurable mental ability and includes Intelligence-, Wisdom-, and Charisma-based spell-attack presets.
 - Treats Minion, Standard, Elite, and Boss as a separate layer from combat role.
 - Generates categorized NPC boosts without requiring a campaign compendium, with search, recommendations, custom names, migration handling, and live impact review.
+- Saves and restores named full-build profiles across actors, and offers a compact Quick build view.
+- Supports editable reach and normal/long range on custom attacks.
+- Can reserve an estimate of existing actor attack damage from the generated DPR budget, with an editable value and explicit assumptions.
 - Uses the same Human, Half-Elf, Dwarf, Halfling, Gnome, Elf, Tiefling, Half-Orc, Orc, Goliath, Drow, Duergar, and Deep Gnome species vocabulary as Wraeclast NPC Generator.
 - Reads species from Wraeclast NPC Generator actors when available, without turning culture or faction into mechanical statistics.
 - Applies actor statistics and generated items as one rollback-safe operation, with a one-step undo for both.
@@ -86,7 +91,7 @@ Boosts apply after the FoF foundation and may intentionally move the finished ac
 
 ## Rules limits
 
-Monster Forge is a transparent **starting-stat and attack-budgeting** tool, not a complete CR calculator. Role, tier, species ability tendencies, derived ability arrays, spell-led role handling, and built-in boost effects are Monster Forge or campaign recommendations rather than additional *Forge of Foes* tables. Generated DPR assumes attacks hit and failed saves, matching the damage side of the benchmark; it does not calculate hit probability. Area attacks expected to hit multiple targets, recharge powers, legendary actions, reactions, recovery, and off-turn damage need separate judgment. In particular, Minion and Boss tier multipliers do not solve action economy.
+Monster Forge is a transparent **starting-stat and attack-budgeting** tool, not a complete CR calculator. Its Review diagnostics show deltas against the selected *Forge of Foes* row; they do not derive a new CR. Role, tier, species ability tendencies, derived ability arrays, spell-led role handling, and built-in boost effects are Monster Forge or campaign recommendations rather than additional *Forge of Foes* tables. Generated DPR assumes attacks hit and failed saves, matching the damage side of the benchmark; it does not calculate hit probability. The optional existing-item estimate assumes one use per item per round and cannot reliably infer Multiattack, recharge, or limited-use cadence. Area attacks expected to hit multiple targets, recharge powers, legendary actions, reactions, recovery, and off-turn damage need separate judgment. In particular, Minion and Boss tier multipliers do not solve action economy.
 
 Status riders always create a native Save activity, an embedded condition effect, and clickable save/condition links. In **Midi-QOL** mode, the attack also receives a Midi triggered-activity link. With Midi-QOL and DAE active—and Midi-QOL configured to apply item effects—the save is triggered for hit targets and the condition is applied to failed-save targets. Manual mode leaves the save and effect application under GM control through the native D&D5e chat card.
 

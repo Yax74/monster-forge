@@ -45,6 +45,23 @@ Hooks.once("init", () => {
     default: {}
   });
 
+  game.settings.register(MODULE_ID, "profiles", {
+    name: "Monster Forge build profiles",
+    hint: "Client-specific named build profiles.",
+    scope: "client",
+    config: false,
+    type: Object,
+    default: []
+  });
+
+  game.settings.register(MODULE_ID, "quickMode", {
+    name: "Monster Forge quick build mode",
+    scope: "client",
+    config: false,
+    type: Boolean,
+    default: false
+  });
+
   game.keybindings.register(MODULE_ID, "open", {
     name: "Open Monster Forge",
     hint: "Open Monster Forge for the selected NPC token.",

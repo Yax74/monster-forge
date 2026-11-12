@@ -211,8 +211,8 @@ export function resolveWeapon(attack = {}) {
     weaponType: action.startsWith("r") ? "martialR" : "martialM",
     properties: [],
     range: action.startsWith("r")
-      ? { value: 60, long: null, units: "ft" }
-      : { value: 5, long: null, units: "ft" },
+      ? { value: Number(attack.customRange) || 60, long: Number(attack.customLongRange) || null, units: "ft" }
+      : { value: Number(attack.customReach) || 5, long: null, units: "ft" },
     img: "icons/svg/sword.svg"
   };
 }
@@ -235,7 +235,13 @@ function normalizeAttack(attack, fallback) {
     customAction: ["mwak", "rwak", "msak", "rsak"].includes(merged.customAction) ? merged.customAction : "mwak",
     customAbility: ABILITIES.includes(merged.customAbility) ? merged.customAbility : "str",
     customDie: DIE_SIZES.includes(Number(merged.customDie)) ? Number(merged.customDie) : 8,
-    customDamageType: DAMAGE_TYPES.includes(merged.customDamageType) ? merged.customDamageType : "slashing"
+    customDamageType: DAMAGE_TYPES.includes(merged.customDamageType) ? merged.customDamageType : "slashing",
+    customReach: clamp(merged.customReach, 5, 100, 5),
+    customRange: clamp(merged.customRange, 5, 1000, 60),
+    customLongRange: Math.max(
+      clamp(merged.customRange, 5, 1000, 60),
+      clamp(merged.customLongRange, 5, 3000, 120)
+    )
   };
 }
 
@@ -249,6 +255,10 @@ export function normalizeConfig(config = {}) {
       Object.keys(DEFAULTS.sections).map((section) => [section, current.sections?.[section] !== false])
     ),
     roleModifier: clamp(current.roleModifier, -50, 50, 0),
+    reserveExistingDpr: Boolean(current.reserveExistingDpr),
+    existingDpr: current.existingDpr === "" || current.existingDpr === null || current.existingDpr === undefined
+      ? ""
+      : clamp(current.existingDpr, 0, 2000, 0),
     followCrAttacks: current.followCrAttacks !== false,
     accuracyMode: current.accuracyMode === "cr" ? "cr" : "actor",
     saveDcMode: current.saveDcMode === "actor" ? "actor" : "cr",
@@ -340,7 +350,9 @@ export function buildDamagePlan(inputConfig = {}, actorData = {}, foundationBenc
     attackBonus: Number(foundationBenchmark?.attackBonus ?? stats.attackBonus),
     saveDc: Number(foundationBenchmark?.saveDc ?? stats.saveDc)
   };
-  const target = roundHalf(benchmark.dpr * (1 + config.roleModifier / 100));
+  const benchmarkTarget = roundHalf(benchmark.dpr * (1 + config.roleModifier / 100));
+  const existingDpr = config.reserveExistingDpr ? clamp(config.existingDpr, 0, 2000, 0) : 0;
+  const target = roundHalf(Math.max(0, benchmarkTarget - existingDpr));
   const tertiary = config.tertiary;
   const tertiaryAverage = tertiary.enabled
     ? roundHalf(tertiary.dice * dieAverage(tertiary.die) * tertiary.usesPerRound)
@@ -355,17 +367,18 @@ export function buildDamagePlan(inputConfig = {}, actorData = {}, foundationBenc
   const weaponAchieved = alternative
     ? Math.max(primary.averagePerRound, secondary?.averagePerRound ?? 0)
     : primary.averagePerRound + (secondary?.averagePerRound ?? 0);
-  const achieved = roundHalf(weaponAchieved + tertiaryAverage);
-  const variance = roundHalf(achieved - target);
+  const generatedAchieved = roundHalf(weaponAchieved + tertiaryAverage);
+  const achieved = roundHalf(existingDpr + generatedAchieved);
+  const variance = roundHalf(achieved - benchmarkTarget);
   const warnings = [];
   const totalAttacks = alternative
     ? Math.max(primary.count, secondary?.count ?? 0)
     : primary.count + (secondary?.count ?? 0);
 
   if (tertiaryAverage > target) {
-    warnings.push("The tertiary feature alone exceeds the selected DPR target.");
+    warnings.push("The tertiary feature alone exceeds the remaining DPR budget after existing damage is reserved.");
   }
-  if (Math.abs(variance) > Math.max(2, target * 0.1)) {
+  if (Math.abs(variance) > Math.max(2, benchmarkTarget * 0.1)) {
     warnings.push(`Dice rounding produces ${variance > 0 ? "+" : ""}${variance} DPR versus the target.`);
   }
   if (totalAttacks !== stats.recommendedAttacks) {
@@ -390,6 +403,9 @@ export function buildDamagePlan(inputConfig = {}, actorData = {}, foundationBenc
     stats,
     benchmark,
     target,
+    benchmarkTarget,
+    existingDpr,
+    generatedAchieved,
     achieved,
     variance,
     weaponBudget: roundHalf(weaponBudget),

@@ -169,6 +169,70 @@
   margin-bottom: 0.65rem;
 }
 
+.monster-forge .mf-profile-toolbar {
+  align-items: end;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 6px;
+  display: grid;
+  gap: 0.45rem;
+  grid-template-columns: minmax(11rem, 1fr) minmax(11rem, 1fr) auto auto auto;
+  margin-bottom: 0.7rem;
+  padding: 0.5rem;
+}
+
+.monster-forge .mf-profile-toolbar small {
+  grid-column: 1 / -1;
+  opacity: 0.75;
+}
+
+.monster-forge .mf-profile-toolbar button {
+  min-height: 2rem;
+}
+
+.monster-forge .mf-profile-toolbar .mf-switch {
+  font-size: 0.7rem;
+}
+
+.monster-forge .mf-audit-summary {
+  background: var(--mf-accent-soft);
+  border-radius: 5px;
+  font-size: 0.75rem;
+  margin: 0.5rem 0;
+  padding: 0.5rem 0.6rem;
+}
+
+.monster-forge .mf-reserve-existing {
+  align-items: center;
+  align-self: end;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 5px;
+  display: flex;
+  min-height: 2rem;
+  padding: 0.3rem;
+}
+
+.monster-forge .mf-reserve-existing input {
+  min-height: auto;
+  width: auto;
+}
+
+.monster-forge.is-quick-mode .mf-tab[data-tab-target="foundation"],
+.monster-forge.is-quick-mode .mf-tab[data-tab-target="boosts"],
+.monster-forge.is-quick-mode .mf-tab-panel[data-tab-panel="foundation"],
+.monster-forge.is-quick-mode .mf-tab-panel[data-tab-panel="boosts"] {
+  display: none !important;
+}
+
+.monster-forge.is-quick-mode::before {
+  background: color-mix(in srgb, var(--mf-accent) 12%, transparent);
+  border-left: 3px solid var(--mf-accent);
+  content: "Quick view hides Foundation and Boosts. Enabled sections still apply when you forge; switch off any section you do not want changed.";
+  display: block;
+  font-size: 0.72rem;
+  margin-bottom: 0.55rem;
+  padding: 0.4rem 0.55rem;
+}
+
 .monster-forge .mf-subheading-row {
   align-items: center;
   border-bottom: 1px solid var(--color-border-light-tertiary, #999);
@@ -704,6 +768,9 @@
 }
 
 @media (max-width: 700px) {
+  .monster-forge .mf-profile-toolbar {
+    grid-template-columns: 1fr 1fr;
+  }
   .monster-forge .mf-grid-3,
   .monster-forge .mf-grid-4,
   .monster-forge .mf-grid-5,

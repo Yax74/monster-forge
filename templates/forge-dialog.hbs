@@ -15,6 +15,17 @@
     </div>
   </header>
 
+  <div class="mf-profile-toolbar">
+    <label>Build profile
+      <select data-profile-select>{{#each profileOptions}}<option value="{{value}}">{{label}}</option>{{/each}}</select>
+    </label>
+    <input type="text" maxlength="60" data-profile-name placeholder="Name this build profile" aria-label="Build profile name">
+    <button type="button" data-action="save-profile"><i class="fa-solid fa-floppy-disk"></i> Save / update</button>
+    <button type="button" data-action="delete-profile" title="Delete selected profile"><i class="fa-solid fa-trash"></i></button>
+    <label class="mf-switch"><input type="checkbox" data-quick-mode {{#if quickMode}}checked{{/if}}> Quick build view</label>
+    <small>Profiles save the full build setup for reuse on other NPCs.</small>
+  </div>
+
   {{#if actor.hasLegacyData}}
   <p class="mf-callout" data-attacks-only><i class="fa-solid fa-wand-magic-sparkles"></i> Legacy macro data was detected. Replace mode will adopt and replace only legacy attack items when Attacks is enabled.</p>
   {{/if}}
@@ -24,7 +35,7 @@
   {{/if}}
 
   {{#if actor.existingOffense}}
-  <p class="mf-callout mf-callout-warning" data-attacks-only><i class="fa-solid fa-triangle-exclamation"></i> This actor already has {{actor.existingOffense}} ungenerated offensive item(s): {{actor.existingOffenseNames}}{{#if actor.existingOffenseMore}}, plus {{actor.existingOffenseMore}} more{{/if}}. Their damage is not included in the generated DPR budget.</p>
+  <p class="mf-callout mf-callout-warning" data-attacks-only><i class="fa-solid fa-triangle-exclamation"></i> This actor already has {{actor.existingOffense}} ungenerated offensive item(s): {{actor.existingOffenseNames}}{{#if actor.existingOffenseMore}}, plus {{actor.existingOffenseMore}} more{{/if}}. <span data-preview="existing-note">Their damage is not included in the generated DPR budget.</span></p>
   {{/if}}
 
   <nav class="mf-tabs" role="tablist" aria-label="Monster Forge sections">
@@ -224,6 +235,8 @@
         </div>
         <div class="mf-grid mf-grid-3">
           <label>Fine DPR adjustment <select name="roleModifier">{{#each damageAdjustmentOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+          <label class="mf-switch mf-reserve-existing"><input type="checkbox" name="reserveExistingDpr" {{#if config.reserveExistingDpr}}checked{{/if}}> Reserve existing item damage</label>
+          <label data-existing-dpr-field>Existing DPR to reserve <input type="number" name="existingDpr" min="0" max="2000" step="0.5" value="{{config.existingDpr}}" placeholder="Auto: {{actor.estimatedExistingDpr}}"></label>
           <label>Attack accuracy <select name="accuracyMode">{{#each accuracyOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
           <label>Saving throw DC <select name="saveDcMode">{{#each saveDcOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
           <label>Condition automation <select name="riderAutomation">{{#each riderAutomationOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
@@ -264,6 +277,9 @@
                 <label>Ability <select name="primary.customAbility">{{#each primary.customAbilityOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
                 <label>Base die <select name="primary.customDie">{{#each primary.customDieOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
                 <label>Base type <select name="primary.customDamageType">{{#each primary.customDamageOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+                <label data-range-melee="primary">Reach (ft) <input type="number" name="primary.customReach" min="5" max="100" step="5" value="{{primary.customReach}}"></label>
+                <label data-range-ranged="primary">Range (ft) <input type="number" name="primary.customRange" min="5" max="1000" step="5" value="{{primary.customRange}}"></label>
+                <label data-range-ranged="primary">Long range (ft) <input type="number" name="primary.customLongRange" min="5" max="3000" step="5" value="{{primary.customLongRange}}"></label>
               </div>
             </div>
           </fieldset>
@@ -287,6 +303,9 @@
                 <label>Ability <select name="secondary.customAbility">{{#each secondary.customAbilityOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
                 <label>Base die <select name="secondary.customDie">{{#each secondary.customDieOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
                 <label>Base type <select name="secondary.customDamageType">{{#each secondary.customDamageOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+                <label data-range-melee="secondary">Reach (ft) <input type="number" name="secondary.customReach" min="5" max="100" step="5" value="{{secondary.customReach}}"></label>
+                <label data-range-ranged="secondary">Range (ft) <input type="number" name="secondary.customRange" min="5" max="1000" step="5" value="{{secondary.customRange}}"></label>
+                <label data-range-ranged="secondary">Long range (ft) <input type="number" name="secondary.customLongRange" min="5" max="3000" step="5" value="{{secondary.customLongRange}}"></label>
               </div>
             </div>
           </fieldset>
@@ -321,10 +340,12 @@
       <div class="mf-metrics">
         <div><span>FoF baseline</span><strong data-preview="baseline">—</strong></div>
         <div><span>Target DPR</span><strong data-preview="target">—</strong></div>
-        <div data-metric="achieved"><span>Generated DPR</span><strong data-preview="achieved">—</strong><small data-preview="variance"></small></div>
+        <div data-metric="achieved"><span>Total DPR incl. reserved</span><strong data-preview="achieved">—</strong><small data-preview="variance"></small></div>
         <div><span>Attack count</span><strong data-preview="attacks">—</strong></div>
       </div>
       <div class="mf-preview-grid">
+        <div><strong>Existing damage</strong><span data-preview="existing-dpr">—</span></div>
+        <div><strong>Generated attacks</strong><span data-preview="generated-dpr">—</span></div>
         <div><strong>Routine</strong><span data-preview="routine">—</span></div>
         <div><strong>Primary</strong><span data-preview="primary">—</span></div>
         <div><strong>Secondary</strong><span data-preview="secondary">—</span></div>
@@ -333,11 +354,12 @@
       </div>
       <h4 class="mf-audit-title">Actor versus selected foundation</h4>
       <div class="mf-audit-grid">
-        <div><strong>Hit points</strong><span>Actor <b data-preview="actor-hp">—</b> · Target <b data-preview="fof-hp">—</b></span></div>
-        <div><strong>Armor class</strong><span>Actor <b data-preview="actor-ac">—</b> · Target <b data-preview="fof-ac">—</b></span></div>
-        <div><strong>Attack bonus</strong><span>Generated <b data-preview="actor-attack">—</b> · Target <b data-preview="fof-attack">—</b></span></div>
-        <div><strong>Save DC</strong><span>Generated <b data-preview="actor-dc">—</b> · Target <b data-preview="fof-dc">—</b></span></div>
+        <div><strong>Hit points</strong><span>Actor <b data-preview="actor-hp">—</b> · Target <b data-preview="fof-hp">—</b> <small data-preview="hp-delta"></small></span></div>
+        <div><strong>Armor class</strong><span>Actor <b data-preview="actor-ac">—</b> · Target <b data-preview="fof-ac">—</b> <small data-preview="ac-delta"></small></span></div>
+        <div><strong>Attack bonus</strong><span>Generated <b data-preview="actor-attack">—</b> · Target <b data-preview="fof-attack">—</b> <small data-preview="attack-delta"></small></span></div>
+        <div><strong>Save DC</strong><span>Generated <b data-preview="actor-dc">—</b> · Target <b data-preview="fof-dc">—</b> <small data-preview="dc-delta"></small></span></div>
       </div>
+      <p class="mf-audit-summary" data-preview="audit-summary">—</p>
       <h4 class="mf-audit-title">Boost impact after foundation</h4>
       <div class="mf-audit-grid mf-boost-impact" data-preview="boost-impact" hidden></div>
       <ul class="mf-warnings" data-preview="warnings"></ul>

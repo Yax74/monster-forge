@@ -19,6 +19,7 @@ import {
   getExistingOffensiveItems,
   getGeneratedItems,
   removeGeneratedItems,
+  estimateExistingDpr,
   resolveTargetActor,
   undoLastOperation
 } from "./actor-service.js";
@@ -99,7 +100,10 @@ function attackContext(attack) {
     ], attack.customAction ?? "mwak"),
     customAbilityOptions: options(ABILITIES.map((ability) => [ability, ability.toUpperCase()]), attack.customAbility ?? "str"),
     customDieOptions: options(DIE_SIZES.map((die) => [die, `d${die}`]), attack.customDie ?? 8),
-    customDamageOptions: options(DAMAGE_TYPES.map((type) => [type, type[0].toUpperCase() + type.slice(1)]), attack.customDamageType ?? "slashing")
+    customDamageOptions: options(DAMAGE_TYPES.map((type) => [type, type[0].toUpperCase() + type.slice(1)]), attack.customDamageType ?? "slashing"),
+    customReach: attack.customReach ?? 5,
+    customRange: attack.customRange ?? 60,
+    customLongRange: attack.customLongRange ?? 120
   };
 }
 
@@ -114,6 +118,9 @@ function buildContext(actor, config) {
   const recommendedBoosts = recommendBoosts({ role: config.foundation.role, tier: config.foundation.tier });
   const boostCategories = buildBoostCategories(boostConfig, recommendedBoosts);
   const boostCatalog = getBoostCatalog();
+  const profiles = Array.isArray(game.settings.get(MODULE_ID, "profiles"))
+    ? game.settings.get(MODULE_ID, "profiles")
+    : [];
   return {
     actor: {
       name: actor.name,
@@ -122,6 +129,7 @@ function buildContext(actor, config) {
       existingOffense: existingOffense.length,
       existingOffenseNames: existingOffense.slice(0, 6).map((item) => item.name).join(", "),
       existingOffenseMore: Math.max(0, existingOffense.length - 6),
+      estimatedExistingDpr: estimateExistingDpr(actor),
       hasUndo: Boolean(actor.getFlag(MODULE_ID, "lastOperation")),
       hasFoundation,
       hasLegacyData: Boolean(actor.getFlag("world", "monsterForgeData")),
@@ -133,6 +141,10 @@ function buildContext(actor, config) {
       ready: midiActive && daeActive
     },
     config,
+    profileOptions: [{ value: "", label: "Select saved profile", selected: true }, ...profiles.map((profile) => ({
+      value: profile.id, label: profile.name, selected: false
+    }))],
+    quickMode: Boolean(game.settings.get(MODULE_ID, "quickMode")),
     crOptions: options(CR_KEYS.map((cr) => [cr, `CR ${cr}`]), config.cr),
     foundation: {
       ...config.foundation,
@@ -265,7 +277,10 @@ function parseAttack(formData, prefix) {
     customAction: field(formData, `${prefix}.customAction`, "mwak"),
     customAbility: field(formData, `${prefix}.customAbility`, "str"),
     customDie: numberField(formData, `${prefix}.customDie`, 8),
-    customDamageType: field(formData, `${prefix}.customDamageType`, "slashing")
+    customDamageType: field(formData, `${prefix}.customDamageType`, "slashing"),
+    customReach: numberField(formData, `${prefix}.customReach`, 5),
+    customRange: numberField(formData, `${prefix}.customRange`, 60),
+    customLongRange: numberField(formData, `${prefix}.customLongRange`, 120)
   };
 }
 
@@ -309,6 +324,8 @@ export function parseForgeForm(form) {
     },
     boosts: parseBoostForm(data),
     roleModifier: numberField(data, "roleModifier", 0),
+    reserveExistingDpr: data.has("reserveExistingDpr"),
+    existingDpr: optionalNumberField(data, "existingDpr"),
     followCrAttacks: data.has("followCrAttacks"),
     accuracyMode: field(data, "accuracyMode", "actor"),
     saveDcMode: field(data, "saveDcMode", "cr"),
@@ -399,7 +416,24 @@ function signed(value) {
   return `${value >= 0 ? "+" : ""}${value}`;
 }
 
+function benchmarkStatus(value, target, tolerance, label) {
+  const actual = Number(value);
+  const expected = Number(target);
+  if (!Number.isFinite(actual) || !Number.isFinite(expected) || expected <= 0) return `${label}: unavailable`;
+  const delta = actual - expected;
+  if (Math.abs(delta) <= tolerance) return `${label}: on benchmark`;
+  return `${label}: ${delta > 0 ? "above" : "below"} by ${Math.abs(Math.round(delta * 10) / 10)}`;
+}
+
 function buildForgePlan(config, actor) {
+  const enteredExistingDpr = config.existingDpr;
+  const existingEstimate = estimateExistingDpr(actor);
+  config = {
+    ...config,
+    existingDpr: config.reserveExistingDpr
+      ? config.existingDpr === "" ? existingEstimate : config.existingDpr
+      : 0
+  };
   const actorProfile = getActorCombatProfile(actor);
   const foundation = buildFoundationPlan(config, actorProfile);
   const effectiveProfile = getEffectiveActorProfile(foundation, actorProfile, config.sections);
@@ -407,6 +441,8 @@ function buildForgePlan(config, actor) {
     ...config,
     foundation: foundation.config
   }, effectiveProfile, foundation.final);
+  // Keep the blank/automatic state in client defaults and profiles; the per-actor estimate is exposed separately on the plan.
+  plan.config.existingDpr = enteredExistingDpr;
   plan.foundation = foundation;
   plan.boosts = selectBoosts(plan.config.boosts, { actor });
   plan.boosts.impact = calculateBoostImpact(plan.boosts.selected, { actorProfile, foundation, plan });
@@ -489,15 +525,27 @@ function updatePreview(root, actor) {
   toggle(root, "[data-panel='tertiary']", config.tertiary.enabled);
   toggle(root, "[data-custom='primary']", config.primary.weaponKey === "custom");
   toggle(root, "[data-custom='secondary']", config.secondary.weaponKey === "custom");
+  toggle(root, "[data-range-melee='primary']", config.primary.customAction?.startsWith("m"));
+  toggle(root, "[data-range-ranged='primary']", config.primary.customAction?.startsWith("r"));
+  toggle(root, "[data-range-melee='secondary']", config.secondary.customAction?.startsWith("m"));
+  toggle(root, "[data-range-ranged='secondary']", config.secondary.customAction?.startsWith("r"));
   toggle(root, "[data-rider-save='primary']", config.primary.rider !== "none");
   toggle(root, "[data-rider-save='secondary']", config.secondary.rider !== "none");
   toggle(root, "[data-tertiary-dc]", config.tertiary.saveAbility !== "none" && config.saveDcMode === "actor");
+  toggle(root, "[data-existing-dpr-field]", config.reserveExistingDpr);
   toggle(root, "[data-foundation-apply]", foundation.config.mode === "apply");
   toggle(root, "[data-casting-ability]", foundation.casting.enabled);
 
   setText(root, "[data-preview='baseline']", plan.stats.dpr);
-  setText(root, "[data-preview='target']", plan.target);
+  setText(root, "[data-preview='target']", plan.benchmarkTarget);
   setText(root, "[data-preview='achieved']", plan.achieved);
+  setText(root, "[data-preview='existing-dpr']", plan.existingDpr ? `${plan.existingDpr} reserved` : "Not reserved");
+  setText(root, "[data-preview='generated-dpr']", plan.generatedAchieved);
+  setText(root, "[data-preview='existing-note']", config.reserveExistingDpr
+    ? `Estimated at ${plan.existingDpr} DPR and subtracted from the budget. It assumes each offensive item is used once per round; verify multiattack, recharge, and limited-use features.`
+    : "Their damage is not included in the generated DPR budget.");
+  const existingDprInput = form.elements.namedItem("existingDpr");
+  if (existingDprInput) existingDprInput.placeholder = `Auto: ${estimateExistingDpr(actor)}`;
   setText(root, "[data-preview='variance']", `${plan.variance > 0 ? "+" : ""}${plan.variance}`);
   setText(root, "[data-preview='attacks']", `${plan.totalAttacks} (${plan.stats.recommendedAttacks} suggested; ${plan.stats.publishedAttacks} published)`);
   const accuracy = config.accuracyMode === "cr"
@@ -544,7 +592,17 @@ function updatePreview(root, actor) {
   setText(root, "[data-preview='foundation-cr']", `${profile.cr ?? "—"} → ${foundation.stats.cr}`);
   setText(root, "[data-preview='foundation-hp']", `${profile.hp || "—"} → ${foundation.final.hp}`);
   setText(root, "[data-preview='foundation-ac']", `${profile.ac || "—"} → ${foundation.final.ac}`);
-  setText(root, "[data-preview='foundation-offense']", `${signed(foundation.final.attackBonus)} / DC ${foundation.final.saveDc} / ${plan.target} DPR`);
+  setText(root, "[data-preview='foundation-offense']", `${signed(foundation.final.attackBonus)} / DC ${foundation.final.saveDc} / ${plan.benchmarkTarget} DPR`);
+  const hpStatus = benchmarkStatus(profile.hp, foundation.final.hp, Math.max(5, foundation.final.hp * 0.2), "HP");
+  const acStatus = benchmarkStatus(profile.ac, foundation.final.ac, 1, "AC");
+  const attackStatus = benchmarkStatus(plan.primary.attackBonus, foundation.final.attackBonus, 1, "Attack");
+  const generatedDc = plan.primary.riderSaveDc ?? plan.tertiarySaveDc ?? plan.suggestedSaveDc;
+  const dcStatus = benchmarkStatus(generatedDc, foundation.final.saveDc, 1, "Save DC");
+  setText(root, "[data-preview='hp-delta']", hpStatus);
+  setText(root, "[data-preview='ac-delta']", acStatus);
+  setText(root, "[data-preview='attack-delta']", attackStatus);
+  setText(root, "[data-preview='dc-delta']", dcStatus);
+  setText(root, "[data-preview='audit-summary']", `Benchmark check (not a full CR calculation): Defense — ${hpStatus}; ${acStatus}. Offense — ${attackStatus}; ${dcStatus}; total DPR ${plan.achieved} vs ${plan.benchmarkTarget}.`);
   for (const ability of ABILITIES) {
     const suggested = foundation.recommendedAbilities[ability];
     const final = foundation.abilities[ability];
@@ -563,7 +621,7 @@ function updatePreview(root, actor) {
   updateBoostImpact(root, plan.boosts.impact);
 
   const varianceCard = root.querySelector("[data-metric='achieved']");
-  varianceCard?.classList.toggle("is-warning", Math.abs(plan.variance) > Math.max(2, plan.target * 0.1));
+  varianceCard?.classList.toggle("is-warning", Math.abs(plan.variance) > Math.max(2, plan.benchmarkTarget * 0.1));
 
   const warnings = root.querySelector("[data-preview='warnings']");
   if (warnings) {
@@ -583,7 +641,9 @@ function updatePreview(root, actor) {
       previewWarnings.push("Foundation & Attributes is off, so generated attacks use the actor's current ability scores.");
     }
     if (config.sections.attacks && existingOffense.length) {
-      previewWarnings.push(`${existingOffense.length} existing offensive item(s) are not included in this generated DPR budget.`);
+      previewWarnings.push(config.reserveExistingDpr
+        ? `Existing-item DPR is reserved at ${plan.existingDpr}. The estimate assumes each offensive item is used once per round; review the estimate for multiattack, recharge, or limited-use features.`
+        : `${existingOffense.length} existing offensive item(s) are not included in this generated DPR budget.`);
     }
     const hasRider = config.primary.rider !== "none" || (config.secondaryEnabled && config.secondary.rider !== "none");
     if (config.sections.attacks && config.riderAutomation === "midi" && hasRider && !midiReady) {
@@ -704,6 +764,36 @@ function clearBoostSelects(root, categoryId = null) {
   for (const input of scope.querySelectorAll("[data-boost-name] input")) input.value = "";
 }
 
+function flattenConfig(value, prefix = "", output = {}) {
+  for (const [key, child] of Object.entries(value ?? {})) {
+    const path = prefix ? `${prefix}.${key}` : key;
+    if (Array.isArray(child)) {
+      output[path] = child;
+    } else if (child && typeof child === "object") {
+      flattenConfig(child, path, output);
+    } else {
+      output[path] = child;
+    }
+  }
+  return output;
+}
+
+function applyProfileToForm(form, config) {
+  const flat = flattenConfig(config);
+  for (const element of form.elements) {
+    if (!element.name) continue;
+    let path = element.name;
+    if (path.startsWith("boosts.selection.")) path = path.replace("boosts.selection.", "boosts.selections.");
+    if (path.startsWith("boosts.name.")) path = path.replace("boosts.name.", "boosts.names.");
+    const value = flat[path];
+    if (element.type === "checkbox") {
+      element.checked = Array.isArray(value) ? value.includes(element.value) : Boolean(value);
+    } else if (value !== undefined && !Array.isArray(value)) {
+      element.value = value ?? "";
+    }
+  }
+}
+
 function attachListeners(_event, dialog, actor) {
   const root = dialog.element;
   const form = dialog.form ?? root.querySelector("form");
@@ -712,6 +802,68 @@ function attachListeners(_event, dialog, actor) {
     updateBoostControls(root, form);
     updatePreview(root, actor);
   };
+
+  const profileSelect = root.querySelector("[data-profile-select]");
+  profileSelect?.addEventListener("change", () => {
+    const profile = (game.settings.get(MODULE_ID, "profiles") ?? []).find((entry) => entry.id === profileSelect.value);
+    if (!profile) return;
+    applyProfileToForm(form, profile.config);
+    const nameInput = root.querySelector("[data-profile-name]");
+    if (nameInput) nameInput.value = profile.name;
+    preview();
+  });
+
+  root.querySelector("[data-action='save-profile']")?.addEventListener("click", async () => {
+    const nameInput = root.querySelector("[data-profile-name]");
+    const name = String(nameInput?.value ?? "").trim().slice(0, 60);
+    if (!name) {
+      ui.notifications.warn("Enter a name for this build profile first.");
+      nameInput?.focus();
+      return;
+    }
+    const profiles = [...(game.settings.get(MODULE_ID, "profiles") ?? [])];
+    const existing = profiles.find((entry) => entry.name.toLowerCase() === name.toLowerCase());
+    const profile = { id: existing?.id ?? foundry.utils.randomID(), name, config: parseForgeForm(form) };
+    const next = existing
+      ? profiles.map((entry) => entry.id === existing.id ? profile : entry)
+      : [...profiles, profile];
+    await game.settings.set(MODULE_ID, "profiles", next);
+    ui.notifications.info(`Monster Forge profile “${name}” saved.`);
+    if (profileSelect && !profileSelect.querySelector(`option[value="${CSS.escape(profile.id)}"]`)) {
+      profileSelect.add(new Option(name, profile.id));
+    }
+    if (profileSelect) profileSelect.value = profile.id;
+  });
+
+  root.querySelector("[data-action='delete-profile']")?.addEventListener("click", async () => {
+    const id = profileSelect?.value;
+    if (!id) return;
+    const profiles = [...(game.settings.get(MODULE_ID, "profiles") ?? [])];
+    const profile = profiles.find((entry) => entry.id === id);
+    if (!profile) return;
+    const confirmed = await confirmAction({
+      title: "Delete build profile",
+      content: `<p>Delete the saved profile <strong>${escapeHtml(profile.name)}</strong>?</p>`
+    });
+    if (!confirmed) return;
+    await game.settings.set(MODULE_ID, "profiles", profiles.filter((entry) => entry.id !== id));
+    profileSelect.querySelector(`option[value="${CSS.escape(id)}"]`)?.remove();
+    profileSelect.value = "";
+  });
+
+  const quickToggle = root.querySelector("[data-quick-mode]");
+  const setQuickMode = (enabled) => {
+    root.querySelector(".monster-forge")?.classList.toggle("is-quick-mode", enabled);
+    if (quickToggle) quickToggle.checked = enabled;
+    if (enabled && ["foundation", "boosts"].includes(root.querySelector("[data-tab-target].is-active")?.dataset.tabTarget)) {
+      activateTab(root, "build");
+    }
+  };
+  setQuickMode(Boolean(game.settings.get(MODULE_ID, "quickMode")));
+  quickToggle?.addEventListener("change", async () => {
+    setQuickMode(quickToggle.checked);
+    await game.settings.set(MODULE_ID, "quickMode", quickToggle.checked);
+  });
   const syncRecommendation = () => {
     const recommended = applyRecommendedAttacks(parseForgeForm(form));
     const secondary = form.elements.namedItem("secondaryEnabled");

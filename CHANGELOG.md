@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.7.0
+
+- Added client-scoped named build profiles that save and restore the full NPC setup across actors.
+- Added a Quick build view that reduces the visible workflow while preserving explicit section apply states.
+- Added editable reach and normal/long range for custom melee and ranged attacks.
+- Added an optional existing-damage reserve to the DPR allocation. The conservative estimate assumes each offensive item is used once per round and warns that multiattack, recharge, and limited-use features need review.
+- Expanded the Review tab with directional HP, AC, attack, and save-DC benchmark diagnostics and a clear reminder that this is not a complete CR calculation.
+
 ## 1.6.0
 
 - Replaced runtime compendium scanning with 55 built-in boost variants across Initiative, Movement, Defence, Saving Throws, Recovery, Weapon Accuracy, Spellcasting, and Leadership.
