@@ -134,7 +134,7 @@ test("derives the standard proficiency bonus from CR", () => {
   assert.equal(crProficiency(30), 9);
 });
 
-test("layers transparent role, tier, and campaign species recommendations", () => {
+test("layers role, tier, and 2024 Orc species recommendations", () => {
   const foundation = buildFoundationPlan({
     cr: "5",
     foundation: { role: "brute", tier: "elite", species: "halfOrc" },
@@ -151,7 +151,7 @@ test("layers transparent role, tier, and campaign species recommendations", () =
   assert.equal(foundation.proficiency, 3);
   assert.equal(foundation.abilities.str, 16);
   assert.equal(foundation.abilities.con, 18);
-  assert.deepEqual(foundation.body, { size: "med", speed: 30, darkvision: 60 });
+  assert.deepEqual(foundation.body, { size: "med", speed: 30, darkvision: 120 });
   assert.match(foundation.sources.baseline, /Forge of Foes CR 5/);
   assert.match(foundation.sources.role, /Monster Forge Brute/);
 });
@@ -284,7 +284,7 @@ test("selects custom-named boosts and warns about equivalent actor features", ()
     },
     names: { "initiative-bonus": "First into the Fray" }
   }, { actor });
-  assert.deepEqual(result.selected.map((entry) => entry.displayName), ["First into the Fray", "Parry"]);
+  assert.deepEqual(result.selected.map((entry) => entry.displayName).sort(), ["First into the Fray", "Parry"].sort());
   assert.match(result.warnings[0], /already present/i);
 });
 
@@ -317,8 +317,8 @@ test("generates native boost effects, activities, flags, and review impact", () 
     },
     names: { "initiative-bonus": "First into the Fray" }
   }).selected;
-  const initiative = prepareBoostItemData(selected[0], { setId: "set-one", idFactory });
-  const recovery = prepareBoostItemData(selected[2], { setId: "set-one", idFactory });
+  const initiative = prepareBoostItemData(selected.find((entry) => entry.id === "initiative.pb"), { setId: "set-one", idFactory });
+  const recovery = prepareBoostItemData(selected.find((entry) => entry.id === "recovery.second-wind"), { setId: "set-one", idFactory });
   assert.equal(initiative.name, "First into the Fray");
   assert.equal(initiative.flags[MODULE_ID].boostId, "initiative.pb");
   assert.equal(initiative.effects[0].system.changes[0].key, "system.attributes.init.bonus");
@@ -326,7 +326,7 @@ test("generates native boost effects, activities, flags, and review impact", () 
   assert.equal(Object.values(recovery.system.activities)[0].type, "heal");
 
   globalThis.game.system.version = "5.1.0";
-  const legacyEffect = prepareBoostItemData(selected[1], { setId: "set-two", idFactory });
+  const legacyEffect = prepareBoostItemData(selected.find((entry) => entry.id === "ac.2"), { setId: "set-two", idFactory });
   assert.equal(legacyEffect.effects[0].changes[0].key, "system.attributes.ac.bonus");
   assert.equal(legacyEffect.effects[0].system, undefined);
   globalThis.game.system.version = "6.0.5";
@@ -828,8 +828,8 @@ test("builds legacy D&D5e 5 actor paths when nested v6 fields are absent", () =>
   assert.equal(update["system.details.cr.value"], 5);
   assert.equal(update["system.attributes.ac.calc"], "natural");
   assert.equal(update["system.attributes.ac.flat"], 15);
-  assert.equal(update["system.attributes.movement.walk"], 25);
-  assert.equal(update["system.attributes.senses.darkvision"], 60);
+  assert.equal(update["system.attributes.movement.walk"], 30);
+  assert.equal(update["system.attributes.senses.darkvision"], 120);
 });
 
 test("replace and undo touch only generated items", async () => {

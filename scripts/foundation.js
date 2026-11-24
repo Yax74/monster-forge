@@ -20,6 +20,12 @@ function selectedKey(value, collection, fallback) {
   return Object.hasOwn(collection, value) ? value : fallback;
 }
 
+function selectedSpeciesKey(value) {
+  // Keep pre-2024 half-orc actor configs working with the 2024 Orc species.
+  const key = value === "halfOrc" ? "orc" : value;
+  return selectedKey(key, getSpeciesProfiles(), DEFAULTS.foundation.species);
+}
+
 function uniqueAbilities(values) {
   return [...new Set(values.filter((ability) => ABILITIES.includes(ability)))];
 }
@@ -56,7 +62,7 @@ export function normalizeFoundationConfig(input = {}) {
   return {
     mode: source.mode === "audit" ? "audit" : "apply",
     role: selectedKey(source.role, COMBAT_ROLES, defaults.role),
-    species: selectedKey(source.species, getSpeciesProfiles(), defaults.species),
+    species: selectedSpeciesKey(source.species),
     tier: selectedKey(source.tier, CREATURE_TIERS, defaults.tier),
     castingAbility: ["auto", "int", "wis", "cha"].includes(source.castingAbility)
       ? source.castingAbility
