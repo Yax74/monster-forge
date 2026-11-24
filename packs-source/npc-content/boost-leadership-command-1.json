@@ -1,0 +1,67 @@
+{
+  "_key": "!items!e99424d3c40fdd38",
+  "_id": "e99424d3c40fdd38",
+  "name": "Command I",
+  "type": "feat",
+  "img": "icons/sundries/flags/banner-blue.webp",
+  "system": {
+    "description": {
+      "value": "<p>As an action, the creature chooses up to two allies within 30 feet that can hear it. Each chosen ally can use its reaction to make one weapon attack.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "leadership",
+        "categoryLabel": "Leadership",
+        "categoryIcon": "icons/sundries/flags/banner-blue.webp",
+        "categoryDescription": "Support and command features; choose one.",
+        "categorySort": 7,
+        "group": "leadership-feature",
+        "groupLabel": "Leadership feature",
+        "groupHelp": "Action-economy impact is called out in Review",
+        "groupSort": 0,
+        "sort": 53,
+        "boost": {
+          "id": "leadership.command-1",
+          "name": "Command I",
+          "label": "Command I",
+          "summary": "Action; up to two allies can each use a reaction to make one weapon attack.",
+          "description": "As an action, the creature chooses up to two allies within 30 feet that can hear it. Each chosen ally can use its reaction to make one weapon attack.",
+          "power": "major",
+          "automation": "manual",
+          "activation": {
+            "type": "action"
+          },
+          "impact": {
+            "action": "Grants up to two reaction attacks"
+          },
+          "groupId": "leadership-feature",
+          "categoryId": "leadership",
+          "exclusiveGroup": "leadership-feature",
+          "rank": 1,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

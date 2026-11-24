@@ -1,0 +1,66 @@
+{
+  "_key": "!items!4ae34e9cc7085005",
+  "_id": "4ae34e9cc7085005",
+  "name": "NPC Full Caster",
+  "type": "feat",
+  "img": "icons/magic/symbols/runes-star-blue.webp",
+  "system": {
+    "description": {
+      "value": "<p>The creature is a full caster. Its effective caster level equals its challenge rating (minimum 1). This feature doesn't add spells automatically.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "spellcasting",
+        "categoryLabel": "Spellcasting",
+        "categoryIcon": "icons/magic/symbols/runes-star-blue.webp",
+        "categoryDescription": "Spell accuracy, DC, and effective caster progression.",
+        "categorySort": 6,
+        "group": "caster-progression",
+        "groupLabel": "Caster progression",
+        "groupHelp": "Records effective caster level; spells remain your choice",
+        "groupSort": 2,
+        "sort": 48,
+        "boost": {
+          "id": "caster.full",
+          "name": "NPC Full Caster",
+          "label": "Full caster",
+          "summary": "Effective caster level equals CR (minimum 1).",
+          "description": "The creature is a full caster. Its effective caster level equals its challenge rating (minimum 1). This feature doesn't add spells automatically.",
+          "power": "strong",
+          "automation": "manual",
+          "kind": "caster",
+          "progression": 1,
+          "impact": {
+            "note": "Full-caster progression"
+          },
+          "groupId": "caster-progression",
+          "categoryId": "spellcasting",
+          "exclusiveGroup": "caster-progression",
+          "rank": 3,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "_key": "!items!5281da047c086e16",
+  "_id": "5281da047c086e16",
+  "name": "Quickness III",
+  "type": "feat",
+  "img": "icons/svg/d20.svg",
+  "system": {
+    "description": {
+      "value": "<p>The creature gains a +3 bonus to initiative.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "initiative",
+        "categoryLabel": "Initiative",
+        "categoryIcon": "icons/svg/d20.svg",
+        "categoryDescription": "Turn-order boosts. Choose one.",
+        "categorySort": 0,
+        "group": "initiative-bonus",
+        "groupLabel": "Initiative boost",
+        "groupHelp": "Flat, proficiency-scaled, or advantage",
+        "groupSort": 0,
+        "sort": 2,
+        "boost": {
+          "id": "initiative.flat.3",
+          "name": "Quickness III",
+          "label": "+3",
+          "summary": "The creature gains a +3 bonus to initiative.",
+          "description": "The creature gains a +3 bonus to initiative.",
+          "power": "strong",
+          "automation": "core",
+          "effect": [
+            {
+              "key": "system.attributes.init.bonus",
+              "value": 3
+            }
+          ],
+          "impact": {
+            "initiative": 3
+          },
+          "groupId": "initiative-bonus",
+          "categoryId": "initiative",
+          "exclusiveGroup": "initiative-bonus",
+          "rank": 3,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

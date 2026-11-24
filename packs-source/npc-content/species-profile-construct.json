@@ -3,10 +3,10 @@
   "_id": "f2246b81speciesp",
   "name": "Construct Species Profile",
   "type": "feat",
-  "img": "icons/svg/book.svg",
+  "img": "icons/creatures/magical/construct-golem-stone-blue.webp",
   "system": {
     "description": {
-      "value": "<p>Species preset: med; walk 30 ft; darkvision 0 ft. Ability scores remain unchanged under 2024 rules. GM-editable body defaults; traits are separate Items.</p>",
+      "value": "<p>Starting profile: med; walk 30 ft; darkvision 0 ft. Suggested ability adjustments are editable Monster Forge heuristics, not 2024 ancestry ability score rules. Traits are separate NPC Items.</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -33,7 +33,14 @@
           "label": "Construct",
           "size": "med",
           "speed": 30,
-          "darkvision": 0
+          "darkvision": 0,
+          "abilities": {
+            "str": 1,
+            "dex": -1,
+            "con": 2,
+            "int": -2,
+            "cha": -2
+          }
         },
         "template": false,
         "version": 1

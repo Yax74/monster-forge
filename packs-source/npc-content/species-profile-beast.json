@@ -3,10 +3,10 @@
   "_id": "fdf38663speciesp",
   "name": "Beast Species Profile",
   "type": "feat",
-  "img": "icons/svg/book.svg",
+  "img": "icons/creatures/mammals/beast-horned-scaled-glowing-orange.webp",
   "system": {
     "description": {
-      "value": "<p>Species preset: med; walk 30 ft; darkvision 0 ft. Ability scores remain unchanged under 2024 rules. GM-editable body defaults; traits are separate Items.</p>",
+      "value": "<p>Starting profile: med; walk 30 ft; darkvision 0 ft. Suggested ability adjustments are editable Monster Forge heuristics, not 2024 ancestry ability score rules. Traits are separate NPC Items.</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -33,7 +33,14 @@
           "label": "Beast",
           "size": "med",
           "speed": 30,
-          "darkvision": 0
+          "darkvision": 0,
+          "abilities": {
+            "dex": 2,
+            "con": 1,
+            "int": -4,
+            "wis": 1,
+            "cha": -2
+          }
         },
         "template": false,
         "version": 1

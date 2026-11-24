@@ -3,7 +3,7 @@
   "_id": "bb16dbbegnomecun",
   "name": "Gnomish Cunning",
   "type": "feat",
-  "img": "icons/svg/book.svg",
+  "img": "icons/magic/symbols/runes-star-blue.webp",
   "system": {
     "description": {
       "value": "<p>This creature has advantage on Intelligence, Wisdom, and Charisma saving throws.</p>",

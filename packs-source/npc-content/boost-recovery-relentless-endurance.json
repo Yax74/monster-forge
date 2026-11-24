@@ -1,0 +1,72 @@
+{
+  "_key": "!items!a8f6bd5caedafd5c",
+  "_id": "a8f6bd5caedafd5c",
+  "name": "Relentless Endurance",
+  "type": "feat",
+  "img": "icons/svg/heal.svg",
+  "system": {
+    "description": {
+      "value": "<p>When the creature is reduced to 0 hit points but not killed outright, it can drop to 1 hit point instead. Once it uses this feature, it can't use it again until it finishes a long rest.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "recovery",
+        "categoryLabel": "Recovery",
+        "categoryIcon": "icons/svg/heal.svg",
+        "categoryDescription": "One healing or survival feature.",
+        "categorySort": 4,
+        "group": "recovery-feature",
+        "groupLabel": "Recovery feature",
+        "groupHelp": "Adds a native activity or clear manual trigger",
+        "groupSort": 0,
+        "sort": 34,
+        "boost": {
+          "id": "recovery.relentless-endurance",
+          "name": "Relentless Endurance",
+          "label": "Relentless Endurance",
+          "summary": "At 0 HP but not killed outright, drop to 1 HP instead; once per long rest.",
+          "description": "When the creature is reduced to 0 hit points but not killed outright, it can drop to 1 hit point instead. Once it uses this feature, it can't use it again until it finishes a long rest.",
+          "power": "strong",
+          "automation": "manual",
+          "activation": {
+            "type": "special",
+            "condition": "Reduced to 0 hit points but not killed outright"
+          },
+          "uses": {
+            "max": "1",
+            "period": "day"
+          },
+          "impact": {
+            "recovery": "Survive at 1 HP once per long rest"
+          },
+          "groupId": "recovery-feature",
+          "categoryId": "recovery",
+          "exclusiveGroup": "recovery-feature",
+          "rank": null,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "_key": "!items!b8a87c77speciesp",
+  "_id": "b8a87c77speciesp",
+  "name": "Dragon Species Profile",
+  "type": "feat",
+  "img": "icons/creatures/reptiles/dragon-horned-blue.webp",
+  "system": {
+    "description": {
+      "value": "<p>Starting profile: lg; walk 40 ft; darkvision 120 ft. Suggested ability adjustments are editable Monster Forge heuristics, not 2024 ancestry ability score rules. Traits are separate NPC Items.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster"
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "species-profile",
+        "speciesKey": "dragon",
+        "profile": {
+          "label": "Dragon",
+          "size": "lg",
+          "speed": 40,
+          "darkvision": 120,
+          "abilities": {
+            "str": 2,
+            "con": 1,
+            "cha": 1
+          }
+        },
+        "template": false,
+        "version": 1
+      }
+    }
+  }
+}

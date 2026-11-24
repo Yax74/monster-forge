@@ -1,0 +1,71 @@
+{
+  "_key": "!items!ddfaf28591721b7e",
+  "_id": "ddfaf28591721b7e",
+  "name": "Regeneration II",
+  "type": "feat",
+  "img": "icons/svg/heal.svg",
+  "system": {
+    "description": {
+      "value": "<p>The creature regains hit points equal to twice its proficiency bonus at the start of each of its turns if it has at least 1 hit point.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "recovery",
+        "categoryLabel": "Recovery",
+        "categoryIcon": "icons/svg/heal.svg",
+        "categoryDescription": "One healing or survival feature.",
+        "categorySort": 4,
+        "group": "recovery-feature",
+        "groupLabel": "Recovery feature",
+        "groupHelp": "Adds a native activity or clear manual trigger",
+        "groupSort": 0,
+        "sort": 36,
+        "boost": {
+          "id": "recovery.regeneration.pb2",
+          "name": "Regeneration II",
+          "label": "Regeneration: 2×PB",
+          "summary": "At turn start, regain twice PB hit points while above 0 HP.",
+          "description": "The creature regains hit points equal to twice its proficiency bonus at the start of each of its turns if it has at least 1 hit point.",
+          "power": "strong",
+          "automation": "activity",
+          "activation": {
+            "type": "special",
+            "condition": "At the start of its turn while above 0 hit points"
+          },
+          "healing": {
+            "formula": "(2*@prof)"
+          },
+          "impact": {
+            "recovery": "2×PB each turn"
+          },
+          "groupId": "recovery-feature",
+          "categoryId": "recovery",
+          "exclusiveGroup": "recovery-feature",
+          "rank": 2,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

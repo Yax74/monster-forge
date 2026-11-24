@@ -3,7 +3,7 @@
   "_id": "d70aea6dorcrelen",
   "name": "Relentless Endurance",
   "type": "feat",
-  "img": "icons/svg/book.svg",
+  "img": "icons/weapons/axes/axe-battle-black.webp",
   "system": {
     "description": {
       "value": "<p>When damage would reduce this creature to 0 Hit Points but not kill it outright, it can drop to 1 Hit Point instead. Once used, this trait recharges after a Long Rest.</p>",

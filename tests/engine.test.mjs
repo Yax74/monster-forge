@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readdir, readFile } from "node:fs/promises";
 
 import { CR_KEYS, FOF_STATS, MODULE_ID } from "../scripts/constants.js";
 import {
@@ -38,9 +39,21 @@ import {
   prepareBoostItemData,
   recommendBoosts,
   restoreBoostConfig,
-  selectBoosts
+  selectBoosts,
+  setBoostCatalogItems
 } from "../scripts/boosts.js";
 import { generatorSpecies } from "../scripts/app.js";
+
+const contentFiles = await readdir(new URL("../packs-source/npc-content/", import.meta.url));
+const boostItems = await Promise.all(contentFiles.filter((file) => file.startsWith("boost-") && file.endsWith(".json")).map(async (file) => {
+  const data = JSON.parse(await readFile(new URL(`../packs-source/npc-content/${file}`, import.meta.url), "utf8"));
+  return {
+    ...data,
+    uuid: `Compendium.monster-forge.npc-content.Item.${data._id}`,
+    getFlag(scope, key) { return this.flags?.[scope]?.[key]; }
+  };
+}));
+setBoostCatalogItems(boostItems);
 
 test("reads legacy NPC Generator species without requiring that module to be active", () => {
   const actor = {
@@ -238,7 +251,7 @@ test("provides a categorized built-in boost catalog with stable exclusive select
   });
   assert.equal(parseBoostVariant("NPC Full Caster").family, "Caster Progression");
   const catalog = getBoostCatalog();
-  assert.equal(catalog.source, "built-in");
+  assert.equal(catalog.source, "compendium");
   assert.ok(catalog.entries.length >= 45);
   assert.deepEqual(catalog.categories.map((category) => category.id), [
     "initiative", "movement", "defence", "resilience", "recovery", "accuracy", "spellcasting", "leadership"

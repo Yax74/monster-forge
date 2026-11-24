@@ -1,0 +1,68 @@
+{
+  "_key": "!items!df90ba2d4a02dbae",
+  "_id": "df90ba2d4a02dbae",
+  "name": "Skirmisher",
+  "type": "feat",
+  "img": "icons/svg/wingfoot.svg",
+  "system": {
+    "description": {
+      "value": "<p>When a hostile creature ends its turn within 5 feet of the creature, the creature can use its reaction to move up to half its speed. This movement doesn't provoke opportunity attacks.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "movement",
+        "categoryLabel": "Movement",
+        "categoryIcon": "icons/svg/wingfoot.svg",
+        "categoryDescription": "Raw speed and one signature mobility feature.",
+        "categorySort": 1,
+        "group": "movement-ability",
+        "groupLabel": "Movement ability",
+        "groupHelp": "One signature mobility option",
+        "groupSort": 1,
+        "sort": 12,
+        "boost": {
+          "id": "movement.skirmisher",
+          "name": "Skirmisher",
+          "label": "Skirmisher",
+          "summary": "Reaction movement when a hostile creature ends its turn within 5 feet.",
+          "description": "When a hostile creature ends its turn within 5 feet of the creature, the creature can use its reaction to move up to half its speed. This movement doesn't provoke opportunity attacks.",
+          "power": "standard",
+          "automation": "manual",
+          "activation": {
+            "type": "reaction",
+            "condition": "A hostile creature ends its turn within 5 feet"
+          },
+          "impact": {
+            "action": "Reaction movement"
+          },
+          "groupId": "movement-ability",
+          "categoryId": "movement",
+          "exclusiveGroup": "movement-ability",
+          "rank": null,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

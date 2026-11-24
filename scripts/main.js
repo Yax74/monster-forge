@@ -1,6 +1,6 @@
 import { MODULE_ID, MODULE_TITLE } from "./constants.js";
 import { getGeneratedItems, removeGeneratedItems, resolveTargetActor, undoLastOperation } from "./actor-service.js";
-import { createNpcFromScratch, openForge } from "./app.js";
+import { createNpcFromScratch, openForge, refreshCompendiumLibrary } from "./app.js";
 import { getBoostCatalog } from "./boosts.js";
 
 function actorFromSheet(app) {
@@ -64,16 +64,32 @@ Hooks.once("init", () => {
 
   game.settings.register(MODULE_ID, "contentPacks", {
     name: "Monster Forge NPC content compendiums",
-    hint: "Comma-separated Item compendium collection IDs. Tagged action, trait, species-trait, and species-profile Items can be browsed by Monster Forge (for example: your-world.monster-features).",
+    hint: "Configured by the GM Setup tab. Linked Item compendiums can provide NPC actions, traits, species traits, boosts, and species profiles.",
     scope: "world",
-    config: true,
+    config: false,
     type: String,
     default: ""
   });
 
+  game.settings.register(MODULE_ID, "defaultSpeciesTraits", {
+    name: "Add species traits to new NPCs by default",
+    hint: "New NPCs begin with this preference; it can still be changed for each creature.",
+    scope: "world",
+    config: false,
+    type: Boolean,
+    default: true
+  });
+
+  game.settings.register(MODULE_ID, "foundationDefaultsV19", {
+    scope: "client",
+    config: false,
+    type: Boolean,
+    default: false
+  });
+
   game.keybindings.register(MODULE_ID, "open", {
     name: "Open Monster Forge",
-    hint: "Open Monster Forge for the selected NPC token.",
+    hint: "Open Monster Forge for the selected NPC, or create a creature if none is selected.",
     editable: [{ key: "KeyM", modifiers: ["ALT"] }],
     restricted: true,
     onDown: () => {
@@ -83,7 +99,13 @@ Hooks.once("init", () => {
   });
 });
 
-Hooks.once("ready", () => {
+Hooks.once("ready", async () => {
+  try {
+    await refreshCompendiumLibrary();
+  } catch (error) {
+    console.error(`${MODULE_ID} | Unable to load the configured Item compendiums.`, error);
+  }
+
   game.monsterForge = Object.freeze({
     open: openForge,
     createNpc: createNpcFromScratch,
@@ -91,7 +113,8 @@ Hooks.once("ready", () => {
     removeGenerated: async (actor = null) => removeGeneratedItems(actor ?? resolveTargetActor()),
     getGenerated: (actor = null) => getGeneratedItems(actor ?? resolveTargetActor()),
     getFoundation: (actor = null) => (actor ?? resolveTargetActor()).getFlag(MODULE_ID, "foundation") ?? null,
-    getBoostCatalog
+    getBoostCatalog,
+    refreshLibrary: refreshCompendiumLibrary
   });
 
   if (game.system.version && !/^5\.|^6\./.test(game.system.version)) {
@@ -109,15 +132,6 @@ Hooks.on("getSceneControlButtons", (controls) => {
     button: true,
     visible: true,
     onChange: () => openForge()
-  };
-  if (!controls.tokens.tools[`${MODULE_ID}-create`]) controls.tokens.tools[`${MODULE_ID}-create`] = {
-    name: `${MODULE_ID}-create`,
-    title: "Create NPC from scratch",
-    icon: "fa-solid fa-user-plus",
-    order: Object.keys(controls.tokens.tools).length,
-    button: true,
-    visible: true,
-    onChange: () => createNpcFromScratch()
   };
 });
 

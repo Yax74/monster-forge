@@ -3,7 +3,7 @@
   "_id": "397c696ftiefling",
   "name": "Fiendish Legacy",
   "type": "feat",
-  "img": "icons/svg/book.svg",
+  "img": "icons/magic/unholy/silhouette-evil-horned-giant.webp",
   "system": {
     "description": {
       "value": "<p>This creature's fiendish legacy grants a limited magical ability. Add the specific spells and uses appropriate to its lineage.</p>",

@@ -1,0 +1,68 @@
+{
+  "_key": "!items!ca64793cd9964e38",
+  "_id": "ca64793cd9964e38",
+  "name": "Uncanny Dodge",
+  "type": "feat",
+  "img": "icons/svg/shield.svg",
+  "system": {
+    "description": {
+      "value": "<p>When an attacker the creature can see hits it with an attack, the creature can use its reaction to halve the attack's damage against it.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "defence",
+        "categoryLabel": "Defence",
+        "categoryIcon": "icons/svg/shield.svg",
+        "categoryDescription": "Passive AC or one defensive reaction.",
+        "categorySort": 2,
+        "group": "defence-reaction",
+        "groupLabel": "Defensive reaction",
+        "groupHelp": "Choose one competing reaction",
+        "groupSort": 1,
+        "sort": 23,
+        "boost": {
+          "id": "reaction.uncanny-dodge",
+          "name": "Uncanny Dodge",
+          "label": "Uncanny Dodge",
+          "summary": "Use a reaction to halve the damage of one visible attack.",
+          "description": "When an attacker the creature can see hits it with an attack, the creature can use its reaction to halve the attack's damage against it.",
+          "power": "strong",
+          "automation": "manual",
+          "activation": {
+            "type": "reaction",
+            "condition": "A visible attacker hits"
+          },
+          "impact": {
+            "action": "Reaction: halve one attack's damage"
+          },
+          "groupId": "defence-reaction",
+          "categoryId": "defence",
+          "exclusiveGroup": "defence-reaction",
+          "rank": null,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "_key": "!items!4ed47e48speciesp",
+  "_id": "4ed47e48speciesp",
+  "name": "Fey Species Profile",
+  "type": "feat",
+  "img": "icons/creatures/magical/fae-fairy-winged-glowing-green.webp",
+  "system": {
+    "description": {
+      "value": "<p>Starting profile: sm; walk 30 ft; darkvision 60 ft. Suggested ability adjustments are editable Monster Forge heuristics, not 2024 ancestry ability score rules. Traits are separate NPC Items.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster"
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "species-profile",
+        "speciesKey": "fey",
+        "profile": {
+          "label": "Fey",
+          "size": "sm",
+          "speed": 30,
+          "darkvision": 60,
+          "abilities": {
+            "dex": 1,
+            "wis": 1,
+            "cha": 1
+          }
+        },
+        "template": false,
+        "version": 1
+      }
+    }
+  }
+}

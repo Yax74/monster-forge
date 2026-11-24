@@ -1,0 +1,68 @@
+{
+  "_key": "!items!026a82d3aed4e88c",
+  "_id": "026a82d3aed4e88c",
+  "name": "Greater Parry",
+  "type": "feat",
+  "img": "icons/svg/shield.svg",
+  "system": {
+    "description": {
+      "value": "<p>The creature adds twice its proficiency bonus to its AC against one melee attack that would hit it. To do so, the creature must see the attacker and be wielding a melee weapon or shield.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "defence",
+        "categoryLabel": "Defence",
+        "categoryIcon": "icons/svg/shield.svg",
+        "categoryDescription": "Passive AC or one defensive reaction.",
+        "categorySort": 2,
+        "group": "defence-reaction",
+        "groupLabel": "Defensive reaction",
+        "groupHelp": "Choose one competing reaction",
+        "groupSort": 1,
+        "sort": 21,
+        "boost": {
+          "id": "reaction.greater-parry",
+          "name": "Greater Parry",
+          "label": "Greater Parry (+2×PB AC)",
+          "summary": "Add twice PB to AC against one visible melee attack that would hit.",
+          "description": "The creature adds twice its proficiency bonus to its AC against one melee attack that would hit it. To do so, the creature must see the attacker and be wielding a melee weapon or shield.",
+          "power": "major",
+          "automation": "manual",
+          "activation": {
+            "type": "reaction",
+            "condition": "A visible melee attack would hit"
+          },
+          "impact": {
+            "action": "Reaction: +2×PB AC vs. one melee attack"
+          },
+          "groupId": "defence-reaction",
+          "categoryId": "defence",
+          "exclusiveGroup": "defence-reaction",
+          "rank": null,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

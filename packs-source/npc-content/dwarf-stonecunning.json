@@ -3,7 +3,7 @@
   "_id": "fdb8a52ddwarfsto",
   "name": "Stonecunning",
   "type": "feat",
-  "img": "icons/svg/book.svg",
+  "img": "icons/svg/shield.svg",
   "system": {
     "description": {
       "value": "<p>This dwarf has a supernatural connection to stone that can reveal nearby vibrations. Set its range and duration to match the creature's challenge and intended use.</p>",

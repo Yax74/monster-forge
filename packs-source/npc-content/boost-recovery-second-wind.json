@@ -1,0 +1,75 @@
+{
+  "_key": "!items!21a7028e8df990e2",
+  "_id": "21a7028e8df990e2",
+  "name": "Second Wind",
+  "type": "feat",
+  "img": "icons/svg/heal.svg",
+  "system": {
+    "description": {
+      "value": "<p>As a bonus action, the creature regains a number of hit points equal to its proficiency bonus in d10s.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "recovery",
+        "categoryLabel": "Recovery",
+        "categoryIcon": "icons/svg/heal.svg",
+        "categoryDescription": "One healing or survival feature.",
+        "categorySort": 4,
+        "group": "recovery-feature",
+        "groupLabel": "Recovery feature",
+        "groupHelp": "Adds a native activity or clear manual trigger",
+        "groupSort": 0,
+        "sort": 33,
+        "boost": {
+          "id": "recovery.second-wind",
+          "name": "Second Wind",
+          "label": "Second Wind",
+          "summary": "Bonus action; regain PBd10 hit points once per long rest.",
+          "description": "As a bonus action, the creature regains a number of hit points equal to its proficiency bonus in d10s.",
+          "power": "strong",
+          "automation": "activity",
+          "activation": {
+            "type": "bonus"
+          },
+          "uses": {
+            "max": "1",
+            "period": "day"
+          },
+          "healing": {
+            "formula": "(@prof)d10"
+          },
+          "impact": {
+            "recovery": "PBd10 once per long rest",
+            "action": "Bonus action"
+          },
+          "groupId": "recovery-feature",
+          "categoryId": "recovery",
+          "exclusiveGroup": "recovery-feature",
+          "rank": null,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

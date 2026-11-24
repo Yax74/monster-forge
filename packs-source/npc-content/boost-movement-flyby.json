@@ -1,0 +1,64 @@
+{
+  "_key": "!items!0b5705127947792c",
+  "_id": "0b5705127947792c",
+  "name": "Flyby",
+  "type": "feat",
+  "img": "icons/svg/wingfoot.svg",
+  "system": {
+    "description": {
+      "value": "<p>The creature doesn't provoke opportunity attacks when it flies out of an enemy's reach.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "movement",
+        "categoryLabel": "Movement",
+        "categoryIcon": "icons/svg/wingfoot.svg",
+        "categoryDescription": "Raw speed and one signature mobility feature.",
+        "categorySort": 1,
+        "group": "movement-ability",
+        "groupLabel": "Movement ability",
+        "groupHelp": "One signature mobility option",
+        "groupSort": 1,
+        "sort": 13,
+        "boost": {
+          "id": "movement.flyby",
+          "name": "Flyby",
+          "label": "Flyby",
+          "summary": "The creature doesn't provoke opportunity attacks when it flies out of an enemy's reach.",
+          "description": "The creature doesn't provoke opportunity attacks when it flies out of an enemy's reach.",
+          "power": "standard",
+          "automation": "manual",
+          "impact": {
+            "note": "Flyby; requires a fly speed"
+          },
+          "groupId": "movement-ability",
+          "categoryId": "movement",
+          "exclusiveGroup": "movement-ability",
+          "rank": null,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "_key": "!items!d8a42bcd0ae7f0ca",
+  "_id": "d8a42bcd0ae7f0ca",
+  "name": "Cunning Action",
+  "type": "feat",
+  "img": "icons/svg/wingfoot.svg",
+  "system": {
+    "description": {
+      "value": "<p>The creature can take the Dash, Disengage, or Hide action as a bonus action.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "movement",
+        "categoryLabel": "Movement",
+        "categoryIcon": "icons/svg/wingfoot.svg",
+        "categoryDescription": "Raw speed and one signature mobility feature.",
+        "categorySort": 1,
+        "group": "movement-ability",
+        "groupLabel": "Movement ability",
+        "groupHelp": "One signature mobility option",
+        "groupSort": 1,
+        "sort": 11,
+        "boost": {
+          "id": "movement.cunning-action",
+          "name": "Cunning Action",
+          "label": "Cunning Action",
+          "summary": "The creature can Dash, Disengage, or Hide as a bonus action.",
+          "description": "The creature can take the Dash, Disengage, or Hide action as a bonus action.",
+          "power": "strong",
+          "automation": "activity",
+          "activation": {
+            "type": "bonus"
+          },
+          "impact": {
+            "action": "Bonus-action Dash/Disengage/Hide"
+          },
+          "groupId": "movement-ability",
+          "categoryId": "movement",
+          "exclusiveGroup": "movement-ability",
+          "rank": null,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

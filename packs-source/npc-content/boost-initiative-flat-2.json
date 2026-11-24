@@ -1,0 +1,70 @@
+{
+  "_key": "!items!3acc031f268f962a",
+  "_id": "3acc031f268f962a",
+  "name": "Quickness II",
+  "type": "feat",
+  "img": "icons/svg/d20.svg",
+  "system": {
+    "description": {
+      "value": "<p>The creature gains a +2 bonus to initiative.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "initiative",
+        "categoryLabel": "Initiative",
+        "categoryIcon": "icons/svg/d20.svg",
+        "categoryDescription": "Turn-order boosts. Choose one.",
+        "categorySort": 0,
+        "group": "initiative-bonus",
+        "groupLabel": "Initiative boost",
+        "groupHelp": "Flat, proficiency-scaled, or advantage",
+        "groupSort": 0,
+        "sort": 1,
+        "boost": {
+          "id": "initiative.flat.2",
+          "name": "Quickness II",
+          "label": "+2",
+          "summary": "The creature gains a +2 bonus to initiative.",
+          "description": "The creature gains a +2 bonus to initiative.",
+          "power": "standard",
+          "automation": "core",
+          "effect": [
+            {
+              "key": "system.attributes.init.bonus",
+              "value": 2
+            }
+          ],
+          "impact": {
+            "initiative": 2
+          },
+          "groupId": "initiative-bonus",
+          "categoryId": "initiative",
+          "exclusiveGroup": "initiative-bonus",
+          "rank": 2,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

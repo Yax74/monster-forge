@@ -1,0 +1,70 @@
+{
+  "_key": "!items!655d9bb4f4054196",
+  "_id": "655d9bb4f4054196",
+  "name": "Perfect Readiness",
+  "type": "feat",
+  "img": "icons/svg/d20.svg",
+  "system": {
+    "description": {
+      "value": "<p>The creature adds twice its proficiency bonus to initiative.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "initiative",
+        "categoryLabel": "Initiative",
+        "categoryIcon": "icons/svg/d20.svg",
+        "categoryDescription": "Turn-order boosts. Choose one.",
+        "categorySort": 0,
+        "group": "initiative-bonus",
+        "groupLabel": "Initiative boost",
+        "groupHelp": "Flat, proficiency-scaled, or advantage",
+        "groupSort": 0,
+        "sort": 4,
+        "boost": {
+          "id": "initiative.pb2",
+          "name": "Perfect Readiness",
+          "label": "+ twice proficiency bonus",
+          "summary": "The creature adds twice its proficiency bonus to initiative.",
+          "description": "The creature adds twice its proficiency bonus to initiative.",
+          "power": "major",
+          "automation": "core",
+          "effect": [
+            {
+              "key": "system.attributes.init.bonus",
+              "value": "(2*@attributes.prof)"
+            }
+          ],
+          "impact": {
+            "initiativeProf": 2
+          },
+          "groupId": "initiative-bonus",
+          "categoryId": "initiative",
+          "exclusiveGroup": "initiative-bonus",
+          "rank": null,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

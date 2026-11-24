@@ -2,7 +2,6 @@ import fs from "node:fs/promises";
 import path from "node:path";
 
 const output = path.resolve("packs-source/npc-content");
-await fs.rm(output, { recursive: true, force: true });
 await fs.mkdir(output, { recursive: true });
 
 const entries = [
@@ -34,6 +33,26 @@ const entries = [
   ["construct-built", "Constructed Nature", "species-trait", "Construct", "This creature does not require air, food, drink, or sleep. Add any additional construct defenses as separate NPC features."]
 ];
 
+const speciesIcons = {
+  human: "icons/creatures/eyes/human-single-blue.webp",
+  dwarf: "icons/svg/shield.svg",
+  halfling: "icons/consumables/food/bread-toast-tan.webp",
+  gnome: "icons/magic/symbols/runes-star-blue.webp",
+  elf: "icons/weapons/bows/shortbow-recurve-yellow-blue.webp",
+  tiefling: "icons/magic/unholy/silhouette-evil-horned-giant.webp",
+  aasimar: "icons/magic/holy/angel-wings-gray.webp",
+  orc: "icons/weapons/axes/axe-battle-black.webp",
+  goliath: "icons/creatures/magical/humanoid-giant-forest-blue.webp",
+  dragonborn: "icons/creatures/abilities/dragon-fire-breath-orange.webp",
+  drow: "icons/creatures/magical/spirit-undead-ghost-purple.webp",
+  duergar: "icons/creatures/magical/construct-face-stone-pink.webp",
+  deepGnome: "icons/commodities/tech/battery-arcane-crystal-green.webp",
+  gemling: "icons/commodities/gems/gem-cluster-blue-white.webp",
+  beast: "icons/creatures/mammals/beast-horned-scaled-glowing-orange.webp",
+  undead: "icons/creatures/magical/spirit-undead-ghost-blue.webp",
+  construct: "icons/creatures/magical/construct-golem-stone-blue.webp"
+};
+
 function stableId(text) {
   let value = 2166136261;
   for (const char of text) value = Math.imul(value ^ char.charCodeAt(0), 16777619);
@@ -42,13 +61,15 @@ function stableId(text) {
 
 for (const [slug, name, kind, speciesLabel, description] of entries) {
   const species = speciesLabel === "Template" ? [] : [speciesLabel === "Deep Gnome" ? "deepGnome" : speciesLabel[0].toLowerCase() + speciesLabel.slice(1).replaceAll(" ", "")];
+  const speciesKey = species[0];
   const id = stableId(slug);
   const data = {
     _key: `!items!${id}`,
     _id: id,
     name,
     type: "feat",
-    img: "icons/svg/book.svg",
+    img: kind === "species-trait" && speciesIcons[speciesKey] ? speciesIcons[speciesKey]
+      : kind === "action" ? "icons/svg/sword.svg" : "icons/svg/book.svg",
     system: {
       description: { value: `<p>${description}</p>`, chat: "", unidentified: "" },
       source: { custom: "Monster Forge NPC Content" },
@@ -80,9 +101,31 @@ const profiles = [
   ["goliath", "Goliath", "med", 35, 0], ["dragonborn", "Dragonborn", "med", 30, 60],
   ["drow", "Drow", "med", 30, 120], ["duergar", "Duergar", "med", 30, 120],
   ["deepGnome", "Deep Gnome", "sm", 30, 120], ["gemling", "Gemling", "med", 30, 0],
-  ["beast", "Beast", "med", 30, 0], ["undead", "Undead", "med", 30, 0],
-  ["construct", "Construct", "med", 30, 0]
+  ["aberration", "Aberration", "med", 30, 60], ["beast", "Beast", "med", 30, 0],
+  ["celestial", "Celestial", "med", 30, 60], ["construct", "Construct", "med", 30, 0],
+  ["dragon", "Dragon", "lg", 40, 120], ["elemental", "Elemental", "med", 30, 60],
+  ["fey", "Fey", "sm", 30, 60], ["fiend", "Fiend", "med", 30, 120],
+  ["giant", "Giant", "lg", 35, 0], ["monstrosity", "Monstrosity", "med", 30, 60],
+  ["ooze", "Ooze", "med", 20, 60], ["plant", "Plant", "med", 25, 60],
+  ["undead", "Undead", "med", 30, 60]
 ];
+
+const abilities = {
+  aberration: { int: 1, cha: 1 }, beast: { dex: 2, con: 1, int: -4, wis: 1, cha: -2 },
+  celestial: { wis: 1, cha: 1 }, construct: { str: 1, dex: -1, con: 2, int: -2, cha: -2 },
+  dragon: { str: 2, con: 1, cha: 1 }, elemental: { con: 1, int: -1 }, fey: { dex: 1, wis: 1, cha: 1 },
+  fiend: { str: 1, con: 1, cha: 1 }, giant: { str: 2, con: 1, dex: -1 },
+  monstrosity: { str: 1, dex: 1, con: 1 }, ooze: { dex: -2, int: -4, wis: -1, cha: -2 },
+  plant: { con: 1, int: -1, wis: 1 }, undead: { str: 1, con: 1, wis: 1, cha: 1 }
+};
+const profileIcons = {
+  beast: "icons/creatures/mammals/beast-horned-scaled-glowing-orange.webp",
+  undead: "icons/creatures/magical/spirit-undead-ghost-blue.webp",
+  construct: "icons/creatures/magical/construct-golem-stone-blue.webp",
+  dragon: "icons/creatures/reptiles/dragon-horned-blue.webp",
+  celestial: "icons/magic/holy/angel-winged-humanoid-blue.webp",
+  fey: "icons/creatures/magical/fae-fairy-winged-glowing-green.webp"
+};
 
 for (const [speciesKey, label, size, speed, darkvision] of profiles) {
   const slug = `species-profile-${speciesKey}`;
@@ -92,9 +135,9 @@ for (const [speciesKey, label, size, speed, darkvision] of profiles) {
     _id: id,
     name: `${label} Species Profile`,
     type: "feat",
-    img: "icons/svg/book.svg",
+    img: profileIcons[speciesKey] ?? "icons/svg/d20.svg",
     system: {
-      description: { value: `<p>Species preset: ${size}; walk ${speed} ft; darkvision ${darkvision} ft. Ability scores remain unchanged under 2024 rules. GM-editable body defaults; traits are separate Items.</p>`, chat: "", unidentified: "" },
+      description: { value: `<p>Starting profile: ${size}; walk ${speed} ft; darkvision ${darkvision} ft. Suggested ability adjustments are editable Monster Forge heuristics, not 2024 ancestry ability score rules. Traits are separate NPC Items.</p>`, chat: "", unidentified: "" },
       source: { custom: "Monster Forge NPC Content" },
       type: { value: "monster" },
       activities: {},
@@ -106,7 +149,7 @@ for (const [speciesKey, label, size, speed, darkvision] of profiles) {
         library: {
           kind: "species-profile",
           speciesKey,
-          profile: { label, size, speed, darkvision },
+          profile: { label, size, speed, darkvision, abilities: abilities[speciesKey] ?? {} },
           template: false,
           version: 1
         }

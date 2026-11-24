@@ -23,18 +23,18 @@ D&D5e 6.x itself requires Foundry V14. Monster Forge uses the attack/save activi
 
 ## Use
 
-1. Select exactly one NPC token, or open an NPC actor sheet. To make a creature from scratch, use the **Create NPC from scratch** token control or `game.monsterForge.createNpc()`.
+1. Click the single Monster Forge token control. With one NPC selected it opens that actor; with no token selected it starts a new creature. More than one selected token prompts you to choose one. You can also open Monster Forge from an NPC sheet or use `game.monsterForge.open()`.
 2. For an existing NPC, click the hammer in Token Controls, use the NPC sheet header control, or press **Alt+M**.
-3. Work through the **Build**, **Foundation**, **Boosts**, **Attacks**, and **NPC features** tabs, then check the exact enabled-section summary on **Review**.
+3. For a new creature, set its identity on the **Identity** tab. Then use **Build**, **Foundation**, **Boosts & features**, and **Attacks**; check the enabled-section summary on **Review**. GMs also have a **GM setup** tab.
 4. Clear a tab's apply checkbox to leave that part of the actor untouched. Choices are retained for the next use; Build choices remain available as planning inputs even when CR writing is off.
 5. Choose CR, combat role, creature tier, and species. Spell-led roles also expose an Intelligence, Wisdom, or Charisma selector. Choose **Preview only** if no build or foundation actor fields should be written.
 6. Review the live suggested/final ability scores and enter only the overrides you want to lock. Role and build changes recalculate every blank score immediately.
 7. Optionally choose categorized built-in boosts. Search or filter them, apply role/tier suggestions, and give any selected boost a custom actor-item name. Then choose a single, combined (**and**), or alternative (**or**) attack routine and any tertiary feature.
 8. Click **Apply build & foundation** for actor fields only, or **Forge NPC** to apply exactly the enabled sections. **Undo last** restores only the actor fields and generated item groups changed by that operation.
 
-The new NPC workflow collects name, creature type, species/lineage, culture, and an optional image path before creating an actor. It can add the selected species' NPC trait Items; that toggle is enabled by default and may be switched off. Culture provides a starting species mapping (Azmeri/Human, Ezomyte/Dwarf, Kalguur/Elf, Karui/Orc, Maraketh/Halfling, Oriathen/Human, Vaal/Gnome); Stygian defaults to Drow and supports Drow, Duergar, or Deep Gnome. The mapping is only a starting choice and can be changed. The 2024 creature types are selectable independently of species. Orc is the canonical profile; legacy Half-Orc data maps to Orc.
+The new NPC workflow collects name, creature type, species/lineage, and an optional image path before creating an actor. Humanoids can select a species such as Human, Dwarf, Elf, Orc, Drow, Duergar, Deep Gnome, or Gemling. Any non-humanoid type locks species to that creature type. Species traits can be auto-added; the default is configurable in GM setup and can be changed for each new creature. Orc is canonical; legacy Half-Orc data maps to Orc.
 
-The **NPC features** tab selects reusable NPC-only actions and traits as Items. The bundled **Monster Forge NPC Content** Item compendium includes blank Action, Trait, Species Feature, and Species Profile templates, plus starter species traits and profiles. In **Configure Settings → Monster Forge**, enter comma-separated Item compendium collection IDs to link user packs. Tag an Item with `flags.monster-forge.library`, using `kind` set to `action`, `trait`, or `species-trait`; species traits also need a `species` array, such as `["orc"]`. Species Profile Items use `kind: "species-profile"`, a unique `speciesKey`, and `profile` data with `label`, `size`, `speed`, and `darkvision`. Linked profile Items extend or override the built-in selector and body defaults. When copying a blank template into a user pack, set `library.template` to `false` and fill in its kind metadata. Selected feature Items are copied to the NPC with activities, effects, and their source UUID preserved for undo/replace tracking. The module pack is read-only; copy templates or entries into a world compendium before editing them so updates do not overwrite GM work.
+The **Boosts & features** tab combines compendium-backed boosts with reusable NPC-only Actions, Traits, and Species Traits. The bundled **Monster Forge NPC Content** Item compendium includes blank templates, starter species traits and profiles, and 55 categorized boost Items. Open **GM setup** to link any Item compendiums from this world and set the default species-trait toggle. Tag library Items under `flags.monster-forge.library`: use `kind: "action"`, `"trait"`, or `"species-trait"` for selectable NPC features; species traits also need a `species` array such as `["orc"]`. Use `kind: "boost"` with category/group metadata and a boost definition to add a selectable boost. Species Profile Items use `kind: "species-profile"`, a unique `speciesKey`, and `profile` data with `label`, `size`, `speed`, `darkvision`, and optional editable `abilities`. Copy the blank templates into a user compendium before editing; the bundled pack is read-only. Selected NPC feature Items preserve activities and effects and are covered by replace and undo.
 
 The dialog can save named client-side build profiles for reuse on another NPC. **Quick build view** hides the Foundation and Boosts tabs; it does not change their apply checkboxes, which remain visible in the Review summary. Custom attacks expose editable reach or normal/long range. When an actor has existing offensive items, **Reserve existing item damage** estimates one use of each item per round and subtracts that amount from the generated attack budget; adjust the estimate for Multiattack, recharge, or limited-use features.
 
@@ -52,7 +52,7 @@ game.monsterForge.getBoostCatalog();
 
 ## Built-in boosts
 
-Monster Forge includes 55 choices organized under **Initiative**, **Movement**, **Defence**, **Saving Throws**, **Recovery**, **Weapon Accuracy**, **Spellcasting**, and **Leadership**. Each pull-down is an exclusive family: choosing another rank replaces the earlier rank instead of allowing accidental stacking. Stable internal IDs keep custom names separate from replacement and migration logic.
+The bundled Monster Forge Item compendium supplies 55 boost choices organized under **Initiative**, **Movement**, **Defence**, **Saving Throws**, **Recovery**, **Weapon Accuracy**, **Spellcasting**, and **Leadership**. Each pull-down is an exclusive family: choosing another rank replaces the earlier rank instead of allowing accidental stacking. Stable internal IDs keep custom names separate from replacement and migration logic.
 
 Selected boosts are generated directly as D&D5e feat items. Straight numerical bonuses use transferable, version-aware Active Effects; actions, reactions, healing, recharge features, and recovery use native activities and item uses where practical. Conditional features keep complete rule text and a manual fallback. Midi-QOL and DAE can enhance supported advantage effects but are never required to read or use the feature.
 
@@ -66,12 +66,12 @@ Boosts apply after the FoF foundation and may intentionally move the finished ac
 - Recalculates and displays suggested and final ability scores whenever CR, role, species, attacks, or spellcasting ability changes; any score can be explicitly overridden.
 - Gives spell-led roles a configurable mental ability and includes Intelligence-, Wisdom-, and Charisma-based spell-attack presets.
 - Treats Minion, Standard, Elite, and Boss as a separate layer from combat role.
-- Generates categorized NPC boosts without requiring a campaign compendium, with search, recommendations, custom names, migration handling, and live impact review.
+- Loads categorized boost definitions from the bundled Item compendium and selected user compendiums, with search, recommendations, custom names, migration handling, and live impact review.
 - Saves and restores named full-build profiles across actors, and offers a compact Quick build view.
 - Supports editable reach and normal/long range on custom attacks.
 - Can reserve an estimate of existing actor attack damage from the generated DPR budget, with an editable value and explicit assumptions.
-- Uses the same Human, Half-Elf, Dwarf, Halfling, Gnome, Elf, Tiefling, Half-Orc, Orc, Goliath, Drow, Duergar, and Deep Gnome species vocabulary as Wraeclast NPC Generator.
-- Reads species from Wraeclast NPC Generator actors when available, without turning culture or faction into mechanical statistics.
+- Supports 2024 humanoid species profiles, including Orc, Drow, Duergar, Deep Gnome, and Gemling, plus creature-type profiles for non-humanoids.
+- Reads species from Wraeclast NPC Generator actors when available without treating narrative data as mechanical statistics.
 - Applies actor statistics and generated items as one rollback-safe operation, with a one-step undo for both.
 - Separates Build, Foundation, Boosts, and Attacks into independently optional tabs; Replace and Undo are scoped to only the enabled generated-item groups.
 - Uses the published *Forge of Foes* total DPR, proficient ability bonus, and AC/DC values for every CR from 0 to 30.
@@ -89,7 +89,7 @@ Boosts apply after the FoF foundation and may intentionally move the finished ac
 - Allows every preset attack to override its associated ability score.
 - Warns when existing ungenerated offensive items are outside the new damage budget.
 - Offers actor-derived or flat *Forge of Foes* accuracy/DC modes.
-- Preserves the campaign presets: Karui Chopper, Oriathan Halberd, Ezomyte Warhammer, and Maraketh Bow.
+- Uses standard D&D 2024 weapon presets with core Foundry icons; custom attacks remain available.
 - Uses deterministic core icons and client-scoped defaults.
 - Recognizes items created by the original macro's `world.monsterForge` flag and can safely replace them.
 

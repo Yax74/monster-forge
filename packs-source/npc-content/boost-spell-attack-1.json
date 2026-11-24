@@ -1,0 +1,74 @@
+{
+  "_key": "!items!1e09379fa734d0b2",
+  "_id": "1e09379fa734d0b2",
+  "name": "Spell Precision I",
+  "type": "feat",
+  "img": "icons/magic/symbols/runes-star-blue.webp",
+  "system": {
+    "description": {
+      "value": "<p>The creature gains a +1 bonus to melee and ranged spell attack rolls.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "spellcasting",
+        "categoryLabel": "Spellcasting",
+        "categoryIcon": "icons/magic/symbols/runes-star-blue.webp",
+        "categoryDescription": "Spell accuracy, DC, and effective caster progression.",
+        "categorySort": 6,
+        "group": "spell-accuracy",
+        "groupLabel": "Spell attack bonus",
+        "groupHelp": "Melee and ranged spell attacks",
+        "groupSort": 0,
+        "sort": 41,
+        "boost": {
+          "id": "spell.attack.1",
+          "name": "Spell Precision I",
+          "label": "+1",
+          "summary": "The creature gains a +1 bonus to melee and ranged spell attack rolls.",
+          "description": "The creature gains a +1 bonus to melee and ranged spell attack rolls.",
+          "power": "light",
+          "automation": "core",
+          "effect": [
+            {
+              "key": "system.bonuses.msak.attack",
+              "value": 1
+            },
+            {
+              "key": "system.bonuses.rsak.attack",
+              "value": 1
+            }
+          ],
+          "impact": {
+            "spellAttack": 1
+          },
+          "groupId": "spell-accuracy",
+          "categoryId": "spellcasting",
+          "exclusiveGroup": "spell-accuracy",
+          "rank": 1,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

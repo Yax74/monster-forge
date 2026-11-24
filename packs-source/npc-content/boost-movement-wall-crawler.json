@@ -1,0 +1,64 @@
+{
+  "_key": "!items!38ed4e24818cb1a6",
+  "_id": "38ed4e24818cb1a6",
+  "name": "Wall Crawler",
+  "type": "feat",
+  "img": "icons/svg/wingfoot.svg",
+  "system": {
+    "description": {
+      "value": "<p>The creature can climb difficult surfaces, including upside down on ceilings, without needing to make an ability check.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "movement",
+        "categoryLabel": "Movement",
+        "categoryIcon": "icons/svg/wingfoot.svg",
+        "categoryDescription": "Raw speed and one signature mobility feature.",
+        "categorySort": 1,
+        "group": "movement-ability",
+        "groupLabel": "Movement ability",
+        "groupHelp": "One signature mobility option",
+        "groupSort": 1,
+        "sort": 14,
+        "boost": {
+          "id": "movement.wall-crawler",
+          "name": "Wall Crawler",
+          "label": "Wall Crawler",
+          "summary": "Climb difficult surfaces, including ceilings, without an ability check.",
+          "description": "The creature can climb difficult surfaces, including upside down on ceilings, without needing to make an ability check.",
+          "power": "light",
+          "automation": "manual",
+          "impact": {
+            "note": "Spider-like climbing"
+          },
+          "groupId": "movement-ability",
+          "categoryId": "movement",
+          "exclusiveGroup": "movement-ability",
+          "rank": null,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

@@ -15,21 +15,6 @@
     </div>
   </header>
 
-  {{#if isNewNpc}}
-  <section class="mf-new-npc-card" aria-label="New NPC identity">
-    <h3>New creature identity</h3>
-    <div class="mf-grid mf-grid-3">
-      <label>Name <input type="text" name="newNpc.name" maxlength="100" value="New Creature" required autofocus></label>
-      <label>Creature type <select name="newNpc.creatureType">{{#each creatureTypeOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
-      <label>Species / lineage <select name="newNpc.species">{{#each newSpeciesOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
-      <label>Culture <select name="newNpc.culture">{{#each cultureOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select><small>Applies the campaign mapping as a starting choice; Stygian supports drow, duergar, or deep gnome.</small></label>
-      <label class="mf-new-npc-image">Portrait / token image path <input type="text" name="newNpc.img" placeholder="icons/svg/mystery-man.svg"></label>
-      <label class="mf-switch"><input type="checkbox" name="newNpc.addSpeciesTraits" checked> Add species traits</label>
-    </div>
-    <p class="mf-help">Species is a mechanical lineage; culture is stored separately as campaign metadata. Species traits are added as NPC items when available in the Monster Forge content library.</p>
-  </section>
-  {{/if}}
-
   <div class="mf-profile-toolbar">
     <label>Build profile
       <select data-profile-select>{{#each profileOptions}}<option value="{{value}}">{{label}}</option>{{/each}}</select>
@@ -46,7 +31,7 @@
   {{/if}}
 
   {{#if actor.importedSpecies}}
-  <p class="mf-callout"><i class="fa-solid fa-link"></i> Species was read from this actor's Wraeclast NPC Generator data: <strong>{{actor.importedSpecies}}</strong>. Culture and faction remain narrative data and are not converted into mechanics.</p>
+  <p class="mf-callout"><i class="fa-solid fa-link"></i> Species was read from this actor's Wraeclast NPC Generator data: <strong>{{actor.importedSpecies}}</strong>.</p>
   {{/if}}
 
   {{#if actor.existingOffense}}
@@ -54,28 +39,48 @@
   {{/if}}
 
   <nav class="mf-tabs" role="tablist" aria-label="Monster Forge sections">
-    <button type="button" role="tab" class="mf-tab is-active" id="mf-tab-build" aria-controls="mf-panel-build" aria-selected="true" data-tab-target="build">
+    {{#if isNewNpc}}
+    <button type="button" role="tab" class="mf-tab is-active" id="mf-tab-identity" aria-controls="mf-panel-identity" aria-selected="true" data-tab-target="identity">
+      <i class="fa-solid fa-fingerprint"></i><span>Identity</span>
+    </button>
+    {{/if}}
+    <button type="button" role="tab" class="mf-tab {{#unless isNewNpc}}is-active{{/unless}}" id="mf-tab-build" aria-controls="mf-panel-build" {{#unless isNewNpc}}aria-selected="true"{{else}}aria-selected="false" tabindex="-1"{{/unless}} data-tab-target="build">
       <i class="fa-solid fa-compass-drafting"></i><span>Build</span><small data-tab-status="build">{{#if config.sections.build}}On{{else}}Off{{/if}}</small>
     </button>
     <button type="button" role="tab" class="mf-tab" id="mf-tab-foundation" aria-controls="mf-panel-foundation" aria-selected="false" tabindex="-1" data-tab-target="foundation">
       <i class="fa-solid fa-shield-halved"></i><span>Foundation</span><small data-tab-status="foundation">{{#if config.sections.foundation}}On{{else}}Off{{/if}}</small>
     </button>
     <button type="button" role="tab" class="mf-tab" id="mf-tab-boosts" aria-controls="mf-panel-boosts" aria-selected="false" tabindex="-1" data-tab-target="boosts">
-      <i class="fa-solid fa-bolt"></i><span>Boosts</span><small data-tab-status="boosts">{{#if config.sections.boosts}}On{{else}}Off{{/if}}</small>
+      <i class="fa-solid fa-bolt"></i><span>Boosts &amp; features</span><small>Boosts <b data-tab-status="boosts">{{#if config.sections.boosts}}On{{else}}Off{{/if}}</b> · Items <b data-tab-status="content">{{#if config.sections.content}}On{{else}}Off{{/if}}</b></small>
     </button>
     <button type="button" role="tab" class="mf-tab" id="mf-tab-attacks" aria-controls="mf-panel-attacks" aria-selected="false" tabindex="-1" data-tab-target="attacks">
       <i class="fa-solid fa-swords"></i><span>Attacks</span><small data-tab-status="attacks">{{#if config.sections.attacks}}On{{else}}Off{{/if}}</small>
     </button>
-    <button type="button" role="tab" class="mf-tab" id="mf-tab-features" aria-controls="mf-panel-features" aria-selected="false" tabindex="-1" data-tab-target="features">
-      <i class="fa-solid fa-book-open"></i><span>NPC features</span><small data-tab-status="content">{{#if config.sections.content}}On{{else}}Off{{/if}}</small>
-    </button>
     <button type="button" role="tab" class="mf-tab" id="mf-tab-review" aria-controls="mf-panel-review" aria-selected="false" tabindex="-1" data-tab-target="review">
       <i class="fa-solid fa-clipboard-check"></i><span>Review</span>
     </button>
+    {{#if isGM}}
+    <button type="button" role="tab" class="mf-tab" id="mf-tab-gm-setup" aria-controls="mf-panel-gm-setup" aria-selected="false" tabindex="-1" data-tab-target="gm-setup">
+      <i class="fa-solid fa-gear"></i><span>GM setup</span>
+    </button>
+    {{/if}}
   </nav>
 
   <div class="mf-tab-stack">
-    <section class="mf-section mf-tab-panel is-active" id="mf-panel-build" role="tabpanel" aria-labelledby="mf-tab-build" data-tab-panel="build" data-section-panel="build">
+    {{#if isNewNpc}}
+    <section class="mf-section mf-tab-panel is-active" id="mf-panel-identity" role="tabpanel" aria-labelledby="mf-tab-identity" data-tab-panel="identity">
+      <div class="mf-section-heading"><div><span class="mf-step">0</span><h3>New creature identity</h3></div></div>
+      <div class="mf-grid mf-grid-3">
+        <label>Name <input type="text" name="newNpc.name" maxlength="100" value="New Creature" required autofocus></label>
+        <label>Creature type <select name="newNpc.creatureType">{{#each creatureTypeOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+        <label>Species / lineage <select data-new-species-picker aria-label="Species or lineage">{{#each newSpeciesOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select><input type="hidden" name="newNpc.species" value="human"></label>
+        <label class="mf-new-npc-image">Portrait / token image path <input type="text" name="newNpc.img" placeholder="icons/svg/mystery-man.svg"></label>
+        <label class="mf-switch"><input type="checkbox" name="newNpc.addSpeciesTraits" {{#if defaultSpeciesTraits}}checked{{/if}}> Add species traits</label>
+      </div>
+      <p class="mf-help">Creature type controls the species selector. Non-humanoids use their creature type as species; humanoids can select a lineage such as drow, duergar, deep gnome, or gemling.</p>
+    </section>
+    {{/if}}
+    <section class="mf-section mf-tab-panel {{#unless isNewNpc}}is-active{{/unless}}" id="mf-panel-build" role="tabpanel" aria-labelledby="mf-tab-build" data-tab-panel="build" data-section-panel="build" {{#if isNewNpc}}hidden{{/if}}>
       <div class="mf-section-heading">
         <div><span class="mf-step">1</span><h3>Build</h3></div>
         <label class="mf-section-toggle"><input type="checkbox" name="sections.build" {{#if config.sections.build}}checked{{/if}}> Write selected CR</label>
@@ -241,6 +246,37 @@
         <ul class="mf-boost-details" data-preview="boost-details" hidden></ul>
         <p class="mf-help">Each pull-down is exclusive, so incompatible ranks can't stack accidentally. A disabled Boosts section retains the choices and leaves existing generated boosts untouched. ★ marks the current role/tier suggestion.</p>
       </div>
+      <section class="mf-subsection" data-section-panel="content">
+        <div class="mf-section-heading">
+          <div><span class="mf-step">5</span><h3>NPC actions &amp; traits</h3></div>
+          <label class="mf-section-toggle"><input type="checkbox" name="sections.content" {{#if config.sections.content}}checked{{/if}}> Apply selected Items</label>
+        </div>
+        <div data-section-body="content">
+          <p class="mf-callout" data-auto-trait-summary hidden></p>
+          <p class="mf-help">Choose reusable NPC-only Items from the bundled library or linked Item compendiums. Add or edit entries in your own compendium; set <code>flags.monster-forge.library.kind</code> to <code>action</code>, <code>trait</code>, or <code>species-trait</code> to make them available here.</p>
+          <label>Filter content <input type="search" data-content-search placeholder="Search names, species, or category"></label>
+          <div class="mf-content-list">
+            {{#each contentGroups}}
+            <details class="mf-content-group" data-content-group open>
+              <summary>{{label}} <small>{{count}}</small></summary>
+              <div class="mf-content-group-items">
+                {{#each entries}}
+                <label class="mf-content-card" data-content-entry data-kind="{{kindKey}}" data-species="{{species}}" data-search="{{name}} {{kind}} {{species}} {{category}}">
+                  <input type="checkbox" name="content.items" value="{{uuid}}">
+                  <img src="{{img}}" alt="">
+                  <span><strong>{{name}}</strong><small>{{kind}} · {{species}} · {{category}}</small></span>
+                </label>
+                {{/each}}
+              </div>
+            </details>
+            {{else}}
+            <p class="mf-help">No tagged NPC actions or traits were found. Configure Item compendiums in GM setup or add entries to the bundled pack.</p>
+            {{/each}}
+          </div>
+          <p class="mf-help">Selected Items are copied onto the NPC and included in Monster Forge undo and replace behavior. Their activities and effects travel with the Item; automation depends on their D&amp;D5e and Midi-QOL data. Review offensive content separately: imported damage is not included in Monster Forge's generated DPR budget.</p>
+        </div>
+      </section>
+
     </section>
 
     <section class="mf-section mf-tab-panel" id="mf-panel-attacks" role="tabpanel" aria-labelledby="mf-tab-attacks" data-tab-panel="attacks" data-section-panel="attacks" hidden>
@@ -352,29 +388,6 @@
       </div>
     </section>
 
-    <section class="mf-section mf-tab-panel" id="mf-panel-features" role="tabpanel" aria-labelledby="mf-tab-features" data-tab-panel="features" data-section-panel="content" hidden>
-      <div class="mf-section-heading">
-        <div><span class="mf-step">5</span><h3>NPC actions &amp; traits</h3></div>
-        <label class="mf-section-toggle"><input type="checkbox" name="sections.content" {{#if config.sections.content}}checked{{/if}}> Apply selected Items</label>
-      </div>
-      <div data-section-body="content">
-      <p class="mf-callout" data-auto-trait-summary hidden></p>
-      <p class="mf-help">Choose reusable NPC-only Items from the bundled library or linked Item compendiums. Add or edit entries in your own compendium; set the Monster Forge Item flag <code>library.kind</code> to <code>action</code>, <code>trait</code>, or <code>species-trait</code> to make them available here.</p>
-      <label>Filter content <input type="search" data-content-search placeholder="Search names, species, or category"></label>
-      <div class="mf-content-list">
-        {{#each contentLibrary}}
-        <label class="mf-content-card" data-content-entry data-kind="{{kindKey}}" data-species="{{species}}" data-search="{{name}} {{kind}} {{species}} {{category}}">
-          <input type="checkbox" name="content.items" value="{{uuid}}">
-          <img src="{{img}}" alt="">
-          <span><strong>{{name}}</strong><small>{{kind}} · {{species}} · {{category}}</small></span>
-        </label>
-        {{else}}
-        <p class="mf-help">No tagged NPC actions or traits were found. Configure Item compendium collection IDs in Monster Forge settings or add entries to the bundled pack.</p>
-        {{/each}}
-      </div>
-      <p class="mf-help">Selected Items are copied onto the NPC and included in Monster Forge undo and replace behavior. Their activities and effects travel with the Item; automation depends on their D&amp;D5e and Midi-QOL data. Review offensive content separately: imported damage is not included in Monster Forge's generated DPR budget.</p>
-      </div>
-    </section>
 
     <section class="mf-preview mf-tab-panel" id="mf-panel-review" role="tabpanel" aria-labelledby="mf-tab-review" data-tab-panel="review" hidden>
       <div class="mf-section-heading"><div><span class="mf-step"><i class="fa-solid fa-chart-line"></i></span><h3>Review &amp; sanity check</h3></div></div>
@@ -412,5 +425,19 @@
       <div class="mf-audit-grid mf-boost-impact" data-preview="boost-impact" hidden></div>
       <ul class="mf-warnings" data-preview="warnings"></ul>
     </section>
+    {{#if isGM}}
+    <section class="mf-section mf-tab-panel" id="mf-panel-gm-setup" role="tabpanel" aria-labelledby="mf-tab-gm-setup" data-tab-panel="gm-setup" hidden>
+      <div class="mf-section-heading"><div><span class="mf-step"><i class="fa-solid fa-gear"></i></span><h3>GM setup</h3></div></div>
+      <p class="mf-help">Choose Item compendiums that Monster Forge should scan for tagged NPC actions, traits, species traits, boost definitions, and species profiles. The bundled Monster Forge pack is always included.</p>
+      <label class="mf-switch"><input type="checkbox" name="gm.defaultSpeciesTraits" {{#if defaultSpeciesTraits}}checked{{/if}}> Add species traits to new NPCs by default</label>
+      <div class="mf-compendium-list">
+        {{#each contentPacks}}
+        <label class="mf-content-card"><input type="checkbox" name="gm.contentPack" value="{{id}}" {{#if linked}}checked{{/if}}><span><strong>{{label}}</strong><small>{{id}}</small></span></label>
+        {{else}}<p class="mf-help">No additional Item compendiums are available in this world.</p>{{/each}}
+      </div>
+      <button type="button" data-action="save-gm-setup"><i class="fa-solid fa-floppy-disk"></i> Save GM setup</button>
+      <p class="mf-help">Only Item compendiums can be linked. Add item flags under <code>flags.monster-forge.library</code>; available kinds are <code>action</code>, <code>trait</code>, <code>species-trait</code>, <code>boost</code>, and <code>species-profile</code>.</p>
+    </section>
+    {{/if}}
   </div>
 </div>

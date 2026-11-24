@@ -3,7 +3,6 @@ import {
   ACTOR_SIZES,
   COMBAT_ROLES,
   CREATURE_TYPES,
-  CULTURE_OPTIONS,
   CR_KEYS,
   CREATURE_TIERS,
   DAMAGE_TYPES,
@@ -23,7 +22,6 @@ import {
   getGeneratedItems,
   removeGeneratedItems,
   estimateExistingDpr,
-  resolveTargetActor,
   undoLastOperation
 } from "./actor-service.js";
 import { applyRecommendedAttacks, buildDamagePlan, getCrStats, mergeDefaults } from "./engine.js";
@@ -40,7 +38,8 @@ import {
   parseBoostForm,
   recommendBoosts,
   restoreBoostConfig,
-  selectBoosts
+  selectBoosts,
+  setBoostCatalogItems
 } from "./boosts.js";
 
 function escapeHtml(value) {
@@ -113,6 +112,27 @@ function attackContext(attack) {
   };
 }
 
+function availableItemPacks() {
+  return [...(game.packs?.values?.() ?? [])]
+    .filter((pack) => pack.documentName === "Item" && pack.collection !== "monster-forge.npc-content")
+    .map((pack) => ({ id: pack.collection, label: pack.metadata?.label ?? pack.title ?? pack.collection }))
+    .sort((a, b) => a.label.localeCompare(b.label) || a.id.localeCompare(b.id));
+}
+
+let compendiumLibraryItems = [];
+
+export async function refreshCompendiumLibrary() {
+  const items = [];
+  for (const id of configuredContentPacks()) {
+    const pack = game.packs.get(id);
+    if (!pack || pack.documentName !== "Item") continue;
+    items.push(...await pack.getDocuments());
+  }
+  compendiumLibraryItems = items;
+  setSpeciesProfileItems(items.filter((item) => item.getFlag(MODULE_ID, "library")?.kind === "species-profile"));
+  setBoostCatalogItems(items.filter((item) => item.getFlag(MODULE_ID, "library")?.kind === "boost"));
+}
+
 async function buildContext(actor, config, isNewNpc = false) {
   const generated = getGeneratedItems(actor);
   const existingOffense = getExistingOffensiveItems(actor);
@@ -124,16 +144,34 @@ async function buildContext(actor, config, isNewNpc = false) {
   const recommendedBoosts = recommendBoosts({ role: config.foundation.role, tier: config.foundation.tier });
   const boostCategories = buildBoostCategories(boostConfig, recommendedBoosts);
   const boostCatalog = getBoostCatalog();
-  const contentLibrary = await getAvailableContent();
+  const contentGroups = [...(await getAvailableContent()).reduce((groups, entry) => {
+    const key = `${entry.kind} · ${entry.category}`;
+    const group = groups.get(key) ?? { label: key, entries: [] };
+    group.entries.push(entry);
+    groups.set(key, group);
+    return groups;
+  }, new Map()).values()].map((group) => ({ ...group, count: group.entries.length }));
   const profiles = Array.isArray(game.settings.get(MODULE_ID, "profiles"))
     ? game.settings.get(MODULE_ID, "profiles")
     : [];
   return {
     isNewNpc,
-    contentLibrary,
+    isGM: Boolean(game.user?.isGM),
+    contentGroups,
+    contentPacks: availableItemPacks().map((pack) => ({ ...pack, linked: configuredContentPacks().includes(pack.id) })),
+    defaultSpeciesTraits: Boolean(game.settings.get(MODULE_ID, "defaultSpeciesTraits")),
     creatureTypeOptions: options(CREATURE_TYPES.map((type) => [type, type[0].toUpperCase() + type.slice(1)]), "humanoid"),
-    cultureOptions: options(CULTURE_OPTIONS.map((culture) => [culture, culture]), "Other"),
-    newSpeciesOptions: options(Object.entries(getSpeciesProfiles()).filter(([key]) => key !== "preserve").map(([key, species]) => [key, species.label]), "human"),
+    newSpeciesOptions: options(Object.entries(getSpeciesProfiles())
+      .filter(([key]) => key !== "preserve" && !CREATURE_TYPES.includes(key))
+      .map(([key, species]) => [key, species.label]), "human"),
+    identity: {
+      name: actor.name,
+      creatureType: actor.flags?.[MODULE_ID]?.identity?.creatureType ?? actor.system?.details?.type?.value ?? "humanoid",
+      species: actor.flags?.[MODULE_ID]?.identity?.species ?? actor.system?.details?.type?.subtype ?? "human",
+      img: actor.img ?? "",
+      addSpeciesTraits: Boolean(game.settings.get(MODULE_ID, "defaultSpeciesTraits")),
+      hasIdentity: Boolean(actor.flags?.[MODULE_ID]?.identity)
+    },
     actor: {
       name: actor.name,
       cr: getCrStats(config.cr).cr,
@@ -298,12 +336,13 @@ function parseAttack(formData, prefix) {
 
 export function parseForgeForm(form) {
   const data = new FormData(form);
+  const creatureTypeField = form.elements.namedItem("newNpc.creatureType");
+  const newCreatureType = creatureTypeField?.value ?? "humanoid";
   return {
     newNpc: {
       name: field(data, "newNpc.name", "New Creature").trim() || "New Creature",
       creatureType: field(data, "newNpc.creatureType", "humanoid"),
       species: field(data, "newNpc.species", "human"),
-      culture: field(data, "newNpc.culture", "Other"),
       img: field(data, "newNpc.img", ""),
       addSpeciesTraits: data.has("newNpc.addSpeciesTraits")
     },
@@ -320,7 +359,9 @@ export function parseForgeForm(form) {
       mode: field(data, "foundation.mode", "apply"),
       role: field(data, "foundation.role", "balanced"),
       tier: field(data, "foundation.tier", "standard"),
-      species: field(data, "foundation.species", "preserve"),
+      species: creatureTypeField && newCreatureType !== "humanoid"
+        ? newCreatureType
+        : field(data, "foundation.species", "preserve"),
       castingAbility: field(data, "foundation.castingAbility", "auto"),
       hpPolicy: field(data, "foundation.hpPolicy", "ratio"),
       manage: {
@@ -915,9 +956,27 @@ function attachListeners(_event, dialog, actor) {
   });
   root.querySelector("[data-content-search]")?.addEventListener("input", (event) => {
     const query = String(event.currentTarget.value ?? "").trim().toLowerCase();
-    for (const entry of root.querySelectorAll("[data-content-entry]")) {
-      entry.hidden = !entry.dataset.search.toLowerCase().includes(query);
+    for (const group of root.querySelectorAll("[data-content-group]")) {
+      let hasMatch = false;
+      for (const entry of group.querySelectorAll("[data-content-entry]")) {
+        entry.hidden = !entry.dataset.search.toLowerCase().includes(query);
+        hasMatch ||= !entry.hidden;
+      }
+      group.hidden = !hasMatch;
+      if (query && hasMatch) group.open = true;
     }
+  });
+  root.querySelector("[data-action='save-gm-setup']")?.addEventListener("click", async () => {
+    if (!game.user?.isGM) return;
+    const ids = selectedContentPackIds(form);
+    const invalid = ids.find((id) => game.packs.get(id)?.documentName !== "Item");
+    if (invalid) {
+      ui.notifications.error(`Monster Forge can only link Item compendiums. “${invalid}” is unavailable or is not an Item pack.`);
+      return;
+    }
+    await game.settings.set(MODULE_ID, "contentPacks", ids.join(","));
+    await game.settings.set(MODULE_ID, "defaultSpeciesTraits", Boolean(form.elements.namedItem("gm.defaultSpeciesTraits")?.checked));
+    ui.notifications.info("Monster Forge GM setup saved. Close and reopen the Forge to load the updated compendium library.");
   });
   const syncRecommendation = () => {
     const recommended = applyRecommendedAttacks(parseForgeForm(form));
@@ -937,28 +996,49 @@ function attachListeners(_event, dialog, actor) {
     preview();
   });
   form.addEventListener("change", (event) => {
-    if (event.target?.name === "newNpc.culture") {
-      const mappedSpecies = {
-        Azmeri: "human", Ezomyte: "dwarf", Kalguur: "elf", Karui: "orc",
-        Maraketh: "halfling", Oriathen: "human", Vaal: "gnome"
-      }[event.target.value];
-      const speciesSelect = form.elements.namedItem("newNpc.species");
-      if (mappedSpecies && speciesSelect && [...speciesSelect.options].some((option) => option.value === mappedSpecies)) {
-        speciesSelect.value = mappedSpecies;
-      } else if (event.target.value === "Stygian" && speciesSelect
-        && !["drow", "duergar", "deepGnome"].includes(speciesSelect.value)) {
-        speciesSelect.value = "drow";
+    if (event.target?.name === "newNpc.creatureType") {
+      const type = event.target.value;
+      const speciesPicker = root.querySelector("[data-new-species-picker]");
+      const speciesField = form.elements.namedItem("newNpc.species");
+      const foundationSpecies = form.elements.namedItem("foundation.species");
+      const locked = type !== "humanoid";
+      if (speciesPicker) {
+        if (locked) {
+          if (!speciesPicker.disabled && speciesPicker.value) speciesPicker.dataset.lastHumanoid = speciesPicker.value;
+          let typeOption = [...speciesPicker.options].find((option) => option.value === type);
+          if (!typeOption) {
+            typeOption = new Option(getSpeciesProfiles()[type]?.label ?? type[0].toUpperCase() + type.slice(1), type);
+            typeOption.dataset.creatureType = "true";
+            speciesPicker.add(typeOption);
+          }
+          speciesPicker.value = type;
+          speciesPicker.disabled = true;
+        } else {
+          speciesPicker.querySelector("option[data-creature-type='true']")?.remove();
+          speciesPicker.disabled = false;
+          const previousSpecies = speciesPicker.dataset.lastHumanoid;
+          speciesPicker.value = [...speciesPicker.options].some((option) => option.value === previousSpecies) ? previousSpecies : "human";
+        }
       }
-      const foundationSpecies = form.elements.namedItem("foundation.species");
-      if (foundationSpecies && speciesSelect) foundationSpecies.value = speciesSelect.value;
+      if (speciesField) speciesField.value = locked ? type : (speciesPicker?.value ?? "human");
+      if (foundationSpecies && speciesField) {
+        foundationSpecies.value = speciesField.value;
+        foundationSpecies.disabled = locked;
+      }
+      updateAutoTraitSummary(root, form);
     }
-    if (event.target?.name === "newNpc.species") {
+    if (event.target?.matches?.("[data-new-species-picker]")) {
+      const speciesField = form.elements.namedItem("newNpc.species");
       const foundationSpecies = form.elements.namedItem("foundation.species");
-      if (foundationSpecies) foundationSpecies.value = event.target.value;
+      event.target.dataset.lastHumanoid = event.target.value;
+      if (speciesField) speciesField.value = event.target.value;
+      if (foundationSpecies) {
+        foundationSpecies.value = event.target.value;
+        foundationSpecies.disabled = false;
+      }
     }
-    if (event.target?.name === "newNpc.species" && ["beast", "undead", "construct"].includes(event.target.value)) {
-      const typeSelect = form.elements.namedItem("newNpc.creatureType");
-      if (typeSelect) typeSelect.value = event.target.value;
+    if (event.target?.name === "foundation.species" && form.elements.namedItem("newNpc.creatureType")?.value !== "humanoid") {
+      event.target.value = form.elements.namedItem("newNpc.creatureType").value;
     }
     const quickSection = event.target?.dataset?.quickSection;
     if (quickSection) {
@@ -1078,18 +1158,29 @@ function attachListeners(_event, dialog, actor) {
 export async function openForge(targetActor = null) {
   try {
     if (game.system.id !== "dnd5e") throw new Error("Monster Forge requires the D&D5e game system.");
-    await refreshSpeciesProfiles();
-    const actor = targetActor ?? resolveTargetActor();
+    let actor = targetActor;
+    if (!actor) {
+      const controlled = canvas?.tokens?.controlled?.map((token) => token.actor).filter(Boolean) ?? [];
+      if (controlled.length > 1) throw new Error("Select one NPC token, or clear the selection to create a new creature.");
+      if (!controlled.length) return createNpcFromScratch();
+      actor = controlled[0];
+    }
+    await refreshCompendiumLibrary();
     if (actor.type !== "npc") throw new Error(`${actor.name} is not an NPC actor.`);
     if (!actor.isOwner) throw new Error(`You do not have permission to edit ${actor.name}.`);
 
-    const saved = game.settings.get(MODULE_ID, "defaults") ?? {};
+    const saved = await getSavedDefaults();
     const actorFoundation = actor.getFlag(MODULE_ID, "foundation")?.config;
     const importedSpecies = generatorSpecies(actor);
+    const identitySpecies = actor.flags?.[MODULE_ID]?.identity?.species
+      ?? actor.system?.details?.type?.subtype;
+    const actorSpeciesKey = identitySpecies && getSpeciesProfiles()[String(identitySpecies).replaceAll(" ", "").toLowerCase()]
+      ? String(identitySpecies).replaceAll(" ", "").toLowerCase()
+      : importedSpecies?.key;
     const rememberedFoundation = actorFoundation
       ? { ...(saved.foundation ?? {}), ...actorFoundation }
-      : importedSpecies
-        ? { ...(saved.foundation ?? {}), species: importedSpecies.key }
+      : actorSpeciesKey
+        ? { ...(saved.foundation ?? {}), species: actorSpeciesKey }
         : saved.foundation;
     const remembered = rememberedFoundation
       ? { ...saved, foundation: rememberedFoundation }
@@ -1186,12 +1277,26 @@ function emptyNpcDraft(name = "New Creature") {
   };
 }
 
+async function getSavedDefaults() {
+  const saved = { ...(game.settings.get(MODULE_ID, "defaults") ?? {}) };
+  if (!game.settings.get(MODULE_ID, "foundationDefaultsV19")) {
+    // Earlier versions defaulted to actor-derived attack/DC math, which could
+    // force high suggested ability scores at upper CRs. Preserve every other
+    // saved preference while adopting the less prescriptive 1.9 defaults.
+    saved.accuracyMode = "cr";
+    saved.saveDcMode = "cr";
+    await game.settings.set(MODULE_ID, "defaults", saved);
+    await game.settings.set(MODULE_ID, "foundationDefaultsV19", true);
+  }
+  return saved;
+}
+
 /** Open the builder without requiring a selected or pre-existing NPC. */
 export async function createNpcFromScratch() {
   try {
     if (game.system.id !== "dnd5e") throw new Error("Monster Forge requires the D&D5e game system.");
-    await refreshSpeciesProfiles();
-    const saved = game.settings.get(MODULE_ID, "defaults") ?? {};
+    await refreshCompendiumLibrary();
+    const saved = await getSavedDefaults();
     let config = mergeDefaults(saved, "0");
     config.foundation = normalizeFoundationConfig(config);
     config.foundation.species = "human";
@@ -1199,6 +1304,11 @@ export async function createNpcFromScratch() {
     config = applyRecommendedAttacks(config, config.cr);
     const draft = emptyNpcDraft();
     const context = await buildContext(draft, config, true);
+    context.identity.name = "New Creature";
+    context.identity.creatureType = "humanoid";
+    context.identity.species = "human";
+    context.identity.img = "";
+    context.identity.addSpeciesTraits = Boolean(game.settings.get(MODULE_ID, "defaultSpeciesTraits"));
     const render = foundry.applications.handlebars?.renderTemplate ?? globalThis.renderTemplate;
     const content = await render(`modules/${MODULE_ID}/templates/forge-dialog.hbs`, context);
 
@@ -1219,15 +1329,22 @@ export async function createNpcFromScratch() {
             let created = null;
             try {
               const parsed = parseForgeForm(button.form);
+              const creatureType = parsed.newNpc.creatureType;
+              parsed.newNpc.species = creatureType === "humanoid" ? parsed.newNpc.species : creatureType;
               parsed.foundation.species = parsed.newNpc.species;
               const image = parsed.newNpc.img.trim();
+              const speciesProfile = getSpeciesProfiles()[parsed.newNpc.species];
               const actorData = {
                 name: parsed.newNpc.name,
                 type: "npc",
                 img: image || "icons/svg/mystery-man.svg",
                 system: {
-                  details: { cr: 0, type: { value: parsed.newNpc.creatureType, subtype: parsed.newNpc.species } },
-                  traits: { size: "med" }
+                  details: { cr: 0, type: { value: creatureType, subtype: parsed.newNpc.species } },
+                  traits: { size: speciesProfile?.size ?? "med" },
+                  attributes: {
+                    movement: { walk: speciesProfile?.speed ?? 30 },
+                    senses: { darkvision: speciesProfile?.darkvision ?? 0 }
+                  }
                 }
               };
               created = await Actor.create(actorData);
@@ -1241,9 +1358,8 @@ export async function createNpcFromScratch() {
               plan.contentItems = [...manualItems, ...speciesItems.filter((item) => !seen.has(item.flags?.[MODULE_ID]?.sourceUuid))];
               await applyPlan(created, plan);
               await created.setFlag(MODULE_ID, "identity", {
-                creatureType: parsed.newNpc.creatureType,
+                creatureType,
                 species: parsed.newNpc.species,
-                culture: parsed.newNpc.culture,
                 addSpeciesTraits: parsed.newNpc.addSpeciesTraits
               });
               ui.notifications.info(`Monster Forge created ${created.name}.`);
@@ -1275,36 +1391,26 @@ function configuredContentPacks() {
   return [...new Set(packIds)];
 }
 
-async function refreshSpeciesProfiles() {
-  const profiles = [];
-  for (const id of configuredContentPacks()) {
-    const pack = game.packs.get(id);
-    if (!pack || pack.documentName !== "Item") continue;
-    for (const item of await pack.getDocuments()) {
-      if (item.getFlag(MODULE_ID, "library")?.kind === "species-profile") profiles.push(item);
-    }
-  }
-  setSpeciesProfileItems(profiles);
+function selectedContentPackIds(form) {
+  return [...form.querySelectorAll("input[name='gm.contentPack']:checked")]
+    .map((input) => input.value)
+    .filter((id) => id && id !== "monster-forge.npc-content");
 }
 
 async function getAvailableContent() {
   const entries = [];
-  for (const id of configuredContentPacks()) {
-    const pack = game.packs.get(id);
-    if (!pack || pack.documentName !== "Item") continue;
-    for (const item of await pack.getDocuments()) {
-      const library = item.getFlag(MODULE_ID, "library");
-      if (!library || library.template || !["action", "trait", "species-trait"].includes(library.kind)) continue;
-      entries.push({
-        uuid: item.uuid,
-        name: item.name,
-        kindKey: library.kind,
-        kind: library.kind === "species-trait" ? "Species trait" : library.kind === "action" ? "Action" : "Trait",
-        species: [].concat(library.species ?? []).join(", ") || "Any",
-        category: library.category ?? library.kind,
-        img: item.img
-      });
-    }
+  for (const item of compendiumLibraryItems) {
+    const library = item.getFlag(MODULE_ID, "library");
+    if (!library || library.template || !["action", "trait", "species-trait"].includes(library.kind)) continue;
+    entries.push({
+      uuid: item.uuid,
+      name: item.name,
+      kindKey: library.kind,
+      kind: library.kind === "species-trait" ? "Species trait" : library.kind === "action" ? "Action" : "Trait",
+      species: [].concat(library.species ?? []).join(", ") || "Any",
+      category: library.category ?? library.kind,
+      img: item.img
+    });
   }
   return entries.sort((a, b) => a.category.localeCompare(b.category) || a.name.localeCompare(b.name));
 }

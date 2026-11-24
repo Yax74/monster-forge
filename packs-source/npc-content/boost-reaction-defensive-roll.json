@@ -1,0 +1,68 @@
+{
+  "_key": "!items!9711ffde6f78cf02",
+  "_id": "9711ffde6f78cf02",
+  "name": "Defensive Roll",
+  "type": "feat",
+  "img": "icons/svg/shield.svg",
+  "system": {
+    "description": {
+      "value": "<p>When the creature takes damage from an attacker it can see, it can use its reaction to reduce the damage by 1d10 + its proficiency bonus (to a minimum of 0 damage).</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "defence",
+        "categoryLabel": "Defence",
+        "categoryIcon": "icons/svg/shield.svg",
+        "categoryDescription": "Passive AC or one defensive reaction.",
+        "categorySort": 2,
+        "group": "defence-reaction",
+        "groupLabel": "Defensive reaction",
+        "groupHelp": "Choose one competing reaction",
+        "groupSort": 1,
+        "sort": 22,
+        "boost": {
+          "id": "reaction.defensive-roll",
+          "name": "Defensive Roll",
+          "label": "Defensive Roll",
+          "summary": "Use a reaction to reduce damage from a seen attacker by 1d10 + PB.",
+          "description": "When the creature takes damage from an attacker it can see, it can use its reaction to reduce the damage by 1d10 + its proficiency bonus (to a minimum of 0 damage).",
+          "power": "standard",
+          "automation": "manual",
+          "activation": {
+            "type": "reaction",
+            "condition": "The creature takes damage from a visible attacker"
+          },
+          "impact": {
+            "action": "Reaction damage reduction"
+          },
+          "groupId": "defence-reaction",
+          "categoryId": "defence",
+          "exclusiveGroup": "defence-reaction",
+          "rank": null,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

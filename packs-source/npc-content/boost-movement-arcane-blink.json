@@ -1,0 +1,68 @@
+{
+  "_key": "!items!e3e04013a3b03f1d",
+  "_id": "e3e04013a3b03f1d",
+  "name": "Arcane Blink",
+  "type": "feat",
+  "img": "icons/svg/wingfoot.svg",
+  "system": {
+    "description": {
+      "value": "<p>Immediately after the creature makes an attack or casts a spell, it can teleport up to 10 feet to an unoccupied space it can see. This movement doesn't provoke opportunity attacks.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "movement",
+        "categoryLabel": "Movement",
+        "categoryIcon": "icons/svg/wingfoot.svg",
+        "categoryDescription": "Raw speed and one signature mobility feature.",
+        "categorySort": 1,
+        "group": "movement-ability",
+        "groupLabel": "Movement ability",
+        "groupHelp": "One signature mobility option",
+        "groupSort": 1,
+        "sort": 15,
+        "boost": {
+          "id": "movement.arcane-blink",
+          "name": "Arcane Blink",
+          "label": "Arcane Blink",
+          "summary": "After an attack or spell, teleport up to 10 feet without provoking opportunity attacks.",
+          "description": "Immediately after the creature makes an attack or casts a spell, it can teleport up to 10 feet to an unoccupied space it can see. This movement doesn't provoke opportunity attacks.",
+          "power": "strong",
+          "automation": "manual",
+          "activation": {
+            "type": "special",
+            "condition": "Immediately after an attack or spell"
+          },
+          "impact": {
+            "action": "Free 10-foot teleport after an attack or spell"
+          },
+          "groupId": "movement-ability",
+          "categoryId": "movement",
+          "exclusiveGroup": "movement-ability",
+          "rank": null,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

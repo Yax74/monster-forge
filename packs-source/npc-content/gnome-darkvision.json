@@ -3,7 +3,7 @@
   "_id": "58f8d5b2gnomedar",
   "name": "Gnomish Darkvision",
   "type": "feat",
-  "img": "icons/svg/book.svg",
+  "img": "icons/magic/symbols/runes-star-blue.webp",
   "system": {
     "description": {
       "value": "<p>This creature can see in darkness within 60 feet as if it were dim light, and in dim light as if it were bright light.</p>",

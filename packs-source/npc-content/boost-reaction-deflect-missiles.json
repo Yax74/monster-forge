@@ -1,0 +1,68 @@
+{
+  "_key": "!items!6253cfc4f8079297",
+  "_id": "6253cfc4f8079297",
+  "name": "Deflect Missiles",
+  "type": "feat",
+  "img": "icons/svg/shield.svg",
+  "system": {
+    "description": {
+      "value": "<p>When the creature is hit by a ranged weapon attack, it can use its reaction to reduce the damage by 1d10 + its Dexterity modifier + its proficiency bonus.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "defence",
+        "categoryLabel": "Defence",
+        "categoryIcon": "icons/svg/shield.svg",
+        "categoryDescription": "Passive AC or one defensive reaction.",
+        "categorySort": 2,
+        "group": "defence-reaction",
+        "groupLabel": "Defensive reaction",
+        "groupHelp": "Choose one competing reaction",
+        "groupSort": 1,
+        "sort": 24,
+        "boost": {
+          "id": "reaction.deflect-missiles",
+          "name": "Deflect Missiles",
+          "label": "Deflect Missiles",
+          "summary": "Use a reaction to reduce ranged weapon damage by 1d10 + DEX modifier + PB.",
+          "description": "When the creature is hit by a ranged weapon attack, it can use its reaction to reduce the damage by 1d10 + its Dexterity modifier + its proficiency bonus.",
+          "power": "standard",
+          "automation": "manual",
+          "activation": {
+            "type": "reaction",
+            "condition": "The creature is hit by a ranged weapon attack"
+          },
+          "impact": {
+            "action": "Reaction ranged-damage reduction"
+          },
+          "groupId": "defence-reaction",
+          "categoryId": "defence",
+          "exclusiveGroup": "defence-reaction",
+          "rank": null,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

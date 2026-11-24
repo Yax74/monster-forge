@@ -1,0 +1,48 @@
+{
+  "_key": "!items!08d3fd5aspeciesp",
+  "_id": "08d3fd5aspeciesp",
+  "name": "Fiend Species Profile",
+  "type": "feat",
+  "img": "icons/svg/d20.svg",
+  "system": {
+    "description": {
+      "value": "<p>Starting profile: med; walk 30 ft; darkvision 120 ft. Suggested ability adjustments are editable Monster Forge heuristics, not 2024 ancestry ability score rules. Traits are separate NPC Items.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster"
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "species-profile",
+        "speciesKey": "fiend",
+        "profile": {
+          "label": "Fiend",
+          "size": "med",
+          "speed": 30,
+          "darkvision": 120,
+          "abilities": {
+            "str": 1,
+            "con": 1,
+            "cha": 1
+          }
+        },
+        "template": false,
+        "version": 1
+      }
+    }
+  }
+}

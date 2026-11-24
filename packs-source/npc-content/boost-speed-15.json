@@ -1,0 +1,70 @@
+{
+  "_key": "!items!f266bfd7386d727e",
+  "_id": "f266bfd7386d727e",
+  "name": "Swift III",
+  "type": "feat",
+  "img": "icons/svg/wingfoot.svg",
+  "system": {
+    "description": {
+      "value": "<p>The creature's walking speed increases by 15 feet.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "movement",
+        "categoryLabel": "Movement",
+        "categoryIcon": "icons/svg/wingfoot.svg",
+        "categoryDescription": "Raw speed and one signature mobility feature.",
+        "categorySort": 1,
+        "group": "movement-speed",
+        "groupLabel": "Speed bonus",
+        "groupHelp": "Applies to walking speed without granting new movement types",
+        "groupSort": 0,
+        "sort": 8,
+        "boost": {
+          "id": "speed.15",
+          "name": "Swift III",
+          "label": "+15",
+          "summary": "The creature's walking speed increases by 15 feet.",
+          "description": "The creature's walking speed increases by 15 feet.",
+          "power": "strong",
+          "automation": "core",
+          "effect": [
+            {
+              "key": "system.attributes.movement.walk",
+              "value": 15
+            }
+          ],
+          "impact": {
+            "speed": 15
+          },
+          "groupId": "movement-speed",
+          "categoryId": "movement",
+          "exclusiveGroup": "movement-speed",
+          "rank": 3,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

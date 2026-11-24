@@ -1,0 +1,71 @@
+{
+  "_key": "!items!f82fbe2d662659b1",
+  "_id": "f82fbe2d662659b1",
+  "name": "Regeneration III",
+  "type": "feat",
+  "img": "icons/svg/heal.svg",
+  "system": {
+    "description": {
+      "value": "<p>The creature regains hit points equal to three times its proficiency bonus at the start of each of its turns if it has at least 1 hit point.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "recovery",
+        "categoryLabel": "Recovery",
+        "categoryIcon": "icons/svg/heal.svg",
+        "categoryDescription": "One healing or survival feature.",
+        "categorySort": 4,
+        "group": "recovery-feature",
+        "groupLabel": "Recovery feature",
+        "groupHelp": "Adds a native activity or clear manual trigger",
+        "groupSort": 0,
+        "sort": 37,
+        "boost": {
+          "id": "recovery.regeneration.pb3",
+          "name": "Regeneration III",
+          "label": "Regeneration: 3×PB",
+          "summary": "At turn start, regain three times PB hit points while above 0 HP.",
+          "description": "The creature regains hit points equal to three times its proficiency bonus at the start of each of its turns if it has at least 1 hit point.",
+          "power": "major",
+          "automation": "activity",
+          "activation": {
+            "type": "special",
+            "condition": "At the start of its turn while above 0 hit points"
+          },
+          "healing": {
+            "formula": "(3*@prof)"
+          },
+          "impact": {
+            "recovery": "3×PB each turn"
+          },
+          "groupId": "recovery-feature",
+          "categoryId": "recovery",
+          "exclusiveGroup": "recovery-feature",
+          "rank": 3,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

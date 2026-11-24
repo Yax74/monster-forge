@@ -3,7 +3,7 @@
   "_id": "33d3ee3adragonbo",
   "name": "Breath Weapon",
   "type": "feat",
-  "img": "icons/svg/book.svg",
+  "img": "icons/creatures/abilities/dragon-fire-breath-orange.webp",
   "system": {
     "description": {
       "value": "<p>When this creature takes the Attack action, it can replace one of its attacks with a breath weapon. Set its damage type, area, damage, and saving throw for this NPC's challenge rating.</p>",

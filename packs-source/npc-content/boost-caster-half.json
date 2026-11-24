@@ -1,0 +1,66 @@
+{
+  "_key": "!items!e10f372009255147",
+  "_id": "e10f372009255147",
+  "name": "NPC Half Caster",
+  "type": "feat",
+  "img": "icons/magic/symbols/runes-star-blue.webp",
+  "system": {
+    "description": {
+      "value": "<p>The creature is a half caster. Its effective caster level is one-half its challenge rating, rounded down (minimum 1). This feature doesn't add spells automatically.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "spellcasting",
+        "categoryLabel": "Spellcasting",
+        "categoryIcon": "icons/magic/symbols/runes-star-blue.webp",
+        "categoryDescription": "Spell accuracy, DC, and effective caster progression.",
+        "categorySort": 6,
+        "group": "caster-progression",
+        "groupLabel": "Caster progression",
+        "groupHelp": "Records effective caster level; spells remain your choice",
+        "groupSort": 2,
+        "sort": 47,
+        "boost": {
+          "id": "caster.half",
+          "name": "NPC Half Caster",
+          "label": "Half caster",
+          "summary": "Effective caster level is one-half CR (minimum 1).",
+          "description": "The creature is a half caster. Its effective caster level is one-half its challenge rating, rounded down (minimum 1). This feature doesn't add spells automatically.",
+          "power": "standard",
+          "automation": "manual",
+          "kind": "caster",
+          "progression": 0.5,
+          "impact": {
+            "note": "Half-caster progression"
+          },
+          "groupId": "caster-progression",
+          "categoryId": "spellcasting",
+          "exclusiveGroup": "caster-progression",
+          "rank": 2,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

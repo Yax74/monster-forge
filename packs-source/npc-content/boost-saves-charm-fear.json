@@ -1,0 +1,64 @@
+{
+  "_key": "!items!6e43a02a24bc4f78",
+  "_id": "6e43a02a24bc4f78",
+  "name": "Iron Will",
+  "type": "feat",
+  "img": "icons/svg/holy-shield.svg",
+  "system": {
+    "description": {
+      "value": "<p>The creature has advantage on saving throws against being charmed or frightened.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "resilience",
+        "categoryLabel": "Saving Throws",
+        "categoryIcon": "icons/svg/holy-shield.svg",
+        "categoryDescription": "Broad bonuses or focused resilience.",
+        "categorySort": 3,
+        "group": "saving-resilience",
+        "groupLabel": "Saving throw boost",
+        "groupHelp": "Choose one broad or focused defence",
+        "groupSort": 0,
+        "sort": 30,
+        "boost": {
+          "id": "saves.charm-fear",
+          "name": "Iron Will",
+          "label": "Charm/frightened advantage",
+          "summary": "The creature has advantage on saves against being charmed or frightened.",
+          "description": "The creature has advantage on saving throws against being charmed or frightened.",
+          "power": "standard",
+          "automation": "manual",
+          "impact": {
+            "note": "Advantage vs. charmed/frightened"
+          },
+          "groupId": "saving-resilience",
+          "categoryId": "resilience",
+          "exclusiveGroup": "saving-resilience",
+          "rank": null,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

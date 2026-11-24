@@ -3,7 +3,7 @@
   "_id": "c8c6ab43goliathg",
   "name": "Giant Ancestry",
   "type": "feat",
-  "img": "icons/svg/book.svg",
+  "img": "icons/creatures/magical/humanoid-giant-forest-blue.webp",
   "system": {
     "description": {
       "value": "<p>This creature manifests a gift tied to its giant ancestry. Select and describe the gift appropriate to this NPC.</p>",

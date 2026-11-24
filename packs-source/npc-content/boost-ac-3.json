@@ -1,0 +1,70 @@
+{
+  "_key": "!items!37db05e6eea3c8ef",
+  "_id": "37db05e6eea3c8ef",
+  "name": "Defended III",
+  "type": "feat",
+  "img": "icons/svg/shield.svg",
+  "system": {
+    "description": {
+      "value": "<p>The creature gains a +3 bonus to AC.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "defence",
+        "categoryLabel": "Defence",
+        "categoryIcon": "icons/svg/shield.svg",
+        "categoryDescription": "Passive AC or one defensive reaction.",
+        "categorySort": 2,
+        "group": "defence-ac",
+        "groupLabel": "Passive AC boost",
+        "groupHelp": "Applied after the FoF foundation",
+        "groupSort": 0,
+        "sort": 19,
+        "boost": {
+          "id": "ac.3",
+          "name": "Defended III",
+          "label": "+3",
+          "summary": "The creature gains a +3 bonus to AC.",
+          "description": "The creature gains a +3 bonus to AC.",
+          "power": "strong",
+          "automation": "core",
+          "effect": [
+            {
+              "key": "system.attributes.ac.bonus",
+              "value": 3
+            }
+          ],
+          "impact": {
+            "ac": 3
+          },
+          "groupId": "defence-ac",
+          "categoryId": "defence",
+          "exclusiveGroup": "defence-ac",
+          "rank": 3,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

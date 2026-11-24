@@ -3,7 +3,7 @@
   "_id": "b32ab6e8drowsunl",
   "name": "Underdark Adaptation",
   "type": "feat",
-  "img": "icons/svg/book.svg",
+  "img": "icons/creatures/magical/spirit-undead-ghost-purple.webp",
   "system": {
     "description": {
       "value": "<p>This drow has keen darkvision and magic associated with its elven lineage. Add only the spells or senses that fit this NPC.</p>",

@@ -3,10 +3,10 @@
   "_id": "70c2c2adspeciesp",
   "name": "Halfling Species Profile",
   "type": "feat",
-  "img": "icons/svg/book.svg",
+  "img": "icons/svg/d20.svg",
   "system": {
     "description": {
-      "value": "<p>Species preset: sm; walk 30 ft; darkvision 0 ft. Ability scores remain unchanged under 2024 rules. GM-editable body defaults; traits are separate Items.</p>",
+      "value": "<p>Starting profile: sm; walk 30 ft; darkvision 0 ft. Suggested ability adjustments are editable Monster Forge heuristics, not 2024 ancestry ability score rules. Traits are separate NPC Items.</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -33,7 +33,8 @@
           "label": "Halfling",
           "size": "sm",
           "speed": 30,
-          "darkvision": 0
+          "darkvision": 0,
+          "abilities": {}
         },
         "template": false,
         "version": 1

@@ -3,7 +3,7 @@
   "_id": "d558fc7corcadren",
   "name": "Adrenaline Rush",
   "type": "feat",
-  "img": "icons/svg/book.svg",
+  "img": "icons/weapons/axes/axe-battle-black.webp",
   "system": {
     "description": {
       "value": "<p>As a Bonus Action, this creature can take the Dash action and gain Temporary Hit Points equal to its Proficiency Bonus. It can do this a number of times equal to its Proficiency Bonus, regaining all uses after a Short or Long Rest.</p>",

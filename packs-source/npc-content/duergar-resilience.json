@@ -3,7 +3,7 @@
   "_id": "de44fc4dduergarr",
   "name": "Duergar Resilience",
   "type": "feat",
-  "img": "icons/svg/book.svg",
+  "img": "icons/creatures/magical/construct-face-stone-pink.webp",
   "system": {
     "description": {
       "value": "<p>This duergar retains its dwarf parent species traits. Add any Stygian-specific resistance or resilience here; no additional condition immunities are assumed.</p>",

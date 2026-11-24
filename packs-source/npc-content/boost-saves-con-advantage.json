@@ -1,0 +1,73 @@
+{
+  "_key": "!items!b3a521c533fb1776",
+  "_id": "b3a521c533fb1776",
+  "name": "Steadfast Constitution",
+  "type": "feat",
+  "img": "icons/svg/holy-shield.svg",
+  "system": {
+    "description": {
+      "value": "<p>The creature has advantage on Constitution saving throws.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "resilience",
+        "categoryLabel": "Saving Throws",
+        "categoryIcon": "icons/svg/holy-shield.svg",
+        "categoryDescription": "Broad bonuses or focused resilience.",
+        "categorySort": 3,
+        "group": "saving-resilience",
+        "groupLabel": "Saving throw boost",
+        "groupHelp": "Choose one broad or focused defence",
+        "groupSort": 0,
+        "sort": 28,
+        "boost": {
+          "id": "saves.con-advantage",
+          "name": "Steadfast Constitution",
+          "label": "CON save advantage",
+          "summary": "The creature has advantage on Constitution saving throws.",
+          "description": "The creature has advantage on Constitution saving throws.",
+          "power": "standard",
+          "automation": "midi",
+          "effect": [
+            {
+              "key": "flags.midi-qol.advantage.ability.save.con",
+              "value": 1
+            }
+          ],
+          "impact": {
+            "note": "Advantage on CON saves"
+          },
+          "groupId": "saving-resilience",
+          "categoryId": "resilience",
+          "exclusiveGroup": "saving-resilience",
+          "rank": null,
+          "requirements": [
+            "midi-qol",
+            "dae"
+          ]
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

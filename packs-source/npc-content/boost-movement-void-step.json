@@ -1,0 +1,72 @@
+{
+  "_key": "!items!79ea2c2c56094c3c",
+  "_id": "79ea2c2c56094c3c",
+  "name": "Void Step",
+  "type": "feat",
+  "img": "icons/svg/wingfoot.svg",
+  "system": {
+    "description": {
+      "value": "<p>As a bonus action, the creature teleports up to 30 feet to an unoccupied space it can see. It can't use Void Step again until it recharges (4–6).</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "movement",
+        "categoryLabel": "Movement",
+        "categoryIcon": "icons/svg/wingfoot.svg",
+        "categoryDescription": "Raw speed and one signature mobility feature.",
+        "categorySort": 1,
+        "group": "movement-ability",
+        "groupLabel": "Movement ability",
+        "groupHelp": "One signature mobility option",
+        "groupSort": 1,
+        "sort": 16,
+        "boost": {
+          "id": "movement.void-step",
+          "name": "Void Step",
+          "label": "Void Step",
+          "summary": "As a bonus action, teleport up to 30 feet; recharge 4–6.",
+          "description": "As a bonus action, the creature teleports up to 30 feet to an unoccupied space it can see. It can't use Void Step again until it recharges (4–6).",
+          "power": "major",
+          "automation": "activity",
+          "activation": {
+            "type": "bonus"
+          },
+          "uses": {
+            "max": "1",
+            "period": "recharge",
+            "formula": "4"
+          },
+          "impact": {
+            "action": "Recharge bonus-action teleport"
+          },
+          "groupId": "movement-ability",
+          "categoryId": "movement",
+          "exclusiveGroup": "movement-ability",
+          "rank": null,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

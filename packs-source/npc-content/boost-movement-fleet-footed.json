@@ -1,0 +1,67 @@
+{
+  "_key": "!items!052b0a6200faa1d2",
+  "_id": "052b0a6200faa1d2",
+  "name": "Fleet Footed",
+  "type": "feat",
+  "img": "icons/svg/wingfoot.svg",
+  "system": {
+    "description": {
+      "value": "<p>The creature can take the Dash or Disengage action as a bonus action.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "movement",
+        "categoryLabel": "Movement",
+        "categoryIcon": "icons/svg/wingfoot.svg",
+        "categoryDescription": "Raw speed and one signature mobility feature.",
+        "categorySort": 1,
+        "group": "movement-ability",
+        "groupLabel": "Movement ability",
+        "groupHelp": "One signature mobility option",
+        "groupSort": 1,
+        "sort": 10,
+        "boost": {
+          "id": "movement.fleet-footed",
+          "name": "Fleet Footed",
+          "label": "Fleet Footed",
+          "summary": "The creature can Dash or Disengage as a bonus action.",
+          "description": "The creature can take the Dash or Disengage action as a bonus action.",
+          "power": "standard",
+          "automation": "activity",
+          "activation": {
+            "type": "bonus"
+          },
+          "impact": {
+            "action": "Bonus-action Dash/Disengage"
+          },
+          "groupId": "movement-ability",
+          "categoryId": "movement",
+          "exclusiveGroup": "movement-ability",
+          "rank": null,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

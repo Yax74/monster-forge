@@ -1,0 +1,70 @@
+{
+  "_key": "!items!6b73a8743931e8db",
+  "_id": "6b73a8743931e8db",
+  "name": "Battle Ready",
+  "type": "feat",
+  "img": "icons/svg/d20.svg",
+  "system": {
+    "description": {
+      "value": "<p>The creature adds its proficiency bonus to initiative.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "initiative",
+        "categoryLabel": "Initiative",
+        "categoryIcon": "icons/svg/d20.svg",
+        "categoryDescription": "Turn-order boosts. Choose one.",
+        "categorySort": 0,
+        "group": "initiative-bonus",
+        "groupLabel": "Initiative boost",
+        "groupHelp": "Flat, proficiency-scaled, or advantage",
+        "groupSort": 0,
+        "sort": 3,
+        "boost": {
+          "id": "initiative.pb",
+          "name": "Battle Ready",
+          "label": "+ proficiency bonus",
+          "summary": "The creature adds its proficiency bonus to initiative.",
+          "description": "The creature adds its proficiency bonus to initiative.",
+          "power": "standard",
+          "automation": "core",
+          "effect": [
+            {
+              "key": "system.attributes.init.bonus",
+              "value": "@attributes.prof"
+            }
+          ],
+          "impact": {
+            "initiativeProf": 1
+          },
+          "groupId": "initiative-bonus",
+          "categoryId": "initiative",
+          "exclusiveGroup": "initiative-bonus",
+          "rank": null,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

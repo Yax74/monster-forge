@@ -1,0 +1,68 @@
+{
+  "_key": "!items!6f2f4d9f28adc1c6",
+  "_id": "6f2f4d9f28adc1c6",
+  "name": "Parry",
+  "type": "feat",
+  "img": "icons/svg/shield.svg",
+  "system": {
+    "description": {
+      "value": "<p>The creature adds its proficiency bonus to its AC against one melee attack that would hit it. To do so, the creature must see the attacker and be wielding a melee weapon or shield.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "defence",
+        "categoryLabel": "Defence",
+        "categoryIcon": "icons/svg/shield.svg",
+        "categoryDescription": "Passive AC or one defensive reaction.",
+        "categorySort": 2,
+        "group": "defence-reaction",
+        "groupLabel": "Defensive reaction",
+        "groupHelp": "Choose one competing reaction",
+        "groupSort": 1,
+        "sort": 20,
+        "boost": {
+          "id": "reaction.parry",
+          "name": "Parry",
+          "label": "Parry (+PB AC)",
+          "summary": "Add PB to AC against one visible melee attack that would hit.",
+          "description": "The creature adds its proficiency bonus to its AC against one melee attack that would hit it. To do so, the creature must see the attacker and be wielding a melee weapon or shield.",
+          "power": "standard",
+          "automation": "manual",
+          "activation": {
+            "type": "reaction",
+            "condition": "A visible melee attack would hit"
+          },
+          "impact": {
+            "action": "Reaction: +PB AC vs. one melee attack"
+          },
+          "groupId": "defence-reaction",
+          "categoryId": "defence",
+          "exclusiveGroup": "defence-reaction",
+          "rank": null,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

@@ -3,10 +3,10 @@
   "_id": "22cba8c6speciesp",
   "name": "Duergar Species Profile",
   "type": "feat",
-  "img": "icons/svg/book.svg",
+  "img": "icons/svg/d20.svg",
   "system": {
     "description": {
-      "value": "<p>Species preset: med; walk 30 ft; darkvision 120 ft. Ability scores remain unchanged under 2024 rules. GM-editable body defaults; traits are separate Items.</p>",
+      "value": "<p>Starting profile: med; walk 30 ft; darkvision 120 ft. Suggested ability adjustments are editable Monster Forge heuristics, not 2024 ancestry ability score rules. Traits are separate NPC Items.</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -33,7 +33,8 @@
           "label": "Duergar",
           "size": "med",
           "speed": 30,
-          "darkvision": 120
+          "darkvision": 120,
+          "abilities": {}
         },
         "template": false,
         "version": 1

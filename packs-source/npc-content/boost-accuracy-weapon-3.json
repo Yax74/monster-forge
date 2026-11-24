@@ -1,0 +1,74 @@
+{
+  "_key": "!items!50e0f2a1d948c902",
+  "_id": "50e0f2a1d948c902",
+  "name": "Weapon Training III",
+  "type": "feat",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "description": {
+      "value": "<p>The creature gains a +3 bonus to melee and ranged weapon attack rolls.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "accuracy",
+        "categoryLabel": "Weapon Accuracy",
+        "categoryIcon": "icons/svg/target.svg",
+        "categoryDescription": "Bonuses to all weapon attack rolls.",
+        "categorySort": 5,
+        "group": "weapon-accuracy",
+        "groupLabel": "Weapon attack bonus",
+        "groupHelp": "Stacks after generated attack accuracy",
+        "groupSort": 0,
+        "sort": 40,
+        "boost": {
+          "id": "accuracy.weapon.3",
+          "name": "Weapon Training III",
+          "label": "+3",
+          "summary": "The creature gains a +3 bonus to melee and ranged weapon attack rolls.",
+          "description": "The creature gains a +3 bonus to melee and ranged weapon attack rolls.",
+          "power": "strong",
+          "automation": "core",
+          "effect": [
+            {
+              "key": "system.bonuses.mwak.attack",
+              "value": 3
+            },
+            {
+              "key": "system.bonuses.rwak.attack",
+              "value": 3
+            }
+          ],
+          "impact": {
+            "weaponAttack": 3
+          },
+          "groupId": "weapon-accuracy",
+          "categoryId": "accuracy",
+          "exclusiveGroup": "weapon-accuracy",
+          "rank": 3,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

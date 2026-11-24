@@ -1,0 +1,49 @@
+{
+  "_key": "!items!3025d6f7speciesp",
+  "_id": "3025d6f7speciesp",
+  "name": "Ooze Species Profile",
+  "type": "feat",
+  "img": "icons/svg/d20.svg",
+  "system": {
+    "description": {
+      "value": "<p>Starting profile: med; walk 20 ft; darkvision 60 ft. Suggested ability adjustments are editable Monster Forge heuristics, not 2024 ancestry ability score rules. Traits are separate NPC Items.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster"
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "species-profile",
+        "speciesKey": "ooze",
+        "profile": {
+          "label": "Ooze",
+          "size": "med",
+          "speed": 20,
+          "darkvision": 60,
+          "abilities": {
+            "dex": -2,
+            "int": -4,
+            "wis": -1,
+            "cha": -2
+          }
+        },
+        "template": false,
+        "version": 1
+      }
+    }
+  }
+}

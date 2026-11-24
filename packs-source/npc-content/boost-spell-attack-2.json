@@ -1,0 +1,74 @@
+{
+  "_key": "!items!ce57d1bb2ff2187b",
+  "_id": "ce57d1bb2ff2187b",
+  "name": "Spell Precision II",
+  "type": "feat",
+  "img": "icons/magic/symbols/runes-star-blue.webp",
+  "system": {
+    "description": {
+      "value": "<p>The creature gains a +2 bonus to melee and ranged spell attack rolls.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "spellcasting",
+        "categoryLabel": "Spellcasting",
+        "categoryIcon": "icons/magic/symbols/runes-star-blue.webp",
+        "categoryDescription": "Spell accuracy, DC, and effective caster progression.",
+        "categorySort": 6,
+        "group": "spell-accuracy",
+        "groupLabel": "Spell attack bonus",
+        "groupHelp": "Melee and ranged spell attacks",
+        "groupSort": 0,
+        "sort": 42,
+        "boost": {
+          "id": "spell.attack.2",
+          "name": "Spell Precision II",
+          "label": "+2",
+          "summary": "The creature gains a +2 bonus to melee and ranged spell attack rolls.",
+          "description": "The creature gains a +2 bonus to melee and ranged spell attack rolls.",
+          "power": "standard",
+          "automation": "core",
+          "effect": [
+            {
+              "key": "system.bonuses.msak.attack",
+              "value": 2
+            },
+            {
+              "key": "system.bonuses.rsak.attack",
+              "value": 2
+            }
+          ],
+          "impact": {
+            "spellAttack": 2
+          },
+          "groupId": "spell-accuracy",
+          "categoryId": "spellcasting",
+          "exclusiveGroup": "spell-accuracy",
+          "rank": 2,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

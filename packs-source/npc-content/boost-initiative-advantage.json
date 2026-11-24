@@ -1,0 +1,68 @@
+{
+  "_key": "!items!c7f4cbeecc85dab0",
+  "_id": "c7f4cbeecc85dab0",
+  "name": "Always Ready",
+  "type": "feat",
+  "img": "icons/svg/d20.svg",
+  "system": {
+    "description": {
+      "value": "<p>The creature has advantage on initiative rolls. Apply advantage when combat begins.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "initiative",
+        "categoryLabel": "Initiative",
+        "categoryIcon": "icons/svg/d20.svg",
+        "categoryDescription": "Turn-order boosts. Choose one.",
+        "categorySort": 0,
+        "group": "initiative-bonus",
+        "groupLabel": "Initiative boost",
+        "groupHelp": "Flat, proficiency-scaled, or advantage",
+        "groupSort": 0,
+        "sort": 5,
+        "boost": {
+          "id": "initiative.advantage",
+          "name": "Always Ready",
+          "label": "Advantage",
+          "summary": "The creature has advantage on initiative rolls.",
+          "description": "The creature has advantage on initiative rolls. Apply advantage when combat begins.",
+          "power": "standard",
+          "automation": "manual",
+          "impact": {
+            "note": "Advantage on initiative"
+          },
+          "activation": {
+            "type": "special",
+            "condition": "When initiative is rolled"
+          },
+          "groupId": "initiative-bonus",
+          "categoryId": "initiative",
+          "exclusiveGroup": "initiative-bonus",
+          "rank": null,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

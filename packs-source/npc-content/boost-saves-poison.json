@@ -1,0 +1,64 @@
+{
+  "_key": "!items!02b05cb1e2236b34",
+  "_id": "02b05cb1e2236b34",
+  "name": "Hardy",
+  "type": "feat",
+  "img": "icons/svg/holy-shield.svg",
+  "system": {
+    "description": {
+      "value": "<p>The creature has advantage on saving throws against poison.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "resilience",
+        "categoryLabel": "Saving Throws",
+        "categoryIcon": "icons/svg/holy-shield.svg",
+        "categoryDescription": "Broad bonuses or focused resilience.",
+        "categorySort": 3,
+        "group": "saving-resilience",
+        "groupLabel": "Saving throw boost",
+        "groupHelp": "Choose one broad or focused defence",
+        "groupSort": 0,
+        "sort": 31,
+        "boost": {
+          "id": "saves.poison",
+          "name": "Hardy",
+          "label": "Poison advantage",
+          "summary": "The creature has advantage on saves against poison.",
+          "description": "The creature has advantage on saving throws against poison.",
+          "power": "light",
+          "automation": "manual",
+          "impact": {
+            "note": "Advantage vs. poison"
+          },
+          "groupId": "saving-resilience",
+          "categoryId": "resilience",
+          "exclusiveGroup": "saving-resilience",
+          "rank": null,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

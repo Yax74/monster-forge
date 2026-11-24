@@ -1,0 +1,67 @@
+{
+  "_key": "!items!dda02262aad4b4ae",
+  "_id": "dda02262aad4b4ae",
+  "name": "Nimble Dash",
+  "type": "feat",
+  "img": "icons/svg/wingfoot.svg",
+  "system": {
+    "description": {
+      "value": "<p>The creature can take the Dash action as a bonus action.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "movement",
+        "categoryLabel": "Movement",
+        "categoryIcon": "icons/svg/wingfoot.svg",
+        "categoryDescription": "Raw speed and one signature mobility feature.",
+        "categorySort": 1,
+        "group": "movement-ability",
+        "groupLabel": "Movement ability",
+        "groupHelp": "One signature mobility option",
+        "groupSort": 1,
+        "sort": 9,
+        "boost": {
+          "id": "movement.nimble-dash",
+          "name": "Nimble Dash",
+          "label": "Nimble Dash",
+          "summary": "The creature can take the Dash action as a bonus action.",
+          "description": "The creature can take the Dash action as a bonus action.",
+          "power": "light",
+          "automation": "activity",
+          "activation": {
+            "type": "bonus"
+          },
+          "impact": {
+            "action": "Bonus-action Dash"
+          },
+          "groupId": "movement-ability",
+          "categoryId": "movement",
+          "exclusiveGroup": "movement-ability",
+          "rank": null,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

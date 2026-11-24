@@ -29,7 +29,7 @@ Tier is applied after the role HP/DPR adjustment. It does not change bounded-acc
 | Elite | ×1.5 | ×1.1 |
 | Boss | ×2 | ×1.2 |
 
-Species is a separate body-and-ability recommendation. Its vocabulary matches Wraeclast NPC Generator, but it never implies a culture, faction, or profession. Manual overrides are applied last.
+Species and creature type are separate editable starting profiles for body data and ability tendencies. Those tendencies are GM-facing heuristics, not 2024 ancestry ability-score rules. Non-humanoid identity profiles follow the selected creature type; manual overrides are applied last.
 
 Recommended proficiency follows the standard CR progression. For each ability actually used by a configured attack, Monster Forge derives the required modifier as `attack bonus − proficiency bonus`. For each configured save DC ability, it derives `save DC − 8 − proficiency bonus`. It converts that modifier to a score with `10 + 2 × modifier`, capped at 30. The rest of the array starts from the selected role and species recommendations. The dialog shows this result as **Suggested** before applying any explicit per-score override, then shows the post-override **Final** value. This ability-array derivation is a Monster Forge convenience, not a *Forge of Foes* table.
 

@@ -1,0 +1,70 @@
+{
+  "_key": "!items!b1bfa576f923e4b8",
+  "_id": "b1bfa576f923e4b8",
+  "name": "Resilient III",
+  "type": "feat",
+  "img": "icons/svg/holy-shield.svg",
+  "system": {
+    "description": {
+      "value": "<p>The creature gains a +3 bonus to all saving throws.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "resilience",
+        "categoryLabel": "Saving Throws",
+        "categoryIcon": "icons/svg/holy-shield.svg",
+        "categoryDescription": "Broad bonuses or focused resilience.",
+        "categorySort": 3,
+        "group": "saving-resilience",
+        "groupLabel": "Saving throw boost",
+        "groupHelp": "Choose one broad or focused defence",
+        "groupSort": 0,
+        "sort": 27,
+        "boost": {
+          "id": "saves.all.3",
+          "name": "Resilient III",
+          "label": "+3",
+          "summary": "The creature gains a +3 bonus to all saving throws.",
+          "description": "The creature gains a +3 bonus to all saving throws.",
+          "power": "strong",
+          "automation": "core",
+          "effect": [
+            {
+              "key": "system.bonuses.abilities.save",
+              "value": 3
+            }
+          ],
+          "impact": {
+            "saves": 3
+          },
+          "groupId": "saving-resilience",
+          "categoryId": "resilience",
+          "exclusiveGroup": "saving-resilience",
+          "rank": 3,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

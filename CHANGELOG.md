@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.9.0
+
+- Made the Monster Forge token control handle both selected-NPC editing and new creature creation; removed the separate create control.
+- Moved new-creature identity to its own tab, removed Culture, and locked species to creature type for non-humanoids.
+- Combined NPC actions and traits with Boosts while keeping their application toggle and undo scope independent.
+- Added a GM Setup tab for linking Item compendiums and choosing the default species-trait behavior.
+- Moved boost definitions into the bundled Item compendium and made boost categories derive from item metadata.
+- Added editable Item-backed species profiles for every creature type; toned down beast, undead, and construct ability recommendations and defaulted suggested scores to avoid forcing CR attack math into ability scores.
+- Replaced campaign-specific attacks with standard D&D 2024 weapon presets and validated the added core icon paths against the supplied Foundry icon catalog.
+
 ## 1.8.0
 
 - Added a create-from-scratch NPC flow with name, image, creature type, species/lineage, and culture fields; the actor is created only after submission and removed if forging fails.

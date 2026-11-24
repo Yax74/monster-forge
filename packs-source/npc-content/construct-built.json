@@ -3,7 +3,7 @@
   "_id": "cd52a48bconstruc",
   "name": "Constructed Nature",
   "type": "feat",
-  "img": "icons/svg/book.svg",
+  "img": "icons/creatures/magical/construct-golem-stone-blue.webp",
   "system": {
     "description": {
       "value": "<p>This creature does not require air, food, drink, or sleep. Add any additional construct defenses as separate NPC features.</p>",

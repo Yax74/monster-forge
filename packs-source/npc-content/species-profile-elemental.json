@@ -1,0 +1,47 @@
+{
+  "_key": "!items!ac849f59speciesp",
+  "_id": "ac849f59speciesp",
+  "name": "Elemental Species Profile",
+  "type": "feat",
+  "img": "icons/svg/d20.svg",
+  "system": {
+    "description": {
+      "value": "<p>Starting profile: med; walk 30 ft; darkvision 60 ft. Suggested ability adjustments are editable Monster Forge heuristics, not 2024 ancestry ability score rules. Traits are separate NPC Items.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster"
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "species-profile",
+        "speciesKey": "elemental",
+        "profile": {
+          "label": "Elemental",
+          "size": "med",
+          "speed": 30,
+          "darkvision": 60,
+          "abilities": {
+            "con": 1,
+            "int": -1
+          }
+        },
+        "template": false,
+        "version": 1
+      }
+    }
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "_key": "!items!88acb7924dad6e4c",
+  "_id": "88acb7924dad6e4c",
+  "name": "Potent Spellcasting I",
+  "type": "feat",
+  "img": "icons/magic/symbols/runes-star-blue.webp",
+  "system": {
+    "description": {
+      "value": "<p>The creature gains a +1 bonus to its spell save DC.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "spellcasting",
+        "categoryLabel": "Spellcasting",
+        "categoryIcon": "icons/magic/symbols/runes-star-blue.webp",
+        "categoryDescription": "Spell accuracy, DC, and effective caster progression.",
+        "categorySort": 6,
+        "group": "spell-dc",
+        "groupLabel": "Spell save DC bonus",
+        "groupHelp": "Applies after the foundation DC",
+        "groupSort": 1,
+        "sort": 44,
+        "boost": {
+          "id": "spell.dc.1",
+          "name": "Potent Spellcasting I",
+          "label": "+1",
+          "summary": "The creature gains a +1 bonus to its spell save DC.",
+          "description": "The creature gains a +1 bonus to its spell save DC.",
+          "power": "standard",
+          "automation": "core",
+          "effect": [
+            {
+              "key": "system.bonuses.spell.dc",
+              "value": 1
+            }
+          ],
+          "impact": {
+            "spellDc": 1
+          },
+          "groupId": "spell-dc",
+          "categoryId": "spellcasting",
+          "exclusiveGroup": "spell-dc",
+          "rank": 1,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

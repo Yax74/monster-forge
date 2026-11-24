@@ -1,0 +1,72 @@
+{
+  "_key": "!items!10b3713441de03b0",
+  "_id": "10b3713441de03b0",
+  "name": "Command II",
+  "type": "feat",
+  "img": "icons/sundries/flags/banner-blue.webp",
+  "system": {
+    "description": {
+      "value": "<p>As an action, the creature chooses up to three allies within 60 feet that can hear it. Each chosen ally can use its reaction to make one weapon attack. Command II then recharges on a 5–6.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "leadership",
+        "categoryLabel": "Leadership",
+        "categoryIcon": "icons/sundries/flags/banner-blue.webp",
+        "categoryDescription": "Support and command features; choose one.",
+        "categorySort": 7,
+        "group": "leadership-feature",
+        "groupLabel": "Leadership feature",
+        "groupHelp": "Action-economy impact is called out in Review",
+        "groupSort": 0,
+        "sort": 54,
+        "boost": {
+          "id": "leadership.command-2",
+          "name": "Command II",
+          "label": "Command II",
+          "summary": "Action; up to three allies can each use a reaction to attack; recharge 5–6.",
+          "description": "As an action, the creature chooses up to three allies within 60 feet that can hear it. Each chosen ally can use its reaction to make one weapon attack. Command II then recharges on a 5–6.",
+          "power": "major",
+          "automation": "manual",
+          "activation": {
+            "type": "action"
+          },
+          "uses": {
+            "max": "1",
+            "period": "recharge",
+            "formula": "5"
+          },
+          "impact": {
+            "action": "Grants up to three reaction attacks"
+          },
+          "groupId": "leadership-feature",
+          "categoryId": "leadership",
+          "exclusiveGroup": "leadership-feature",
+          "rank": 2,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

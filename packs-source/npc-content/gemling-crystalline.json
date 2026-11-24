@@ -3,7 +3,7 @@
   "_id": "15315461gemlingc",
   "name": "Gemling Crystalline Adaptation",
   "type": "feat",
-  "img": "icons/svg/book.svg",
+  "img": "icons/commodities/gems/gem-cluster-blue-white.webp",
   "system": {
     "description": {
       "value": "<p>A gemling bears a distinctive crystalline adaptation. Define its resistance, sense, movement, or other feature for this creature in the item description or activities.</p>",

@@ -3,7 +3,7 @@
   "_id": "9ff1c9c5aasimarh",
   "name": "Healing Hands",
   "type": "feat",
-  "img": "icons/svg/book.svg",
+  "img": "icons/magic/holy/angel-wings-gray.webp",
   "system": {
     "description": {
       "value": "<p>As an action, this creature can touch another creature and restore Hit Points. Set the amount appropriate to this NPC's role and challenge rating.</p>",

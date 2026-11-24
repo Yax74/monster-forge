@@ -183,9 +183,13 @@ export function buildFoundationPlan(inputConfig = {}, actorProfile = {}) {
   const attackModifier = final.attackBonus - proficiency;
   const saveModifier = final.saveDc - 8 - proficiency;
 
-  for (const ability of attackAbilities) requiredModifiers[ability] = attackModifier;
-  for (const ability of saveAbilities) {
-    requiredModifiers[ability] = Math.max(requiredModifiers[ability] ?? -Infinity, saveModifier);
+  if ((inputConfig.accuracyMode ?? "actor") !== "cr") {
+    for (const ability of attackAbilities) requiredModifiers[ability] = attackModifier;
+  }
+  if ((inputConfig.saveDcMode ?? "actor") !== "cr") {
+    for (const ability of saveAbilities) {
+      requiredModifiers[ability] = Math.max(requiredModifiers[ability] ?? -Infinity, saveModifier);
+    }
   }
   for (const [ability, modifier] of Object.entries(requiredModifiers)) {
     abilityScores[ability] = scoreForModifier(modifier);
@@ -220,14 +224,14 @@ export function buildFoundationPlan(inputConfig = {}, actorProfile = {}) {
   if (foundation.tier === "minion" || foundation.tier === "boss") {
     warnings.push(`${tier.label} scaling changes durability and DPR only; reactions, legendary actions, and encounter action economy remain GM decisions.`);
   }
-  if (Object.values(achievedAttackBonuses).some((value) => value !== final.attackBonus)) {
+  if (inputConfig.accuracyMode !== "cr" && Object.values(achievedAttackBonuses).some((value) => value !== final.attackBonus)) {
     warnings.push("One or more recommended ability scores cannot reproduce the foundation attack bonus exactly; a manual ability override or shared attack/DC ability is responsible.");
   }
-  if (Object.values(achievedSaveDcs).some((value) => value !== final.saveDc)) {
+  if (inputConfig.saveDcMode !== "cr" && Object.values(achievedSaveDcs).some((value) => value !== final.saveDc)) {
     warnings.push("One or more recommended ability scores cannot reproduce the foundation save DC exactly; a manual ability override or shared attack/DC ability is responsible.");
   }
   if (foundation.species !== "preserve" && Object.keys(species.abilities ?? {}).length) {
-    warnings.push("Species ability tendencies are Monster Forge recommendations based on the campaign's 2014-style species assumptions, not Forge of Foes rules.");
+    warnings.push("Ability suggestions use the selected role and editable creature profile. Flat benchmark accuracy/DC keeps high-CR attack math from forcing every suggested ability score upward.");
   }
   const selectedAttacks = [inputConfig.primary, inputConfig.secondaryEnabled ? inputConfig.secondary : null]
     .filter(Boolean)

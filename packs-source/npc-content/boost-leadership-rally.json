@@ -1,0 +1,81 @@
+{
+  "_key": "!items!029afefc945594bd",
+  "_id": "029afefc945594bd",
+  "name": "Rally",
+  "type": "feat",
+  "img": "icons/sundries/flags/banner-blue.webp",
+  "system": {
+    "description": {
+      "value": "<p>As a bonus action, the creature chooses one ally within 30 feet that can see or hear it. That ally gains 1d8 + the creature's Charisma modifier temporary hit points. Rally then recharges on a 5–6.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "leadership",
+        "categoryLabel": "Leadership",
+        "categoryIcon": "icons/sundries/flags/banner-blue.webp",
+        "categoryDescription": "Support and command features; choose one.",
+        "categorySort": 7,
+        "group": "leadership-feature",
+        "groupLabel": "Leadership feature",
+        "groupHelp": "Action-economy impact is called out in Review",
+        "groupSort": 0,
+        "sort": 51,
+        "boost": {
+          "id": "leadership.rally",
+          "name": "Rally",
+          "label": "Rally",
+          "summary": "Bonus action; grant 1d8 + CHA modifier temporary HP; recharge 5–6.",
+          "description": "As a bonus action, the creature chooses one ally within 30 feet that can see or hear it. That ally gains 1d8 + the creature's Charisma modifier temporary hit points. Rally then recharges on a 5–6.",
+          "power": "strong",
+          "automation": "activity",
+          "activation": {
+            "type": "bonus"
+          },
+          "uses": {
+            "max": "1",
+            "period": "recharge",
+            "formula": "5"
+          },
+          "healing": {
+            "number": 1,
+            "denomination": 8,
+            "bonus": "@abilities.cha.mod",
+            "type": "temphp",
+            "target": "ally",
+            "range": 30
+          },
+          "impact": {
+            "recovery": "1d8 + CHA temporary HP",
+            "action": "Recharge bonus action"
+          },
+          "groupId": "leadership-feature",
+          "categoryId": "leadership",
+          "exclusiveGroup": "leadership-feature",
+          "rank": null,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

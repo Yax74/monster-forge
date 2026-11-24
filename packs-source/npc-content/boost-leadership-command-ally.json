@@ -1,0 +1,72 @@
+{
+  "_key": "!items!238a8220429d0966",
+  "_id": "238a8220429d0966",
+  "name": "Command Ally",
+  "type": "feat",
+  "img": "icons/sundries/flags/banner-blue.webp",
+  "system": {
+    "description": {
+      "value": "<p>As a bonus action, the creature chooses one ally within 30 feet that can hear it. That ally can use its reaction to make one weapon attack. Command Ally then recharges on a 5–6.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "leadership",
+        "categoryLabel": "Leadership",
+        "categoryIcon": "icons/sundries/flags/banner-blue.webp",
+        "categoryDescription": "Support and command features; choose one.",
+        "categorySort": 7,
+        "group": "leadership-feature",
+        "groupLabel": "Leadership feature",
+        "groupHelp": "Action-economy impact is called out in Review",
+        "groupSort": 0,
+        "sort": 52,
+        "boost": {
+          "id": "leadership.command-ally",
+          "name": "Command Ally",
+          "label": "Command Ally",
+          "summary": "Bonus action; one ally can use its reaction to make one weapon attack; recharge 5–6.",
+          "description": "As a bonus action, the creature chooses one ally within 30 feet that can hear it. That ally can use its reaction to make one weapon attack. Command Ally then recharges on a 5–6.",
+          "power": "major",
+          "automation": "manual",
+          "activation": {
+            "type": "bonus"
+          },
+          "uses": {
+            "max": "1",
+            "period": "recharge",
+            "formula": "5"
+          },
+          "impact": {
+            "action": "Grants one reaction attack"
+          },
+          "groupId": "leadership-feature",
+          "categoryId": "leadership",
+          "exclusiveGroup": "leadership-feature",
+          "rank": null,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

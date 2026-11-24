@@ -1,0 +1,70 @@
+{
+  "_key": "!items!a8d557eb704fd3f7",
+  "_id": "a8d557eb704fd3f7",
+  "name": "Resilient I",
+  "type": "feat",
+  "img": "icons/svg/holy-shield.svg",
+  "system": {
+    "description": {
+      "value": "<p>The creature gains a +1 bonus to all saving throws.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "resilience",
+        "categoryLabel": "Saving Throws",
+        "categoryIcon": "icons/svg/holy-shield.svg",
+        "categoryDescription": "Broad bonuses or focused resilience.",
+        "categorySort": 3,
+        "group": "saving-resilience",
+        "groupLabel": "Saving throw boost",
+        "groupHelp": "Choose one broad or focused defence",
+        "groupSort": 0,
+        "sort": 25,
+        "boost": {
+          "id": "saves.all.1",
+          "name": "Resilient I",
+          "label": "+1",
+          "summary": "The creature gains a +1 bonus to all saving throws.",
+          "description": "The creature gains a +1 bonus to all saving throws.",
+          "power": "light",
+          "automation": "core",
+          "effect": [
+            {
+              "key": "system.bonuses.abilities.save",
+              "value": 1
+            }
+          ],
+          "impact": {
+            "saves": 1
+          },
+          "groupId": "saving-resilience",
+          "categoryId": "resilience",
+          "exclusiveGroup": "saving-resilience",
+          "rank": 1,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

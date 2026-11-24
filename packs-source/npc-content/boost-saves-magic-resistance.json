@@ -1,0 +1,64 @@
+{
+  "_key": "!items!69ab93c73894fd2c",
+  "_id": "69ab93c73894fd2c",
+  "name": "Magic Resistance",
+  "type": "feat",
+  "img": "icons/svg/holy-shield.svg",
+  "system": {
+    "description": {
+      "value": "<p>The creature has advantage on saving throws against spells and other magical effects.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "resilience",
+        "categoryLabel": "Saving Throws",
+        "categoryIcon": "icons/svg/holy-shield.svg",
+        "categoryDescription": "Broad bonuses or focused resilience.",
+        "categorySort": 3,
+        "group": "saving-resilience",
+        "groupLabel": "Saving throw boost",
+        "groupHelp": "Choose one broad or focused defence",
+        "groupSort": 0,
+        "sort": 32,
+        "boost": {
+          "id": "saves.magic-resistance",
+          "name": "Magic Resistance",
+          "label": "Magic Resistance",
+          "summary": "The creature has advantage on saving throws against spells and other magical effects.",
+          "description": "The creature has advantage on saving throws against spells and other magical effects.",
+          "power": "major",
+          "automation": "manual",
+          "impact": {
+            "note": "Advantage vs. magic"
+          },
+          "groupId": "saving-resilience",
+          "categoryId": "resilience",
+          "exclusiveGroup": "saving-resilience",
+          "rank": null,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

@@ -3,7 +3,7 @@
   "_id": "e2db5ea0elftranc",
   "name": "Trance",
   "type": "feat",
-  "img": "icons/svg/book.svg",
+  "img": "icons/weapons/bows/shortbow-recurve-yellow-blue.webp",
   "system": {
     "description": {
       "value": "<p>This creature doesn't need to sleep, and magic can't put it to sleep. It can finish a Long Rest in four hours of trancelike meditation.</p>",

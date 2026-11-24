@@ -1,0 +1,70 @@
+{
+  "_key": "!items!c661dda9f2ea00c0",
+  "_id": "c661dda9f2ea00c0",
+  "name": "Tactical Guidance",
+  "type": "feat",
+  "img": "icons/sundries/flags/banner-blue.webp",
+  "system": {
+    "description": {
+      "value": "<p>As a bonus action, the creature chooses one ally within 30 feet that can see or hear it. Before the start of the creature's next turn, the ally can gain advantage on one attack roll, ability check, or saving throw of its choice.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "leadership",
+        "categoryLabel": "Leadership",
+        "categoryIcon": "icons/sundries/flags/banner-blue.webp",
+        "categoryDescription": "Support and command features; choose one.",
+        "categorySort": 7,
+        "group": "leadership-feature",
+        "groupLabel": "Leadership feature",
+        "groupHelp": "Action-economy impact is called out in Review",
+        "groupSort": 0,
+        "sort": 50,
+        "boost": {
+          "id": "leadership.tactical-guidance",
+          "name": "Tactical Guidance",
+          "label": "Tactical Guidance",
+          "summary": "Grant one ally within 30 feet advantage on its next attack, check, or save before your next turn.",
+          "description": "As a bonus action, the creature chooses one ally within 30 feet that can see or hear it. Before the start of the creature's next turn, the ally can gain advantage on one attack roll, ability check, or saving throw of its choice.",
+          "power": "strong",
+          "automation": "midi",
+          "activation": {
+            "type": "bonus"
+          },
+          "impact": {
+            "action": "Bonus action; grants advantage"
+          },
+          "groupId": "leadership-feature",
+          "categoryId": "leadership",
+          "exclusiveGroup": "leadership-feature",
+          "rank": null,
+          "requirements": [
+            "midi-qol",
+            "dae"
+          ]
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

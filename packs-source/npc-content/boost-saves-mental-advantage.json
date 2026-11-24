@@ -1,0 +1,81 @@
+{
+  "_key": "!items!046a7a8e1cac34ca",
+  "_id": "046a7a8e1cac34ca",
+  "name": "Indomitable Mind",
+  "type": "feat",
+  "img": "icons/svg/holy-shield.svg",
+  "system": {
+    "description": {
+      "value": "<p>The creature has advantage on Intelligence, Wisdom, and Charisma saving throws.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "resilience",
+        "categoryLabel": "Saving Throws",
+        "categoryIcon": "icons/svg/holy-shield.svg",
+        "categoryDescription": "Broad bonuses or focused resilience.",
+        "categorySort": 3,
+        "group": "saving-resilience",
+        "groupLabel": "Saving throw boost",
+        "groupHelp": "Choose one broad or focused defence",
+        "groupSort": 0,
+        "sort": 29,
+        "boost": {
+          "id": "saves.mental-advantage",
+          "name": "Indomitable Mind",
+          "label": "INT/WIS/CHA save advantage",
+          "summary": "The creature has advantage on Intelligence, Wisdom, and Charisma saving throws.",
+          "description": "The creature has advantage on Intelligence, Wisdom, and Charisma saving throws.",
+          "power": "major",
+          "automation": "midi",
+          "effect": [
+            {
+              "key": "flags.midi-qol.advantage.ability.save.int",
+              "value": 1
+            },
+            {
+              "key": "flags.midi-qol.advantage.ability.save.wis",
+              "value": 1
+            },
+            {
+              "key": "flags.midi-qol.advantage.ability.save.cha",
+              "value": 1
+            }
+          ],
+          "impact": {
+            "note": "Advantage on mental saves"
+          },
+          "groupId": "saving-resilience",
+          "categoryId": "resilience",
+          "exclusiveGroup": "saving-resilience",
+          "rank": null,
+          "requirements": [
+            "midi-qol",
+            "dae"
+          ]
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

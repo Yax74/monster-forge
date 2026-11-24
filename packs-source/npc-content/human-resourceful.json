@@ -3,7 +3,7 @@
   "_id": "c59a0bd8humanres",
   "name": "Resourceful",
   "type": "feat",
-  "img": "icons/svg/book.svg",
+  "img": "icons/creatures/eyes/human-single-blue.webp",
   "system": {
     "description": {
       "value": "<p>This creature gains Heroic Inspiration when it finishes a Long Rest.</p>",

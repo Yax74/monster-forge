@@ -3,7 +3,7 @@
   "_id": "1fe877bbbeastins",
   "name": "Bestial Instinct",
   "type": "feat",
-  "img": "icons/svg/book.svg",
+  "img": "icons/creatures/mammals/beast-horned-scaled-glowing-orange.webp",
   "system": {
     "description": {
       "value": "<p>Describe this creature's distinctive natural sense, movement, or hunting adaptation here.</p>",

@@ -3,7 +3,7 @@
   "_id": "421ef4fbhalfling",
   "name": "Brave",
   "type": "feat",
-  "img": "icons/svg/book.svg",
+  "img": "icons/consumables/food/bread-toast-tan.webp",
   "system": {
     "description": {
       "value": "<p>This creature has advantage on saving throws to avoid or end the Frightened condition.</p>",

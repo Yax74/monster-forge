@@ -1,0 +1,70 @@
+{
+  "_key": "!items!33ac9cdb33035645",
+  "_id": "33ac9cdb33035645",
+  "name": "Resilient II",
+  "type": "feat",
+  "img": "icons/svg/holy-shield.svg",
+  "system": {
+    "description": {
+      "value": "<p>The creature gains a +2 bonus to all saving throws.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "resilience",
+        "categoryLabel": "Saving Throws",
+        "categoryIcon": "icons/svg/holy-shield.svg",
+        "categoryDescription": "Broad bonuses or focused resilience.",
+        "categorySort": 3,
+        "group": "saving-resilience",
+        "groupLabel": "Saving throw boost",
+        "groupHelp": "Choose one broad or focused defence",
+        "groupSort": 0,
+        "sort": 26,
+        "boost": {
+          "id": "saves.all.2",
+          "name": "Resilient II",
+          "label": "+2",
+          "summary": "The creature gains a +2 bonus to all saving throws.",
+          "description": "The creature gains a +2 bonus to all saving throws.",
+          "power": "standard",
+          "automation": "core",
+          "effect": [
+            {
+              "key": "system.bonuses.abilities.save",
+              "value": 2
+            }
+          ],
+          "impact": {
+            "saves": 2
+          },
+          "groupId": "saving-resilience",
+          "categoryId": "resilience",
+          "exclusiveGroup": "saving-resilience",
+          "rank": 2,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "_key": "!items!7e96224677037548",
+  "_id": "7e96224677037548",
+  "name": "Master of Tactics",
+  "type": "feat",
+  "img": "icons/sundries/flags/banner-blue.webp",
+  "system": {
+    "description": {
+      "value": "<p>The creature can take the Help action as a bonus action. When it does so to aid an ally in attacking a creature, the target can be within 30 feet of the creature, rather than 5 feet, if the target can see or hear it.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "leadership",
+        "categoryLabel": "Leadership",
+        "categoryIcon": "icons/sundries/flags/banner-blue.webp",
+        "categoryDescription": "Support and command features; choose one.",
+        "categorySort": 7,
+        "group": "leadership-feature",
+        "groupLabel": "Leadership feature",
+        "groupHelp": "Action-economy impact is called out in Review",
+        "groupSort": 0,
+        "sort": 49,
+        "boost": {
+          "id": "leadership.master-tactics",
+          "name": "Master of Tactics",
+          "label": "Master of Tactics",
+          "summary": "Use Help as a bonus action at 30 feet.",
+          "description": "The creature can take the Help action as a bonus action. When it does so to aid an ally in attacking a creature, the target can be within 30 feet of the creature, rather than 5 feet, if the target can see or hear it.",
+          "power": "standard",
+          "automation": "activity",
+          "activation": {
+            "type": "bonus"
+          },
+          "impact": {
+            "action": "Bonus-action Help at 30 feet"
+          },
+          "groupId": "leadership-feature",
+          "categoryId": "leadership",
+          "exclusiveGroup": "leadership-feature",
+          "rank": null,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

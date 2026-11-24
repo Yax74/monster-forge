@@ -1,6 +1,6 @@
 export const MODULE_ID = "monster-forge";
 export const MODULE_TITLE = "Monster Forge";
-export const MODULE_VERSION = "1.8.0";
+export const MODULE_VERSION = "1.9.0";
 
 /**
  * Baseline statistics from the published Forge of Foes monster statistics
@@ -244,9 +244,19 @@ export const SPECIES_PROFILES = Object.freeze({
   duergar: { label: "Duergar", size: "med", speed: 30, darkvision: 120, abilities: {} },
   deepGnome: { label: "Deep Gnome", size: "sm", speed: 30, darkvision: 120, abilities: {} },
   gemling: { label: "Gemling", size: "med", speed: 30, darkvision: 0, abilities: {} },
-  beast: { label: "Beast", size: "med", speed: 30, darkvision: 0, abilities: {} },
-  undead: { label: "Undead", size: "med", speed: 30, darkvision: 0, abilities: {} },
-  construct: { label: "Construct", size: "med", speed: 30, darkvision: 0, abilities: {} }
+  aberration: { label: "Aberration", size: "med", speed: 30, darkvision: 60, abilities: { int: 1, cha: 1 } },
+  beast: { label: "Beast", size: "med", speed: 30, darkvision: 0, abilities: { dex: 2, con: 1, int: -4, wis: 1, cha: -2 } },
+  celestial: { label: "Celestial", size: "med", speed: 30, darkvision: 60, abilities: { wis: 1, cha: 1 } },
+  construct: { label: "Construct", size: "med", speed: 30, darkvision: 0, abilities: { str: 1, dex: -1, con: 2, int: -2, cha: -2 } },
+  dragon: { label: "Dragon", size: "lg", speed: 40, darkvision: 120, abilities: { str: 2, con: 1, cha: 1 } },
+  elemental: { label: "Elemental", size: "med", speed: 30, darkvision: 60, abilities: { con: 1, int: -1 } },
+  fey: { label: "Fey", size: "sm", speed: 30, darkvision: 60, abilities: { dex: 1, wis: 1, cha: 1 } },
+  fiend: { label: "Fiend", size: "med", speed: 30, darkvision: 120, abilities: { str: 1, con: 1, cha: 1 } },
+  giant: { label: "Giant", size: "lg", speed: 35, darkvision: 0, abilities: { str: 2, con: 1, dex: -1 } },
+  monstrosity: { label: "Monstrosity", size: "med", speed: 30, darkvision: 60, abilities: { str: 1, dex: 1, con: 1 } },
+  ooze: { label: "Ooze", size: "med", speed: 20, darkvision: 60, abilities: { dex: -2, int: -4, wis: -1, cha: -2 } },
+  plant: { label: "Plant", size: "med", speed: 25, darkvision: 60, abilities: { con: 1, int: -1, wis: 1 } },
+  undead: { label: "Undead", size: "med", speed: 30, darkvision: 60, abilities: { str: 1, con: 1, wis: 1, cha: 1 } }
 });
 
 let activeSpeciesProfiles = { ...SPECIES_PROFILES };
@@ -265,7 +275,7 @@ export function setSpeciesProfileItems(items = []) {
       size,
       speed: Number.isFinite(speed) && speed >= 0 && speed <= 300 ? speed : 30,
       darkvision: Number.isFinite(darkvision) && darkvision >= 0 && darkvision <= 1000 ? darkvision : 0,
-      abilities: {}
+      abilities: Object.fromEntries(Object.entries(profile.abilities ?? {}).map(([ability, value]) => [ability, Number(value) || 0]))
     };
   }
   return activeSpeciesProfiles;
@@ -280,9 +290,7 @@ export const CREATURE_TYPES = Object.freeze([
   "fiend", "giant", "humanoid", "monstrosity", "ooze", "plant", "undead"
 ]);
 
-export const CULTURE_OPTIONS = Object.freeze([
-  "Azmeri", "Ezomyte", "Kalguur", "Karui", "Maraketh", "Oriathen", "Stygian", "Vaal", "Wraeclast Native", "Other"
-]);
+
 
 export const ACTOR_SIZES = Object.freeze({
   tiny: "Tiny",
@@ -327,159 +335,46 @@ const spellAttack = (overrides = {}) => ({
 });
 
 export const WEAPONS = Object.freeze({
-  dagger: melee({
-    name: "Dagger",
-    baseDice: 1,
-    die: 4,
-    damageType: "piercing",
-    ability: "dex",
-    weaponType: "simpleM",
-    properties: ["fin", "lgt", "thr"],
-    range: { value: 20, long: 60, units: "ft" },
-    img: "icons/weapons/daggers/dagger-straight-blue.webp"
-  }),
-  shortsword: melee({
-    name: "Shortsword",
-    baseDice: 1,
-    die: 6,
-    damageType: "piercing",
-    ability: "dex",
-    weaponType: "martialM",
-    properties: ["fin", "lgt"],
-    img: "icons/weapons/swords/shortsword-guard-brown.webp"
-  }),
-  mace: melee({
-    name: "Mace",
-    baseDice: 1,
-    die: 6,
-    damageType: "bludgeoning",
-    ability: "str",
-    weaponType: "simpleM",
-    img: "icons/weapons/maces/mace-round-spiked-black.webp"
-  }),
-  longsword: melee({
-    name: "Longsword",
-    baseDice: 1,
-    die: 8,
-    damageType: "slashing",
-    ability: "str",
-    weaponType: "martialM",
-    properties: ["ver"],
-    img: "icons/weapons/swords/sword-guard-steel-green.webp"
-  }),
-  greatsword: melee({
-    name: "Greatsword",
-    baseDice: 2,
-    die: 6,
-    damageType: "slashing",
-    ability: "str",
-    weaponType: "martialM",
-    properties: ["hvy", "two"],
-    img: "icons/weapons/swords/greatsword-guard-gold-worn.webp"
-  }),
-  shortbow: ranged({
-    name: "Shortbow",
-    baseDice: 1,
-    die: 6,
-    damageType: "piercing",
-    ability: "dex",
-    weaponType: "simpleR",
-    range: { value: 80, long: 320, units: "ft" },
-    img: "icons/weapons/bows/shortbow-recurve-yellow-blue.webp"
-  }),
-  longbow: ranged({
-    name: "Longbow",
-    baseDice: 1,
-    die: 8,
-    damageType: "piercing",
-    ability: "dex",
-    weaponType: "martialR",
-    properties: ["amm", "hvy", "two"],
-    range: { value: 150, long: 600, units: "ft" },
-    img: "icons/weapons/bows/longbow-recurve-leather-red.webp"
-  }),
-  bite: melee({
-    name: "Bite",
-    baseDice: 1,
-    die: 8,
-    damageType: "piercing",
-    ability: "str",
-    img: "icons/creatures/abilities/mouth-teeth-human.webp"
-  }),
-  claw: melee({
-    name: "Claws",
-    baseDice: 1,
-    die: 6,
-    damageType: "slashing",
-    ability: "str",
-    img: "icons/creatures/claws/claw-curved-jagged-gray.webp"
-  }),
-  arcaneBolt: spellAttack({
-    name: "Arcane Bolt",
-    baseDice: 1,
-    die: 8,
-    damageType: "force",
-    ability: "int",
-    img: "icons/magic/light/projectile-beam-blue.webp"
-  }),
-  divineBolt: spellAttack({
-    name: "Divine Bolt",
-    baseDice: 1,
-    die: 8,
-    damageType: "radiant",
-    ability: "wis",
-    img: "icons/magic/holy/projectiles-blades-salvo-yellow.webp"
-  }),
-  occultBolt: spellAttack({
-    name: "Occult Bolt",
-    baseDice: 1,
-    die: 10,
-    damageType: "necrotic",
-    ability: "cha",
-    img: "icons/magic/unholy/projectile-missile-green.webp"
-  }),
-  karuiChopper: melee({
-    name: "Karui Chopper",
-    baseDice: 1,
-    die: 12,
-    damageType: "slashing",
-    ability: "str",
-    weaponType: "martialM",
-    properties: ["hvy", "two"],
-    img: "icons/weapons/axes/axe-battle-black.webp"
-  }),
-  oriathanHalberd: melee({
-    name: "Oriathan Halberd",
-    baseDice: 1,
-    die: 10,
-    damageType: "slashing",
-    ability: "str",
-    weaponType: "martialM",
-    properties: ["hvy", "rch", "two"],
-    range: { value: 10, long: null, units: "ft" },
-    img: "icons/weapons/polearms/halberd-crescent-glowing.webp"
-  }),
-  ezomyteHammer: melee({
-    name: "Ezomyte Warhammer",
-    baseDice: 2,
-    die: 8,
-    damageType: "bludgeoning",
-    ability: "str",
-    weaponType: "martialM",
-    properties: ["hvy", "two"],
-    img: "icons/weapons/hammers/hammer-double-glowing-yellow.webp"
-  }),
-  marakethBow: ranged({
-    name: "Maraketh Bow",
-    baseDice: 1,
-    die: 8,
-    damageType: "piercing",
-    ability: "dex",
-    weaponType: "martialR",
-    properties: ["amm", "hvy", "two"],
-    range: { value: 150, long: 600, units: "ft" },
-    img: "icons/weapons/bows/longbow-gold-pink.webp"
-  })
+  club: melee({ name: "Club", baseDice: 1, die: 4, damageType: "bludgeoning", ability: "str", weaponType: "simpleM", img: "icons/weapons/clubs/bat-baseball-wood.webp" }),
+  dagger: melee({ name: "Dagger", baseDice: 1, die: 4, damageType: "piercing", ability: "dex", weaponType: "simpleM", properties: ["fin", "lgt", "thr"], range: { value: 20, long: 60, units: "ft" }, img: "icons/weapons/daggers/dagger-straight-blue.webp" }),
+  greatclub: melee({ name: "Greatclub", baseDice: 1, die: 8, damageType: "bludgeoning", ability: "str", weaponType: "simpleM", properties: ["two"], img: "icons/weapons/clubs/club-spiked-glowing.webp" }),
+  handaxe: melee({ name: "Handaxe", baseDice: 1, die: 6, damageType: "slashing", ability: "str", weaponType: "simpleM", properties: ["lgt", "thr"], range: { value: 20, long: 60, units: "ft" }, img: "icons/weapons/axes/axe-battle-simple.webp" }),
+  javelin: melee({ name: "Javelin", baseDice: 1, die: 6, damageType: "piercing", ability: "str", weaponType: "simpleM", properties: ["thr"], range: { value: 30, long: 120, units: "ft" }, img: "icons/weapons/polearms/javelin-simple.webp" }),
+  lightHammer: melee({ name: "Light Hammer", baseDice: 1, die: 4, damageType: "bludgeoning", ability: "str", weaponType: "simpleM", properties: ["lgt", "thr"], range: { value: 20, long: 60, units: "ft" }, img: "icons/weapons/hammers/hammer-mallet-wood.webp" }),
+  mace: melee({ name: "Mace", baseDice: 1, die: 6, damageType: "bludgeoning", ability: "str", weaponType: "simpleM", img: "icons/weapons/maces/mace-round-spiked-black.webp" }),
+  quarterstaff: melee({ name: "Quarterstaff", baseDice: 1, die: 6, damageType: "bludgeoning", ability: "str", weaponType: "simpleM", properties: ["ver"], img: "icons/weapons/staves/staff-simple-brown.webp" }),
+  sickle: melee({ name: "Sickle", baseDice: 1, die: 4, damageType: "slashing", ability: "str", weaponType: "simpleM", properties: ["lgt"], img: "icons/weapons/sickles/sickle-curved.webp" }),
+  spear: melee({ name: "Spear", baseDice: 1, die: 6, damageType: "piercing", ability: "str", weaponType: "simpleM", properties: ["thr", "ver"], range: { value: 20, long: 60, units: "ft" }, img: "icons/weapons/polearms/spear-simple-hooked.webp" }),
+  dart: ranged({ name: "Dart", baseDice: 1, die: 4, damageType: "piercing", ability: "dex", weaponType: "simpleR", properties: ["fin", "thr"], range: { value: 20, long: 60, units: "ft" }, img: "icons/weapons/thrown/dart-feathered.webp" }),
+  lightCrossbow: ranged({ name: "Light Crossbow", baseDice: 1, die: 8, damageType: "piercing", ability: "dex", weaponType: "simpleR", properties: ["amm", "lod", "two"], range: { value: 80, long: 320, units: "ft" }, img: "icons/weapons/crossbows/crossbow-simple-brown.webp" }),
+  shortbow: ranged({ name: "Shortbow", baseDice: 1, die: 6, damageType: "piercing", ability: "dex", weaponType: "simpleR", properties: ["amm", "two"], range: { value: 80, long: 320, units: "ft" }, img: "icons/weapons/bows/shortbow-recurve-yellow-blue.webp" }),
+  sling: ranged({ name: "Sling", baseDice: 1, die: 4, damageType: "bludgeoning", ability: "dex", weaponType: "simpleR", properties: ["amm"], range: { value: 30, long: 120, units: "ft" }, img: "icons/weapons/slings/sling-leather.webp" }),
+  battleaxe: melee({ name: "Battleaxe", baseDice: 1, die: 8, damageType: "slashing", ability: "str", weaponType: "martialM", properties: ["ver"], img: "icons/weapons/axes/axe-battle-black.webp" }),
+  flail: melee({ name: "Flail", baseDice: 1, die: 8, damageType: "bludgeoning", ability: "str", weaponType: "martialM", img: "icons/weapons/maces/flail-ball-grey.webp" }),
+  glaive: melee({ name: "Glaive", baseDice: 1, die: 10, damageType: "slashing", ability: "str", weaponType: "martialM", properties: ["hvy", "rch", "two"], range: { value: 10, long: null, units: "ft" }, img: "icons/weapons/polearms/glaive-simple.webp" }),
+  greataxe: melee({ name: "Greataxe", baseDice: 1, die: 12, damageType: "slashing", ability: "str", weaponType: "martialM", properties: ["hvy", "two"], img: "icons/weapons/axes/axe-battle-heavy-black.webp" }),
+  greatsword: melee({ name: "Greatsword", baseDice: 2, die: 6, damageType: "slashing", ability: "str", weaponType: "martialM", properties: ["hvy", "two"], img: "icons/weapons/swords/greatsword-guard-gold-worn.webp" }),
+  halberd: melee({ name: "Halberd", baseDice: 1, die: 10, damageType: "slashing", ability: "str", weaponType: "martialM", properties: ["hvy", "rch", "two"], range: { value: 10, long: null, units: "ft" }, img: "icons/weapons/polearms/halberd-crescent-glowing.webp" }),
+  lance: melee({ name: "Lance", baseDice: 1, die: 10, damageType: "piercing", ability: "str", weaponType: "martialM", properties: ["rch"], range: { value: 10, long: null, units: "ft" }, img: "icons/weapons/polearms/spear-pike-steel.webp" }),
+  longsword: melee({ name: "Longsword", baseDice: 1, die: 8, damageType: "slashing", ability: "str", weaponType: "martialM", properties: ["ver"], img: "icons/weapons/swords/sword-guard-steel-green.webp" }),
+  maul: melee({ name: "Maul", baseDice: 2, die: 6, damageType: "bludgeoning", ability: "str", weaponType: "martialM", properties: ["hvy", "two"], img: "icons/weapons/hammers/hammer-double-stone.webp" }),
+  morningstar: melee({ name: "Morningstar", baseDice: 1, die: 8, damageType: "piercing", ability: "str", weaponType: "martialM", img: "icons/weapons/maces/flail-morning-star.webp" }),
+  pike: melee({ name: "Pike", baseDice: 1, die: 10, damageType: "piercing", ability: "str", weaponType: "martialM", properties: ["hvy", "rch", "two"], range: { value: 10, long: null, units: "ft" }, img: "icons/weapons/polearms/spear-pike-steel.webp" }),
+  rapier: melee({ name: "Rapier", baseDice: 1, die: 8, damageType: "piercing", ability: "dex", weaponType: "martialM", properties: ["fin"], img: "icons/weapons/swords/sword-simple-white.webp" }),
+  scimitar: melee({ name: "Scimitar", baseDice: 1, die: 6, damageType: "slashing", ability: "dex", weaponType: "martialM", properties: ["fin", "lgt"], img: "icons/weapons/swords/scimitar-guard.webp" }),
+  shortsword: melee({ name: "Shortsword", baseDice: 1, die: 6, damageType: "piercing", ability: "dex", weaponType: "martialM", properties: ["fin", "lgt"], img: "icons/weapons/swords/shortsword-guard-brown.webp" }),
+  trident: melee({ name: "Trident", baseDice: 1, die: 8, damageType: "piercing", ability: "str", weaponType: "martialM", properties: ["thr", "ver"], range: { value: 20, long: 60, units: "ft" }, img: "icons/weapons/polearms/trident-curved-steel.webp" }),
+  warPick: melee({ name: "War Pick", baseDice: 1, die: 8, damageType: "piercing", ability: "str", weaponType: "martialM", img: "icons/weapons/axes/axe-pick-white.webp" }),
+  warhammer: melee({ name: "Warhammer", baseDice: 1, die: 8, damageType: "bludgeoning", ability: "str", weaponType: "martialM", properties: ["ver"], img: "icons/weapons/hammers/hammer-double-stone.webp" }),
+  whip: melee({ name: "Whip", baseDice: 1, die: 4, damageType: "slashing", ability: "dex", weaponType: "martialM", properties: ["fin", "rch"], range: { value: 10, long: null, units: "ft" }, img: "icons/weapons/misc/whip-leather.webp" }),
+  handCrossbow: ranged({ name: "Hand Crossbow", baseDice: 1, die: 6, damageType: "piercing", ability: "dex", weaponType: "martialR", properties: ["amm", "lgt", "lod"], range: { value: 30, long: 120, units: "ft" }, img: "icons/weapons/crossbows/handcrossbow-black.webp" }),
+  heavyCrossbow: ranged({ name: "Heavy Crossbow", baseDice: 1, die: 10, damageType: "piercing", ability: "dex", weaponType: "martialR", properties: ["amm", "hvy", "lod", "two"], range: { value: 100, long: 400, units: "ft" }, img: "icons/weapons/crossbows/crossbow-heavy-black.webp" }),
+  longbow: ranged({ name: "Longbow", baseDice: 1, die: 8, damageType: "piercing", ability: "dex", weaponType: "martialR", properties: ["amm", "hvy", "two"], range: { value: 150, long: 600, units: "ft" }, img: "icons/weapons/bows/longbow-recurve-leather-red.webp" }),
+  bite: melee({ name: "Bite", baseDice: 1, die: 8, damageType: "piercing", ability: "str", img: "icons/creatures/abilities/mouth-teeth-human.webp" }),
+  claw: melee({ name: "Claws", baseDice: 1, die: 6, damageType: "slashing", ability: "str", img: "icons/creatures/claws/claw-curved-jagged-gray.webp" }),
+  arcaneBolt: spellAttack({ name: "Arcane Bolt", baseDice: 1, die: 8, damageType: "force", ability: "int", img: "icons/skills/ranged/energy-weapon-fire-beam-blue.webp" }),
+  divineBolt: spellAttack({ name: "Divine Bolt", baseDice: 1, die: 8, damageType: "radiant", ability: "wis", img: "icons/magic/holy/projectiles-blades-salvo-yellow.webp" }),
+  occultBolt: spellAttack({ name: "Occult Bolt", baseDice: 1, die: 10, damageType: "necrotic", ability: "cha", img: "icons/magic/unholy/projectile-missile-green.webp" })
 });
 
 export const DEFAULTS = Object.freeze({
@@ -528,7 +423,7 @@ export const DEFAULTS = Object.freeze({
   reserveExistingDpr: false,
   existingDpr: "",
   followCrAttacks: true,
-  accuracyMode: "actor",
+  accuracyMode: "cr",
   saveDcMode: "cr",
   riderAutomation: "midi",
   applyMode: "replace",

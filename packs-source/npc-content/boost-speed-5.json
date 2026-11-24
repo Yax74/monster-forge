@@ -1,0 +1,70 @@
+{
+  "_key": "!items!bb685065a1ef80f3",
+  "_id": "bb685065a1ef80f3",
+  "name": "Swift I",
+  "type": "feat",
+  "img": "icons/svg/wingfoot.svg",
+  "system": {
+    "description": {
+      "value": "<p>The creature's walking speed increases by 5 feet.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster",
+      "subtype": ""
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "boost",
+        "category": "movement",
+        "categoryLabel": "Movement",
+        "categoryIcon": "icons/svg/wingfoot.svg",
+        "categoryDescription": "Raw speed and one signature mobility feature.",
+        "categorySort": 1,
+        "group": "movement-speed",
+        "groupLabel": "Speed bonus",
+        "groupHelp": "Applies to walking speed without granting new movement types",
+        "groupSort": 0,
+        "sort": 6,
+        "boost": {
+          "id": "speed.5",
+          "name": "Swift I",
+          "label": "+5",
+          "summary": "The creature's walking speed increases by 5 feet.",
+          "description": "The creature's walking speed increases by 5 feet.",
+          "power": "light",
+          "automation": "core",
+          "effect": [
+            {
+              "key": "system.attributes.movement.walk",
+              "value": 5
+            }
+          ],
+          "impact": {
+            "speed": 5
+          },
+          "groupId": "movement-speed",
+          "categoryId": "movement",
+          "exclusiveGroup": "movement-speed",
+          "rank": 1,
+          "requirements": []
+        },
+        "template": false,
+        "version": 2
+      }
+    }
+  }
+}

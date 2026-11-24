@@ -1,0 +1,48 @@
+{
+  "_key": "!items!a6c39c11speciesp",
+  "_id": "a6c39c11speciesp",
+  "name": "Plant Species Profile",
+  "type": "feat",
+  "img": "icons/svg/d20.svg",
+  "system": {
+    "description": {
+      "value": "<p>Starting profile: med; walk 25 ft; darkvision 60 ft. Suggested ability adjustments are editable Monster Forge heuristics, not 2024 ancestry ability score rules. Traits are separate NPC Items.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster"
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "species-profile",
+        "speciesKey": "plant",
+        "profile": {
+          "label": "Plant",
+          "size": "med",
+          "speed": 25,
+          "darkvision": 60,
+          "abilities": {
+            "con": 1,
+            "int": -1,
+            "wis": 1
+          }
+        },
+        "template": false,
+        "version": 1
+      }
+    }
+  }
+}

@@ -229,13 +229,36 @@
 }
 
 .monster-forge .mf-content-list {
-  display: grid;
-  gap: 0.4rem;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  display: block;
   margin-top: 0.5rem;
   max-height: 28rem;
   overflow: auto;
   padding: 0.15rem;
+}
+
+.monster-forge .mf-content-group {
+  border: 1px solid var(--color-border-light-tertiary, #999);
+  border-radius: 0.35rem;
+  margin-bottom: 0.45rem;
+  padding: 0.35rem;
+}
+
+.monster-forge .mf-content-group > summary {
+  cursor: pointer;
+  font-weight: 700;
+  padding: 0.25rem;
+}
+
+.monster-forge .mf-content-group > summary small {
+  font-weight: 400;
+  opacity: 0.75;
+}
+
+.monster-forge .mf-content-group-items {
+  display: grid;
+  gap: 0.4rem;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  padding-top: 0.35rem;
 }
 
 .monster-forge .mf-content-card {
