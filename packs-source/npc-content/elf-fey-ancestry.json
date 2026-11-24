@@ -6,7 +6,7 @@
   "img": "icons/svg/book.svg",
   "system": {
     "description": {
-      "value": "<p>This creature has advantage on saving throws to avoid or end the Charmed condition, and magic cannot put it to sleep.</p>",
+      "value": "<p>This creature has advantage on saving throws to avoid or end the Charmed condition.</p>",
       "chat": "",
       "unidentified": ""
     },

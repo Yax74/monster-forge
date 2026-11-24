@@ -6,7 +6,7 @@
   "img": "icons/svg/book.svg",
   "system": {
     "description": {
-      "value": "<p>This creature enters a meditative state instead of sleeping and can complete its rest in less time than most creatures.</p>",
+      "value": "<p>This creature doesn't need to sleep, and magic can't put it to sleep. It can finish a Long Rest in four hours of trancelike meditation.</p>",
       "chat": "",
       "unidentified": ""
     },

@@ -6,7 +6,7 @@
   "img": "icons/svg/book.svg",
   "system": {
     "description": {
-      "value": "<p>This duergar has resistance to poison damage and advantage on saving throws against the Charmed or Stunned conditions.</p>",
+      "value": "<p>This duergar retains its dwarf parent species traits. Add any Stygian-specific resistance or resilience here; no additional condition immunities are assumed.</p>",
       "chat": "",
       "unidentified": ""
     },

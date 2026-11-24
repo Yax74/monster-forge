@@ -6,7 +6,7 @@
   "img": "icons/svg/book.svg",
   "system": {
     "description": {
-      "value": "<p>As an action, this creature exhales destructive energy. Add the damage type, area, damage, and saving throw appropriate to its draconic ancestry and challenge rating.</p>",
+      "value": "<p>When this creature takes the Attack action, it can replace one of its attacks with a breath weapon. Set its damage type, area, damage, and saving throw for this NPC's challenge rating.</p>",
       "chat": "",
       "unidentified": ""
     },

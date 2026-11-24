@@ -6,7 +6,7 @@
   "img": "icons/svg/book.svg",
   "system": {
     "description": {
-      "value": "<p>This creature has advantage on Intelligence, Wisdom, and Charisma saving throws against magic.</p>",
+      "value": "<p>This creature has advantage on Intelligence, Wisdom, and Charisma saving throws.</p>",
       "chat": "",
       "unidentified": ""
     },
