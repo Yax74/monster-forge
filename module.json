@@ -1,7 +1,7 @@
 {
   "id": "monster-forge",
   "title": "Monster Forge",
-  "description": "A reversible D&D5e NPC forge with from-scratch NPC creation, reusable actions and traits, species features, and Forge of Foes foundations.",
+  "description": "A reversible D&D5e NPC forge with from-scratch NPC creation, a reusable feature library, linked compendiums, and Forge of Foes foundations.",
   "version": "1.9.0",
   "url": "https://github.com/Yax74/monster-forge",
   "manifest": "https://github.com/Yax74/monster-forge/releases/latest/download/module.json",
