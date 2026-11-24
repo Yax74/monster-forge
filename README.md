@@ -23,14 +23,18 @@ D&D5e 6.x itself requires Foundry V14. Monster Forge uses the attack/save activi
 
 ## Use
 
-1. Select exactly one NPC token, or open an NPC actor sheet.
-2. Click the hammer in Token Controls, use the NPC sheet header control, or press **Alt+M**.
-3. Work through the **Build**, **Foundation**, **Boosts**, and **Attacks** tabs, then check the exact enabled-section summary on **Review**.
+1. Select exactly one NPC token, or open an NPC actor sheet. To make a creature from scratch, use the **Create NPC from scratch** token control or `game.monsterForge.createNpc()`.
+2. For an existing NPC, click the hammer in Token Controls, use the NPC sheet header control, or press **Alt+M**.
+3. Work through the **Build**, **Foundation**, **Boosts**, **Attacks**, and **NPC features** tabs, then check the exact enabled-section summary on **Review**.
 4. Clear a tab's apply checkbox to leave that part of the actor untouched. Choices are retained for the next use; Build choices remain available as planning inputs even when CR writing is off.
 5. Choose CR, combat role, creature tier, and species. Spell-led roles also expose an Intelligence, Wisdom, or Charisma selector. Choose **Preview only** if no build or foundation actor fields should be written.
 6. Review the live suggested/final ability scores and enter only the overrides you want to lock. Role and build changes recalculate every blank score immediately.
 7. Optionally choose categorized built-in boosts. Search or filter them, apply role/tier suggestions, and give any selected boost a custom actor-item name. Then choose a single, combined (**and**), or alternative (**or**) attack routine and any tertiary feature.
 8. Click **Apply build & foundation** for actor fields only, or **Forge NPC** to apply exactly the enabled sections. **Undo last** restores only the actor fields and generated item groups changed by that operation.
+
+The new NPC workflow collects name, creature type, species/lineage, culture, and an optional image path before creating an actor. It can add the selected species' NPC trait Items; that toggle is enabled by default and may be switched off. Culture provides a starting species mapping (Azmeri/Human, Ezomyte/Dwarf, Kalguur/Elf, Karui/Orc, Maraketh/Halfling, Oriathen/Human, Vaal/Gnome); Stygian defaults to Drow and supports Drow, Duergar, or Deep Gnome. The mapping is only a starting choice and can be changed. The 2024 creature types are selectable independently of species. Orc is the canonical profile; legacy Half-Orc data maps to Orc.
+
+The **NPC features** tab selects reusable NPC-only actions and traits as Items. The bundled **Monster Forge NPC Content** Item compendium includes blank Action, Trait, Species Feature, and Species Profile templates, plus starter species traits and profiles. In **Configure Settings → Monster Forge**, enter comma-separated Item compendium collection IDs to link user packs. Tag an Item with `flags.monster-forge.library`, using `kind` set to `action`, `trait`, or `species-trait`; species traits also need a `species` array, such as `["orc"]`. Species Profile Items use `kind: "species-profile"`, a unique `speciesKey`, and `profile` data with `label`, `size`, `speed`, and `darkvision`. Linked profile Items extend or override the built-in selector and body defaults. When copying a blank template into a user pack, set `library.template` to `false` and fill in its kind metadata. Selected feature Items are copied to the NPC with activities, effects, and their source UUID preserved for undo/replace tracking. The module pack is read-only; copy templates or entries into a world compendium before editing them so updates do not overwrite GM work.
 
 The dialog can save named client-side build profiles for reuse on another NPC. **Quick build view** hides the Foundation and Boosts tabs; it does not change their apply checkboxes, which remain visible in the Review summary. Custom attacks expose editable reach or normal/long range. When an actor has existing offensive items, **Reserve existing item damage** estimates one use of each item per round and subtracts that amount from the generated attack budget; adjust the estimate for Multiattack, recharge, or limited-use features.
 

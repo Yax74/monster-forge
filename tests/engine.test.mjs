@@ -442,7 +442,7 @@ test("normalizes stale or invalid saved form values", () => {
   assert.equal(config.foundation.role, "balanced");
   assert.equal(config.foundation.manage.hp, true);
   assert.equal(config.foundation.overrides.abilities.str, "");
-  assert.deepEqual(config.sections, { build: true, foundation: true, boosts: true, attacks: true });
+  assert.deepEqual(config.sections, { build: true, foundation: true, boosts: true, attacks: true, content: true });
   assert.equal(config.secondaryMode, "combined");
   assert.equal(config.splitPrimary, 95);
   assert.equal(config.primary.count, 20);
@@ -462,7 +462,7 @@ test("preserves independently disabled section defaults", () => {
     sections: { foundation: false, attacks: false },
     secondaryMode: "alternative"
   });
-  assert.deepEqual(config.sections, { build: true, foundation: false, boosts: true, attacks: false });
+  assert.deepEqual(config.sections, { build: true, foundation: false, boosts: true, attacks: false, content: true });
   assert.equal(config.secondaryMode, "alternative");
 });
 

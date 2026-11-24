@@ -1,6 +1,6 @@
 export const MODULE_ID = "monster-forge";
 export const MODULE_TITLE = "Monster Forge";
-export const MODULE_VERSION = "1.7.0";
+export const MODULE_VERSION = "1.8.0";
 
 /**
  * Baseline statistics from the published Forge of Foes monster statistics
@@ -225,26 +225,64 @@ export const CREATURE_TIERS = Object.freeze({
 });
 
 /**
- * Species names mirror the campaign NPC generator. These presets recommend
- * body data and small 2014-style ability tendencies; they never imply culture
- * or faction membership.
+ * Shipped body presets for 2024 creature building. Rules traits are separate
+ * compendium Items, and these presets never imply culture or faction.
  */
 export const SPECIES_PROFILES = Object.freeze({
   preserve: { label: "Preserve actor", size: null, speed: null, darkvision: null, abilities: {} },
-  human: { label: "Human", size: "med", speed: 30, darkvision: 0, abilities: { str: 1, dex: 1, con: 1, int: 1, wis: 1, cha: 1 } },
-  halfElf: { label: "Half-Elf", size: "med", speed: 30, darkvision: 60, abilities: { dex: 1, wis: 1, cha: 2 } },
-  dwarf: { label: "Dwarf", size: "med", speed: 25, darkvision: 60, abilities: { con: 2 } },
-  halfling: { label: "Halfling", size: "sm", speed: 25, darkvision: 0, abilities: { dex: 2 } },
-  gnome: { label: "Gnome", size: "sm", speed: 25, darkvision: 60, abilities: { int: 2 } },
-  elf: { label: "Elf", size: "med", speed: 30, darkvision: 60, abilities: { dex: 2 } },
-  tiefling: { label: "Tiefling", size: "med", speed: 30, darkvision: 60, abilities: { int: 1, cha: 2 } },
-  halfOrc: { label: "Half-Orc", size: "med", speed: 30, darkvision: 60, abilities: { str: 2, con: 1 } },
-  orc: { label: "Orc", size: "med", speed: 30, darkvision: 60, abilities: { str: 2, con: 1 } },
-  goliath: { label: "Goliath", size: "med", speed: 30, darkvision: 0, abilities: { str: 2, con: 1 } },
-  drow: { label: "Drow", size: "med", speed: 30, darkvision: 120, abilities: { dex: 2, cha: 1 } },
-  duergar: { label: "Duergar", size: "med", speed: 25, darkvision: 120, abilities: { con: 2, str: 1 } },
-  deepGnome: { label: "Deep Gnome", size: "sm", speed: 25, darkvision: 120, abilities: { int: 2, dex: 1 } }
+  human: { label: "Human", size: "med", speed: 30, darkvision: 0, abilities: {} },
+  dwarf: { label: "Dwarf", size: "med", speed: 30, darkvision: 120, abilities: {} },
+  halfling: { label: "Halfling", size: "sm", speed: 30, darkvision: 0, abilities: {} },
+  gnome: { label: "Gnome", size: "sm", speed: 30, darkvision: 60, abilities: {} },
+  elf: { label: "Elf", size: "med", speed: 30, darkvision: 60, abilities: {} },
+  tiefling: { label: "Tiefling", size: "med", speed: 30, darkvision: 60, abilities: {} },
+  aasimar: { label: "Aasimar", size: "med", speed: 30, darkvision: 60, abilities: {} },
+  orc: { label: "Orc", size: "med", speed: 30, darkvision: 120, abilities: {} },
+  goliath: { label: "Goliath", size: "med", speed: 35, darkvision: 0, abilities: {} },
+  dragonborn: { label: "Dragonborn", size: "med", speed: 30, darkvision: 60, abilities: {} },
+  drow: { label: "Drow", size: "med", speed: 30, darkvision: 120, abilities: {} },
+  duergar: { label: "Duergar", size: "med", speed: 30, darkvision: 120, abilities: {} },
+  deepGnome: { label: "Deep Gnome", size: "sm", speed: 30, darkvision: 120, abilities: {} },
+  gemling: { label: "Gemling", size: "med", speed: 30, darkvision: 0, abilities: {} },
+  beast: { label: "Beast", size: "med", speed: 30, darkvision: 0, abilities: {} },
+  undead: { label: "Undead", size: "med", speed: 30, darkvision: 0, abilities: {} },
+  construct: { label: "Construct", size: "med", speed: 30, darkvision: 0, abilities: {} }
 });
+
+let activeSpeciesProfiles = { ...SPECIES_PROFILES };
+
+export function setSpeciesProfileItems(items = []) {
+  activeSpeciesProfiles = { ...SPECIES_PROFILES };
+  for (const item of items) {
+    const profile = item.getFlag?.(MODULE_ID, "library")?.profile;
+    const key = item.getFlag?.(MODULE_ID, "library")?.speciesKey;
+    if (!key || !profile?.label) continue;
+    const size = ["tiny", "sm", "med", "lg", "huge", "grg"].includes(profile.size) ? profile.size : "med";
+    const speed = Number(profile.speed);
+    const darkvision = Number(profile.darkvision);
+    activeSpeciesProfiles[key] = {
+      label: String(profile.label),
+      size,
+      speed: Number.isFinite(speed) && speed >= 0 && speed <= 300 ? speed : 30,
+      darkvision: Number.isFinite(darkvision) && darkvision >= 0 && darkvision <= 1000 ? darkvision : 0,
+      abilities: {}
+    };
+  }
+  return activeSpeciesProfiles;
+}
+
+export function getSpeciesProfiles() {
+  return activeSpeciesProfiles;
+}
+
+export const CREATURE_TYPES = Object.freeze([
+  "aberration", "beast", "celestial", "construct", "dragon", "elemental", "fey",
+  "fiend", "giant", "humanoid", "monstrosity", "ooze", "plant", "undead"
+]);
+
+export const CULTURE_OPTIONS = Object.freeze([
+  "Azmeri", "Ezomyte", "Kalguur", "Karui", "Maraketh", "Oriathen", "Stygian", "Vaal", "Wraeclast Native", "Other"
+]);
 
 export const ACTOR_SIZES = Object.freeze({
   tiny: "Tiny",
@@ -450,7 +488,8 @@ export const DEFAULTS = Object.freeze({
     build: true,
     foundation: true,
     boosts: true,
-    attacks: true
+    attacks: true,
+    content: true
   },
   foundation: {
     mode: "apply",

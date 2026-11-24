@@ -15,6 +15,21 @@
     </div>
   </header>
 
+  {{#if isNewNpc}}
+  <section class="mf-new-npc-card" aria-label="New NPC identity">
+    <h3>New creature identity</h3>
+    <div class="mf-grid mf-grid-3">
+      <label>Name <input type="text" name="newNpc.name" maxlength="100" value="New Creature" required autofocus></label>
+      <label>Creature type <select name="newNpc.creatureType">{{#each creatureTypeOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+      <label>Species / lineage <select name="newNpc.species">{{#each newSpeciesOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+      <label>Culture <select name="newNpc.culture">{{#each cultureOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select><small>Applies the campaign mapping as a starting choice; Stygian supports drow, duergar, or deep gnome.</small></label>
+      <label class="mf-new-npc-image">Portrait / token image path <input type="text" name="newNpc.img" placeholder="icons/svg/mystery-man.svg"></label>
+      <label class="mf-switch"><input type="checkbox" name="newNpc.addSpeciesTraits" checked> Add species traits</label>
+    </div>
+    <p class="mf-help">Species is a mechanical lineage; culture is stored separately as campaign metadata. Species traits are added as NPC items when available in the Monster Forge content library.</p>
+  </section>
+  {{/if}}
+
   <div class="mf-profile-toolbar">
     <label>Build profile
       <select data-profile-select>{{#each profileOptions}}<option value="{{value}}">{{label}}</option>{{/each}}</select>
@@ -51,6 +66,9 @@
     <button type="button" role="tab" class="mf-tab" id="mf-tab-attacks" aria-controls="mf-panel-attacks" aria-selected="false" tabindex="-1" data-tab-target="attacks">
       <i class="fa-solid fa-swords"></i><span>Attacks</span><small data-tab-status="attacks">{{#if config.sections.attacks}}On{{else}}Off{{/if}}</small>
     </button>
+    <button type="button" role="tab" class="mf-tab" id="mf-tab-features" aria-controls="mf-panel-features" aria-selected="false" tabindex="-1" data-tab-target="features">
+      <i class="fa-solid fa-book-open"></i><span>NPC features</span><small data-tab-status="content">{{#if config.sections.content}}On{{else}}Off{{/if}}</small>
+    </button>
     <button type="button" role="tab" class="mf-tab" id="mf-tab-review" aria-controls="mf-panel-review" aria-selected="false" tabindex="-1" data-tab-target="review">
       <i class="fa-solid fa-clipboard-check"></i><span>Review</span>
     </button>
@@ -61,6 +79,11 @@
       <div class="mf-section-heading">
         <div><span class="mf-step">1</span><h3>Build</h3></div>
         <label class="mf-section-toggle"><input type="checkbox" name="sections.build" {{#if config.sections.build}}checked{{/if}}> Write selected CR</label>
+      </div>
+      <div class="mf-quick-section-controls" data-quick-section-controls hidden aria-label="Quick build section controls">
+        <strong>Quick build: included sections</strong>
+        <label><input type="checkbox" data-quick-section="foundation" {{#if config.sections.foundation}}checked{{/if}}> Foundation</label>
+        <label><input type="checkbox" data-quick-section="boosts" {{#if config.sections.boosts}}checked{{/if}}> Boosts</label>
       </div>
       <div data-section-body="build" data-planning-body>
         <div class="mf-grid mf-grid-4">
@@ -329,6 +352,30 @@
       </div>
     </section>
 
+    <section class="mf-section mf-tab-panel" id="mf-panel-features" role="tabpanel" aria-labelledby="mf-tab-features" data-tab-panel="features" data-section-panel="content" hidden>
+      <div class="mf-section-heading">
+        <div><span class="mf-step">5</span><h3>NPC actions &amp; traits</h3></div>
+        <label class="mf-section-toggle"><input type="checkbox" name="sections.content" {{#if config.sections.content}}checked{{/if}}> Apply selected Items</label>
+      </div>
+      <div data-section-body="content">
+      <p class="mf-callout" data-auto-trait-summary hidden></p>
+      <p class="mf-help">Choose reusable NPC-only Items from the bundled library or linked Item compendiums. Add or edit entries in your own compendium; set the Monster Forge Item flag <code>library.kind</code> to <code>action</code>, <code>trait</code>, or <code>species-trait</code> to make them available here.</p>
+      <label>Filter content <input type="search" data-content-search placeholder="Search names, species, or category"></label>
+      <div class="mf-content-list">
+        {{#each contentLibrary}}
+        <label class="mf-content-card" data-content-entry data-kind="{{kindKey}}" data-species="{{species}}" data-search="{{name}} {{kind}} {{species}} {{category}}">
+          <input type="checkbox" name="content.items" value="{{uuid}}">
+          <img src="{{img}}" alt="">
+          <span><strong>{{name}}</strong><small>{{kind}} · {{species}} · {{category}}</small></span>
+        </label>
+        {{else}}
+        <p class="mf-help">No tagged NPC actions or traits were found. Configure Item compendium collection IDs in Monster Forge settings or add entries to the bundled pack.</p>
+        {{/each}}
+      </div>
+      <p class="mf-help">Selected Items are copied onto the NPC and included in Monster Forge undo and replace behavior. Their activities and effects travel with the Item; automation depends on their D&amp;D5e and Midi-QOL data. Review offensive content separately: imported damage is not included in Monster Forge's generated DPR budget.</p>
+      </div>
+    </section>
+
     <section class="mf-preview mf-tab-panel" id="mf-panel-review" role="tabpanel" aria-labelledby="mf-tab-review" data-tab-panel="review" hidden>
       <div class="mf-section-heading"><div><span class="mf-step"><i class="fa-solid fa-chart-line"></i></span><h3>Review &amp; sanity check</h3></div></div>
       <div class="mf-review-sections">
@@ -336,6 +383,7 @@
         <div><strong>Foundation</strong><span data-preview="section-foundation">—</span></div>
         <div><strong>Boosts</strong><span data-preview="section-boosts">—</span></div>
         <div><strong>Attacks</strong><span data-preview="section-attacks">—</span></div>
+        <div><strong>NPC content</strong><span data-preview="section-content">—</span></div>
       </div>
       <div class="mf-metrics">
         <div><span>FoF baseline</span><strong data-preview="baseline">—</strong></div>

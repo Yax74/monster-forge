@@ -1,0 +1,43 @@
+{
+  "_key": "!items!154214c8speciesp",
+  "_id": "154214c8speciesp",
+  "name": "Tiefling Species Profile",
+  "type": "feat",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "description": {
+      "value": "<p>Species preset: med; walk 30 ft; darkvision 60 ft. Ability scores remain unchanged under 2024 rules. GM-editable body defaults; traits are separate Items.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster"
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "species-profile",
+        "speciesKey": "tiefling",
+        "profile": {
+          "label": "Tiefling",
+          "size": "med",
+          "speed": 30,
+          "darkvision": 60
+        },
+        "template": false,
+        "version": 1
+      }
+    }
+  }
+}

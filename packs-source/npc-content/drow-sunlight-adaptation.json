@@ -1,0 +1,40 @@
+{
+  "_key": "!items!b32ab6e8drowsunl",
+  "_id": "b32ab6e8drowsunl",
+  "name": "Underdark Adaptation",
+  "type": "feat",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "description": {
+      "value": "<p>This drow has keen darkvision and magic associated with its elven lineage. Add only the spells or senses that fit this NPC.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster"
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "species-trait",
+        "species": [
+          "drow"
+        ],
+        "category": "species",
+        "template": false,
+        "version": 1
+      }
+    }
+  }
+}

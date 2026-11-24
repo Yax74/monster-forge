@@ -1,0 +1,40 @@
+{
+  "_key": "!items!a154c0d7dwarfres",
+  "_id": "a154c0d7dwarfres",
+  "name": "Dwarven Resilience",
+  "type": "feat",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "description": {
+      "value": "<p>This creature has resistance to poison damage and advantage on saving throws to avoid or end the Poisoned condition.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster"
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "species-trait",
+        "species": [
+          "dwarf"
+        ],
+        "category": "species",
+        "template": false,
+        "version": 1
+      }
+    }
+  }
+}

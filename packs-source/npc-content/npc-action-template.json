@@ -1,0 +1,38 @@
+{
+  "_key": "!items!11c8723anpcactio",
+  "_id": "11c8723anpcactio",
+  "name": "Blank NPC Action",
+  "type": "feat",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "description": {
+      "value": "<p>Add the NPC action rules text and D&D5e activity data. This template is not intended to be added directly to a creature.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster"
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "action",
+        "species": [],
+        "category": "action",
+        "template": true,
+        "version": 1
+      }
+    }
+  }
+}

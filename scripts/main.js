@@ -1,6 +1,6 @@
 import { MODULE_ID, MODULE_TITLE } from "./constants.js";
 import { getGeneratedItems, removeGeneratedItems, resolveTargetActor, undoLastOperation } from "./actor-service.js";
-import { openForge } from "./app.js";
+import { createNpcFromScratch, openForge } from "./app.js";
 import { getBoostCatalog } from "./boosts.js";
 
 function actorFromSheet(app) {
@@ -62,6 +62,15 @@ Hooks.once("init", () => {
     default: false
   });
 
+  game.settings.register(MODULE_ID, "contentPacks", {
+    name: "Monster Forge NPC content compendiums",
+    hint: "Comma-separated Item compendium collection IDs. Tagged action, trait, species-trait, and species-profile Items can be browsed by Monster Forge (for example: your-world.monster-features).",
+    scope: "world",
+    config: true,
+    type: String,
+    default: ""
+  });
+
   game.keybindings.register(MODULE_ID, "open", {
     name: "Open Monster Forge",
     hint: "Open Monster Forge for the selected NPC token.",
@@ -77,6 +86,7 @@ Hooks.once("init", () => {
 Hooks.once("ready", () => {
   game.monsterForge = Object.freeze({
     open: openForge,
+    createNpc: createNpcFromScratch,
     undo: async (actor = null) => undoLastOperation(actor ?? resolveTargetActor()),
     removeGenerated: async (actor = null) => removeGeneratedItems(actor ?? resolveTargetActor()),
     getGenerated: (actor = null) => getGeneratedItems(actor ?? resolveTargetActor()),
@@ -90,8 +100,8 @@ Hooks.once("ready", () => {
 });
 
 Hooks.on("getSceneControlButtons", (controls) => {
-  if (!game.user.isGM || !controls.tokens?.tools || controls.tokens.tools[MODULE_ID]) return;
-  controls.tokens.tools[MODULE_ID] = {
+  if (!game.user.isGM || !controls.tokens?.tools) return;
+  if (!controls.tokens.tools[MODULE_ID]) controls.tokens.tools[MODULE_ID] = {
     name: MODULE_ID,
     title: MODULE_TITLE,
     icon: "fa-solid fa-hammer",
@@ -99,6 +109,15 @@ Hooks.on("getSceneControlButtons", (controls) => {
     button: true,
     visible: true,
     onChange: () => openForge()
+  };
+  if (!controls.tokens.tools[`${MODULE_ID}-create`]) controls.tokens.tools[`${MODULE_ID}-create`] = {
+    name: `${MODULE_ID}-create`,
+    title: "Create NPC from scratch",
+    icon: "fa-solid fa-user-plus",
+    order: Object.keys(controls.tokens.tools).length,
+    button: true,
+    visible: true,
+    onChange: () => createNpcFromScratch()
   };
 });
 

@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.8.0
+
+- Added a create-from-scratch NPC flow with name, image, creature type, species/lineage, and culture fields; the actor is created only after submission and removed if forging fails.
+- Separated creature type from species, added the 2024 creature type list, and normalized legacy Half-Orc species metadata to Orc. Species presets no longer apply legacy ability-score bonuses.
+- Added an NPC-only Features tab for selecting reusable Action, Trait, and Species Trait Items from the bundled Item compendium and GM-linked Item compendiums.
+- Added a species-trait toggle during new NPC creation, enabled by default, and bundled starter trait Items plus blank Action, Trait, and Species Feature templates.
+- Included selected content Items in section-scoped replacement, cleanup, and undo, preserving their D&D5e activities and Active Effects.
+- Added the bundled Item pack to the Foundry package and release archive.
+
 ## 1.7.0
 
 - Added client-scoped named build profiles that save and restore the full NPC setup across actors.

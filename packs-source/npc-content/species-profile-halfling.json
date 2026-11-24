@@ -1,0 +1,43 @@
+{
+  "_key": "!items!70c2c2adspeciesp",
+  "_id": "70c2c2adspeciesp",
+  "name": "Halfling Species Profile",
+  "type": "feat",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "description": {
+      "value": "<p>Species preset: sm; walk 30 ft; darkvision 0 ft. Ability scores remain unchanged under 2024 rules. GM-editable body defaults; traits are separate Items.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster"
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "species-profile",
+        "speciesKey": "halfling",
+        "profile": {
+          "label": "Halfling",
+          "size": "sm",
+          "speed": 30,
+          "darkvision": 0
+        },
+        "template": false,
+        "version": 1
+      }
+    }
+  }
+}

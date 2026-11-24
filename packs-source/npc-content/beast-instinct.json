@@ -1,0 +1,40 @@
+{
+  "_key": "!items!1fe877bbbeastins",
+  "_id": "1fe877bbbeastins",
+  "name": "Bestial Instinct",
+  "type": "feat",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "description": {
+      "value": "<p>Describe this creature's distinctive natural sense, movement, or hunting adaptation here.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster"
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "species-trait",
+        "species": [
+          "beast"
+        ],
+        "category": "species",
+        "template": false,
+        "version": 1
+      }
+    }
+  }
+}

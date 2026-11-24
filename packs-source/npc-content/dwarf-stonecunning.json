@@ -1,0 +1,40 @@
+{
+  "_key": "!items!fdb8a52ddwarfsto",
+  "_id": "fdb8a52ddwarfsto",
+  "name": "Stonecunning",
+  "type": "feat",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "description": {
+      "value": "<p>This dwarf has a supernatural connection to stone that can reveal nearby vibrations. Set its range and duration to match the creature's challenge and intended use.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster"
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "species-trait",
+        "species": [
+          "dwarf"
+        ],
+        "category": "species",
+        "template": false,
+        "version": 1
+      }
+    }
+  }
+}

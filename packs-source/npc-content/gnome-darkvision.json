@@ -1,0 +1,40 @@
+{
+  "_key": "!items!58f8d5b2gnomedar",
+  "_id": "58f8d5b2gnomedar",
+  "name": "Gnomish Darkvision",
+  "type": "feat",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "description": {
+      "value": "<p>This creature can see in darkness within 60 feet as if it were dim light, and in dim light as if it were bright light.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster"
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "species-trait",
+        "species": [
+          "gnome"
+        ],
+        "category": "species",
+        "template": false,
+        "version": 1
+      }
+    }
+  }
+}

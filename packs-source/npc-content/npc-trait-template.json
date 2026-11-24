@@ -1,0 +1,38 @@
+{
+  "_key": "!items!a868b44anpctrait",
+  "_id": "a868b44anpctrait",
+  "name": "Blank NPC Trait",
+  "type": "feat",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "description": {
+      "value": "<p>Add the passive or triggered NPC trait rules text and any relevant activities or effects. This template is not intended to be added directly to a creature.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "Monster Forge NPC Content"
+    },
+    "type": {
+      "value": "monster"
+    },
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    }
+  },
+  "effects": [],
+  "flags": {
+    "monster-forge": {
+      "library": {
+        "kind": "trait",
+        "species": [],
+        "category": "trait",
+        "template": true,
+        "version": 1
+      }
+    }
+  }
+}

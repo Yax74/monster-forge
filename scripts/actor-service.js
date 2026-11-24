@@ -131,6 +131,7 @@ function generatedItemsForSections(actor, sections) {
     const legacy = Boolean(item.getFlag?.("world", "monsterForge"));
     const kind = item.getFlag?.(MODULE_ID, "kind");
     if (kind === "boost") return active.boosts;
+    if (kind === "content") return active.content;
     if (legacy || !kind || ["attack", "tertiary", "multiattack"].includes(kind)) return active.attacks;
     return false;
   });
@@ -344,8 +345,10 @@ export async function applyPlan(actor, plan) {
     : null;
   const foundationUpdate = buildFoundationActorUpdate(actor, plan.foundation, sections);
   const includedBoosts = sections.boosts ? plan.boosts?.selected ?? [] : [];
+  const includedContent = sections.content ? plan.contentItems ?? [] : [];
   const hasChanges = sections.attacks
     || includedBoosts.length > 0
+    || includedContent.length > 0
     || priorItems.length > 0
     || Object.keys(foundationUpdate).length > 0;
   if (!hasChanges) {
@@ -389,6 +392,7 @@ export async function applyPlan(actor, plan) {
       featureData.push(buildMultiattackItem(plan, weapons, buildOptions));
     }
     featureData.push(...includedBoosts.map((entry) => prepareBoostItemData(entry, { ...buildOptions, plan })));
+    featureData.push(...clone(includedContent));
 
     const features = featureData.length
       ? await actor.createEmbeddedDocuments("Item", featureData)
@@ -427,6 +431,7 @@ export async function applyPlan(actor, plan) {
       replaced: priorItems.length,
       actorUpdated: hasFoundationUpdate,
       boosts: includedBoosts.length,
+      content: includedContent.length,
       attacks: sections.attacks ? weapons.length : 0,
       sections
     };

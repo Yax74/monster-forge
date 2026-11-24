@@ -1,5 +1,14 @@
 # Monster Forge To-do
 
+## NPC creation and content library (1.8.0)
+
+- [x] Create NPC actors from scratch with identity, species/lineage, culture, and creature type fields.
+- [x] Keep selected NPC actions and traits as reusable Items in a bundled compendium, with user Item compendium links.
+- [x] Add species trait Items from the selected profile, with a default-on creation toggle.
+- [x] Include blank Action, Trait, and Species Feature compendium templates.
+- [ ] Expand the starter species feature coverage and add optional rules-managed activities or MIDI automation where each feature's workflow is well-defined.
+- [ ] Make custom species profile body data fully data-driven from compendium Items; current body presets remain in the module.
+
 ## Tabbed dialog and independently optional sections
 
 - [x] Replace the current long scrolling dialog with clear tabs: **Build**, **Foundation & Attributes**, **Boosts**, **Attacks & Riders**, and **Review**.

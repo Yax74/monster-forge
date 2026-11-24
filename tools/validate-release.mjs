@@ -40,7 +40,7 @@ for (const relativePath of [...(manifest.esmodules ?? []), ...(manifest.styles ?
   }
 }
 
-for (const required of ["README.md", "CHANGELOG.md", "LICENSE", "templates/forge-dialog.hbs"]) {
+for (const required of ["README.md", "CHANGELOG.md", "LICENSE", "templates/forge-dialog.hbs", "packs/npc-content"]) {
   try {
     await access(path.join(root, required));
   } catch {

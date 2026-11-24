@@ -49,7 +49,7 @@ jobs:
         run: |
           mkdir -p dist/package
           cp module.json README.md CHANGELOG.md LICENSE dist/package/
-          cp -R docs scripts styles templates dist/package/
+          cp -R docs packs scripts styles templates dist/package/
           cp module.json dist/module.json
           (cd dist/package && zip -q -r ../monster-forge.zip .)
           (cd dist && sha256sum monster-forge.zip > monster-forge.zip.sha256)

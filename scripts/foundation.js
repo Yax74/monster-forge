@@ -4,7 +4,7 @@ import {
   COMBAT_ROLES,
   CREATURE_TIERS,
   DEFAULTS,
-  SPECIES_PROFILES
+  getSpeciesProfiles
 } from "./constants.js";
 import { clamp, getCrStats, resolveWeapon, roundHalf } from "./engine.js";
 
@@ -56,7 +56,7 @@ export function normalizeFoundationConfig(input = {}) {
   return {
     mode: source.mode === "audit" ? "audit" : "apply",
     role: selectedKey(source.role, COMBAT_ROLES, defaults.role),
-    species: selectedKey(source.species, SPECIES_PROFILES, defaults.species),
+    species: selectedKey(source.species, getSpeciesProfiles(), defaults.species),
     tier: selectedKey(source.tier, CREATURE_TIERS, defaults.tier),
     castingAbility: ["auto", "int", "wis", "cha"].includes(source.castingAbility)
       ? source.castingAbility
@@ -153,7 +153,7 @@ export function buildFoundationPlan(inputConfig = {}, actorProfile = {}) {
   const stats = getCrStats(inputConfig.cr ?? DEFAULTS.cr);
   const role = COMBAT_ROLES[foundation.role];
   const tier = CREATURE_TIERS[foundation.tier];
-  const species = SPECIES_PROFILES[foundation.species];
+  const species = getSpeciesProfiles()[foundation.species];
   const proficiency = crProficiency(stats.cr);
 
   const derived = {
