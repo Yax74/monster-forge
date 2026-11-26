@@ -6,7 +6,7 @@
   "img": "icons/magic/symbols/runes-star-blue.webp",
   "system": {
     "description": {
-      "value": "<p><strong>[[lookup @name]].</strong> The creature is a full caster. Its effective caster level equals its challenge rating (minimum 1). This feature doesn&#039;t add spells automatically.</p><p><strong>Effective caster level:</strong> 1. Add spells separately.</p><p><em>resolve conditional timing manually.</em></p><p class=\"monster-forge-note\">Monster Forge · Strong power · Manual feature</p>",
+      "value": "<p>Spellcasting. The creature is a full caster.</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -29,7 +29,7 @@
   "flags": {
     "monster-forge": {
       "generated": true,
-      "version": "1.10.0",
+      "version": "1.11.0",
       "setId": "library-source",
       "kind": "boost",
       "role": "boost",
@@ -58,8 +58,8 @@
           "id": "caster.full",
           "name": "NPC Full Caster",
           "label": "Full caster",
-          "summary": "Effective caster level equals CR (minimum 1).",
-          "description": "The creature is a full caster. Its effective caster level equals its challenge rating (minimum 1). This feature doesn't add spells automatically.",
+          "summary": "Spellcasting. The creature is a full caster.",
+          "description": "Spellcasting. The creature is a full caster.",
           "power": "strong",
           "automation": "manual",
           "kind": "caster",

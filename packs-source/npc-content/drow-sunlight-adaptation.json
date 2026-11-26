@@ -6,7 +6,7 @@
   "img": "icons/creatures/magical/spirit-undead-ghost-purple.webp",
   "system": {
     "description": {
-      "value": "<p>This drow has keen darkvision and magic associated with its elven lineage. Add only the spells or senses that fit this NPC.</p>",
+      "value": "<p>This creature has Darkvision with a range of 120 feet.</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -23,7 +23,45 @@
       "recovery": []
     }
   },
-  "effects": [],
+  "effects": [
+    {
+      "_id": "11c3255fdrowsunl",
+      "name": "Underdark Adaptation",
+      "img": "icons/magic/symbols/runes-star-blue.webp",
+      "type": "base",
+      "transfer": true,
+      "disabled": false,
+      "duration": {},
+      "statuses": [],
+      "flags": {
+        "dae": {
+          "stackable": "noneName",
+          "showIcon": false,
+          "specialDuration": []
+        }
+      },
+      "system": {
+        "changes": [
+          {
+            "_id": "685e4c4011c3255f",
+            "key": "system.attributes.senses.ranges.darkvision",
+            "value": "120",
+            "priority": 20,
+            "type": "upgrade",
+            "phase": "initial",
+            "conditions": "{}",
+            "replacement": ""
+          }
+        ],
+        "conditions": "{}",
+        "magical": false,
+        "rider": {
+          "statuses": []
+        }
+      },
+      "_key": "!effects!11c3255fdrowsunl"
+    }
+  ],
   "flags": {
     "monster-forge": {
       "library": {
@@ -33,6 +71,8 @@
         ],
         "category": "species",
         "template": false,
+        "automation": "core-effect",
+        "requirements": [],
         "version": 1
       }
     }

@@ -6,7 +6,7 @@
   "img": "icons/magic/symbols/runes-star-blue.webp",
   "system": {
     "description": {
-      "value": "<p><strong>[[lookup @name]].</strong> The creature gains a +1 bonus to its spell save DC.</p><p class=\"monster-forge-note\">Monster Forge · Standard power · Core effect</p>",
+      "value": "<p>The creature gains a +1 bonus to its spell save DC.</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -67,7 +67,7 @@
   "flags": {
     "monster-forge": {
       "generated": true,
-      "version": "1.10.0",
+      "version": "1.11.0",
       "setId": "library-source",
       "kind": "boost",
       "role": "boost",

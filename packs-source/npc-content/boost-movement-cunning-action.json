@@ -6,7 +6,7 @@
   "img": "icons/skills/movement/feet-winged-boots-blue.webp",
   "system": {
     "description": {
-      "value": "<p><strong>[[lookup @name]].</strong> The creature can take the Dash, Disengage, or Hide action as a bonus action.</p><p>Use the generated activity for the roll or action prompt.</p><p class=\"monster-forge-note\">Monster Forge · Strong power · Core activity</p>",
+      "value": "<p>The creature can take the Dash, Disengage, or Hide action as a bonus action.</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -50,6 +50,12 @@
             "contiguous": false,
             "units": "ft",
             "type": "",
+            "size": "",
+            "width": "",
+            "height": "",
+            "distance": "",
+            "direction": "",
+            "angle": "",
             "stationary": false
           },
           "affects": {
@@ -73,7 +79,7 @@
   "flags": {
     "monster-forge": {
       "generated": true,
-      "version": "1.10.0",
+      "version": "1.11.0",
       "setId": "library-source",
       "kind": "boost",
       "role": "boost",

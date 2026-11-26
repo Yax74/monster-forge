@@ -6,7 +6,7 @@
   "img": "icons/commodities/tech/battery-arcane-crystal-green.webp",
   "system": {
     "description": {
-      "value": "<p>This deep gnome's darkvision extends to 120 feet, and it is adapted to life underground. The parent Gnome profile supplies Gnomish Cunning.</p>",
+      "value": "<p>This creature has Darkvision with a range of 120 feet.</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -23,7 +23,45 @@
       "recovery": []
     }
   },
-  "effects": [],
+  "effects": [
+    {
+      "_id": "bfd4089edeepgnom",
+      "name": "Underdark Adaptation",
+      "img": "icons/magic/symbols/runes-star-blue.webp",
+      "type": "base",
+      "transfer": true,
+      "disabled": false,
+      "duration": {},
+      "statuses": [],
+      "flags": {
+        "dae": {
+          "stackable": "noneName",
+          "showIcon": false,
+          "specialDuration": []
+        }
+      },
+      "system": {
+        "changes": [
+          {
+            "_id": "34b02e4fbfd4089e",
+            "key": "system.attributes.senses.ranges.darkvision",
+            "value": "120",
+            "priority": 20,
+            "type": "upgrade",
+            "phase": "initial",
+            "conditions": "{}",
+            "replacement": ""
+          }
+        ],
+        "conditions": "{}",
+        "magical": false,
+        "rider": {
+          "statuses": []
+        }
+      },
+      "_key": "!effects!bfd4089edeepgnom"
+    }
+  ],
   "flags": {
     "monster-forge": {
       "library": {
@@ -33,6 +71,8 @@
         ],
         "category": "species",
         "template": false,
+        "automation": "core-effect",
+        "requirements": [],
         "version": 1
       }
     }

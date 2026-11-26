@@ -6,7 +6,7 @@
   "img": "icons/skills/movement/feet-winged-boots-blue.webp",
   "system": {
     "description": {
-      "value": "<p><strong>[[lookup @name]].</strong> Immediately after the creature makes an attack or casts a spell, it can teleport up to 10 feet to an unoccupied space it can see. This movement doesn&#039;t provoke opportunity attacks.</p><p>Use the generated activity for the roll or action prompt.</p><p class=\"monster-forge-note\">Monster Forge · Strong power · Manual feature</p>",
+      "value": "<p>Immediately after the creature makes an attack or casts a spell, it can teleport up to 10 feet to an unoccupied space it can see. This movement doesn&#039;t provoke opportunity attacks.</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -50,6 +50,12 @@
             "contiguous": false,
             "units": "ft",
             "type": "",
+            "size": "",
+            "width": "",
+            "height": "",
+            "distance": "",
+            "direction": "",
+            "angle": "",
             "stationary": false
           },
           "affects": {
@@ -73,7 +79,7 @@
   "flags": {
     "monster-forge": {
       "generated": true,
-      "version": "1.10.0",
+      "version": "1.11.0",
       "setId": "library-source",
       "kind": "boost",
       "role": "boost",

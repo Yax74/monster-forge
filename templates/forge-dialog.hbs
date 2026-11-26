@@ -51,7 +51,7 @@
       <i class="fa-solid fa-shield-halved"></i><span>Foundation</span><small data-tab-status="foundation">{{#if config.sections.foundation}}On{{else}}Off{{/if}}</small>
     </button>
     <button type="button" role="tab" class="mf-tab" id="mf-tab-boosts" aria-controls="mf-panel-boosts" aria-selected="false" tabindex="-1" data-tab-target="boosts">
-      <i class="fa-solid fa-bolt"></i><span>Boosts &amp; features</span><small>Boosts <b data-tab-status="boosts">{{#if config.sections.boosts}}On{{else}}Off{{/if}}</b> · Items <b data-tab-status="content">{{#if config.sections.content}}On{{else}}Off{{/if}}</b></small>
+      <i class="fa-solid fa-bolt"></i><span>Traits</span><small data-tab-status="traits">On</small>
     </button>
     <button type="button" role="tab" class="mf-tab" id="mf-tab-attacks" aria-controls="mf-panel-attacks" aria-selected="false" tabindex="-1" data-tab-target="attacks">
       <i class="fa-solid fa-swords"></i><span>Attacks</span><small data-tab-status="attacks">{{#if config.sections.attacks}}On{{else}}Off{{/if}}</small>
@@ -190,7 +190,7 @@
 
     <section class="mf-section mf-tab-panel" id="mf-panel-boosts" role="tabpanel" aria-labelledby="mf-tab-boosts" data-tab-panel="boosts" hidden>
       <div class="mf-section-heading mf-library-heading">
-        <div><span class="mf-step">3</span><h3>NPC actions, traits &amp; boosts</h3></div>
+        <div><span class="mf-step">3</span><h3>Traits</h3></div>
         <div class="mf-library-toggles">
           <label class="mf-section-toggle"><input type="checkbox" name="sections.boosts" {{#if config.sections.boosts}}checked{{/if}}> Apply boosts</label>
           <label class="mf-section-toggle"><input type="checkbox" name="sections.content" {{#if config.sections.content}}checked{{/if}}> Apply actions &amp; traits</label>

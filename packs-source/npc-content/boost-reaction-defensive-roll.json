@@ -6,7 +6,7 @@
   "img": "icons/magic/defensive/shield-barrier-blue.webp",
   "system": {
     "description": {
-      "value": "<p><strong>[[lookup @name]].</strong> When the creature takes damage from an attacker it can see, it can use its reaction to reduce the damage by 1d10 + its proficiency bonus (to a minimum of 0 damage).</p><p>Use the generated activity for the roll or action prompt.</p><p class=\"monster-forge-note\">Monster Forge · Standard power · Manual feature</p>",
+      "value": "<p>When the creature takes damage from an attacker it can see, it can use its reaction to reduce the damage by 1d10 + its proficiency bonus (to a minimum of 0 damage).</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -50,6 +50,12 @@
             "contiguous": false,
             "units": "ft",
             "type": "",
+            "size": "",
+            "width": "",
+            "height": "",
+            "distance": "",
+            "direction": "",
+            "angle": "",
             "stationary": false
           },
           "affects": {
@@ -73,7 +79,7 @@
   "flags": {
     "monster-forge": {
       "generated": true,
-      "version": "1.10.0",
+      "version": "1.11.0",
       "setId": "library-source",
       "kind": "boost",
       "role": "boost",

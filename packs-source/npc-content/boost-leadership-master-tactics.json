@@ -6,7 +6,7 @@
   "img": "icons/skills/social/diplomacy-handshake-blue.webp",
   "system": {
     "description": {
-      "value": "<p><strong>[[lookup @name]].</strong> The creature can take the Help action as a bonus action. When it does so to aid an ally in attacking a creature, the target can be within 30 feet of the creature, rather than 5 feet, if the target can see or hear it.</p><p>Use the generated activity for the roll or action prompt.</p><p class=\"monster-forge-note\">Monster Forge · Standard power · Core activity</p>",
+      "value": "<p>The creature can take the Help action as a bonus action. When it does so to aid an ally in attacking a creature, the target can be within 30 feet of the creature, rather than 5 feet, if the target can see or hear it.</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -41,8 +41,8 @@
           "chatFlavor": ""
         },
         "range": {
-          "units": "self",
-          "value": null,
+          "units": "ft",
+          "value": 30,
           "override": true
         },
         "target": {
@@ -50,12 +50,18 @@
             "contiguous": false,
             "units": "ft",
             "type": "",
+            "size": "",
+            "width": "",
+            "height": "",
+            "distance": "",
+            "direction": "",
+            "angle": "",
             "stationary": false
           },
           "affects": {
             "choice": false,
-            "type": "self",
-            "count": ""
+            "type": "ally",
+            "count": "1"
           },
           "override": true,
           "prompt": true
@@ -73,7 +79,7 @@
   "flags": {
     "monster-forge": {
       "generated": true,
-      "version": "1.10.0",
+      "version": "1.11.0",
       "setId": "library-source",
       "kind": "boost",
       "role": "boost",
@@ -117,7 +123,13 @@
           "exclusiveGroup": "leadership-feature",
           "rank": null,
           "requirements": [],
-          "img": "icons/skills/social/diplomacy-handshake-blue.webp"
+          "img": "icons/skills/social/diplomacy-handshake-blue.webp",
+          "target": {
+            "type": "ally",
+            "count": "1",
+            "range": 30,
+            "rangeUnits": "ft"
+          }
         },
         "template": false,
         "version": 2

@@ -6,7 +6,7 @@
   "img": "icons/skills/movement/feet-winged-boots-blue.webp",
   "system": {
     "description": {
-      "value": "<p><strong>[[lookup @name]].</strong> The creature&#039;s walking speed increases by 10 feet.</p><p class=\"monster-forge-note\">Monster Forge · Standard power · Core effect</p>",
+      "value": "<p>The creature&#039;s walking speed increases by 10 feet.</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -67,7 +67,7 @@
   "flags": {
     "monster-forge": {
       "generated": true,
-      "version": "1.10.0",
+      "version": "1.11.0",
       "setId": "library-source",
       "kind": "boost",
       "role": "boost",

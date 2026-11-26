@@ -6,7 +6,7 @@
   "img": "icons/creatures/reptiles/dragon-horned-blue.webp",
   "system": {
     "description": {
-      "value": "<p>Starting profile: lg; walk 40 ft; darkvision 120 ft. Suggested ability adjustments are editable Monster Forge heuristics, not 2024 ancestry ability score rules. Traits are separate NPC Items.</p>",
+      "value": "",
       "chat": "",
       "unidentified": ""
     },

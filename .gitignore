@@ -3,3 +3,5 @@ node_modules/
 *.zip
 *.sha256
 packs/**/LOCK
+packs/**/LOG*
+packs/**/*.log

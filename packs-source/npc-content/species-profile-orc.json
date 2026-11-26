@@ -6,7 +6,7 @@
   "img": "icons/weapons/axes/axe-battle-black.webp",
   "system": {
     "description": {
-      "value": "<p>Starting profile: med; walk 30 ft; darkvision 120 ft. Suggested ability adjustments are editable Monster Forge heuristics, not 2024 ancestry ability score rules. Traits are separate NPC Items.</p>",
+      "value": "",
       "chat": "",
       "unidentified": ""
     },

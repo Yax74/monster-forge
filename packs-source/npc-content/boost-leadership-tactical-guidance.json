@@ -6,7 +6,7 @@
   "img": "icons/skills/social/diplomacy-handshake-blue.webp",
   "system": {
     "description": {
-      "value": "<p><strong>[[lookup @name]].</strong> As a bonus action, the creature chooses one ally within 30 feet that can see or hear it. Before the start of the creature&#039;s next turn, the ally can gain advantage on one attack roll, ability check, or saving throw of its choice.</p><p>Use the generated activity for the roll or action prompt.</p><p class=\"monster-forge-note\">Monster Forge · Strong power · Midi/DAE optional</p>",
+      "value": "<p>As a bonus action, the creature chooses one ally within 30 feet that can see or hear it. Before the start of the creature&#039;s next turn, the ally can gain advantage on one attack roll, ability check, or saving throw of its choice.</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -41,8 +41,8 @@
           "chatFlavor": ""
         },
         "range": {
-          "units": "self",
-          "value": null,
+          "units": "ft",
+          "value": 30,
           "override": true
         },
         "target": {
@@ -50,12 +50,18 @@
             "contiguous": false,
             "units": "ft",
             "type": "",
+            "size": "",
+            "width": "",
+            "height": "",
+            "distance": "",
+            "direction": "",
+            "angle": "",
             "stationary": false
           },
           "affects": {
             "choice": false,
-            "type": "self",
-            "count": ""
+            "type": "ally",
+            "count": "1"
           },
           "override": true,
           "prompt": true
@@ -73,7 +79,7 @@
   "flags": {
     "monster-forge": {
       "generated": true,
-      "version": "1.10.0",
+      "version": "1.11.0",
       "setId": "library-source",
       "kind": "boost",
       "role": "boost",
@@ -83,12 +89,9 @@
       "defaultName": "Tactical Guidance",
       "customName": "",
       "power": "strong",
-      "automation": "midi",
+      "automation": "activity",
       "exclusiveGroup": "leadership-feature",
-      "requirements": [
-        "midi-qol",
-        "dae"
-      ],
+      "requirements": [],
       "library": {
         "kind": "boost",
         "category": "leadership",
@@ -108,7 +111,7 @@
           "summary": "Grant one ally within 30 feet advantage on its next attack, check, or save before your next turn.",
           "description": "As a bonus action, the creature chooses one ally within 30 feet that can see or hear it. Before the start of the creature's next turn, the ally can gain advantage on one attack roll, ability check, or saving throw of its choice.",
           "power": "strong",
-          "automation": "midi",
+          "automation": "activity",
           "activation": {
             "type": "bonus"
           },
@@ -119,11 +122,13 @@
           "categoryId": "leadership",
           "exclusiveGroup": "leadership-feature",
           "rank": null,
-          "requirements": [
-            "midi-qol",
-            "dae"
-          ],
-          "img": "icons/skills/social/diplomacy-handshake-blue.webp"
+          "img": "icons/skills/social/diplomacy-handshake-blue.webp",
+          "target": {
+            "type": "ally",
+            "count": "1",
+            "range": 30,
+            "rangeUnits": "ft"
+          }
         },
         "template": false,
         "version": 2

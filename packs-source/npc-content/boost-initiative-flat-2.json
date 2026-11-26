@@ -6,7 +6,7 @@
   "img": "icons/skills/movement/feet-winged-boots-brown.webp",
   "system": {
     "description": {
-      "value": "<p><strong>[[lookup @name]].</strong> The creature gains a +2 bonus to initiative.</p><p class=\"monster-forge-note\">Monster Forge · Standard power · Core effect</p>",
+      "value": "<p>The creature gains a +2 bonus to initiative.</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -46,7 +46,7 @@
         "changes": [
           {
             "_id": "d27d21543acc031f",
-            "key": "system.attributes.init.bonus",
+            "key": "system.attributes.init.roll.bonus",
             "value": "2",
             "priority": 20,
             "type": "add",
@@ -67,7 +67,7 @@
   "flags": {
     "monster-forge": {
       "generated": true,
-      "version": "1.10.0",
+      "version": "1.11.0",
       "setId": "library-source",
       "kind": "boost",
       "role": "boost",
@@ -102,8 +102,8 @@
           "automation": "core",
           "effect": [
             {
-              "key": "system.attributes.init.bonus",
-              "value": 2
+              "key": "system.attributes.init.roll.bonus",
+              "value": "2"
             }
           ],
           "impact": {

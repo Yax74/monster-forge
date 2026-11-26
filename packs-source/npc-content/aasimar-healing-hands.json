@@ -6,7 +6,7 @@
   "img": "icons/magic/holy/angel-wings-gray.webp",
   "system": {
     "description": {
-      "value": "<p>As an action, this creature can touch another creature and restore Hit Points. Set the amount appropriate to this NPC's role and challenge rating.</p>",
+      "value": "<p>As an action, this creature touches another creature. The target regains hit points equal to a roll of a number of d4s equal to this creature's Proficiency Bonus. Once used, this trait can't be used again until the creature finishes a Long Rest.</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -16,11 +16,88 @@
     "type": {
       "value": "monster"
     },
-    "activities": {},
+    "activities": {
+      "76c58a53healingh": {
+        "_id": "76c58a53healingh",
+        "type": "heal",
+        "name": "Healing Hands",
+        "sort": 0,
+        "activation": {
+          "type": "action",
+          "value": 1,
+          "condition": "",
+          "override": true
+        },
+        "consumption": {
+          "targets": [
+            {
+              "type": "itemUses",
+              "value": "1",
+              "target": ""
+            }
+          ],
+          "scaling": {
+            "allowed": false
+          },
+          "spellSlot": false
+        },
+        "description": {
+          "value": "",
+          "chatFlavor": ""
+        },
+        "range": {
+          "units": "ft",
+          "value": "5",
+          "override": true
+        },
+        "target": {
+          "template": {
+            "contiguous": false,
+            "units": "ft",
+            "type": "",
+            "size": "",
+            "width": "",
+            "height": "",
+            "distance": "",
+            "direction": "",
+            "angle": "",
+            "stationary": false
+          },
+          "affects": {
+            "choice": false,
+            "type": "creature",
+            "count": "1"
+          },
+          "override": true,
+          "prompt": true
+        },
+        "healing": {
+          "number": null,
+          "denomination": 0,
+          "bonus": "",
+          "types": [
+            "healing"
+          ],
+          "custom": {
+            "enabled": true,
+            "formula": "(@prof)d4"
+          },
+          "scaling": {
+            "number": 1
+          },
+          "modifiers": []
+        }
+      }
+    },
     "uses": {
       "spent": 0,
-      "max": "",
-      "recovery": []
+      "max": 1,
+      "recovery": [
+        {
+          "period": "lr",
+          "type": "recoverAll"
+        }
+      ]
     }
   },
   "effects": [],
@@ -33,6 +110,8 @@
         ],
         "category": "species",
         "template": false,
+        "automation": "core-activity",
+        "requirements": [],
         "version": 1
       }
     }

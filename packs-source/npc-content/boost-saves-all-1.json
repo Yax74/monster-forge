@@ -6,7 +6,7 @@
   "img": "icons/magic/defensive/shield-barrier-blue.webp",
   "system": {
     "description": {
-      "value": "<p><strong>[[lookup @name]].</strong> The creature gains a +1 bonus to all saving throws.</p><p class=\"monster-forge-note\">Monster Forge · Light power · Core effect</p>",
+      "value": "<p>The creature gains a +1 bonus to all saving throws.</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -46,7 +46,7 @@
         "changes": [
           {
             "_id": "520571a2a8d557eb",
-            "key": "system.bonuses.abilities.save",
+            "key": "system.rolls.ability.save.bonus",
             "value": "1",
             "priority": 20,
             "type": "add",
@@ -67,7 +67,7 @@
   "flags": {
     "monster-forge": {
       "generated": true,
-      "version": "1.10.0",
+      "version": "1.11.0",
       "setId": "library-source",
       "kind": "boost",
       "role": "boost",
@@ -102,8 +102,8 @@
           "automation": "core",
           "effect": [
             {
-              "key": "system.bonuses.abilities.save",
-              "value": 1
+              "key": "system.rolls.ability.save.bonus",
+              "value": "1"
             }
           ],
           "impact": {

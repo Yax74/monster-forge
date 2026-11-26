@@ -6,7 +6,7 @@
   "img": "icons/skills/social/diplomacy-handshake-blue.webp",
   "system": {
     "description": {
-      "value": "<p><strong>[[lookup @name]].</strong> As an action, the creature chooses up to three allies within 60 feet that can hear it. Each chosen ally can use its reaction to make one weapon attack. Command II then recharges on a 5–6.</p><p>Use the generated activity for the roll or action prompt.</p><p class=\"monster-forge-note\">Monster Forge · Major power · Manual feature</p>",
+      "value": "<p>As an action, the creature chooses up to three allies within 60 feet that can hear it. Each chosen ally can use its reaction to make one weapon attack. Command II then recharges on a 5–6.</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -47,8 +47,8 @@
           "chatFlavor": ""
         },
         "range": {
-          "units": "self",
-          "value": null,
+          "units": "ft",
+          "value": 60,
           "override": true
         },
         "target": {
@@ -56,12 +56,18 @@
             "contiguous": false,
             "units": "ft",
             "type": "",
+            "size": "",
+            "width": "",
+            "height": "",
+            "distance": "",
+            "direction": "",
+            "angle": "",
             "stationary": false
           },
           "affects": {
             "choice": false,
-            "type": "self",
-            "count": ""
+            "type": "ally",
+            "count": "3"
           },
           "override": true,
           "prompt": true
@@ -85,7 +91,7 @@
   "flags": {
     "monster-forge": {
       "generated": true,
-      "version": "1.10.0",
+      "version": "1.11.0",
       "setId": "library-source",
       "kind": "boost",
       "role": "boost",
@@ -134,7 +140,13 @@
           "exclusiveGroup": "leadership-feature",
           "rank": 2,
           "requirements": [],
-          "img": "icons/skills/social/diplomacy-handshake-blue.webp"
+          "img": "icons/skills/social/diplomacy-handshake-blue.webp",
+          "target": {
+            "type": "ally",
+            "count": "3",
+            "range": 60,
+            "rangeUnits": "ft"
+          }
         },
         "template": false,
         "version": 2

@@ -321,7 +321,7 @@ test("generates native boost effects, activities, flags, and review impact", () 
   const recovery = prepareBoostItemData(selected.find((entry) => entry.id === "recovery.second-wind"), { setId: "set-one", idFactory });
   assert.equal(initiative.name, "First into the Fray");
   assert.equal(initiative.flags[MODULE_ID].boostId, "initiative.pb");
-  assert.equal(initiative.effects[0].system.changes[0].key, "system.attributes.init.bonus");
+  assert.equal(initiative.effects[0].system.changes[0].key, "system.attributes.init.roll.bonus");
   assert.equal(recovery.system.uses.max, "1");
   assert.equal(Object.values(recovery.system.activities)[0].type, "heal");
 
@@ -339,6 +339,24 @@ test("generates native boost effects, activities, flags, and review impact", () 
   assert.equal(impact.initiative, 3);
   assert.equal(impact.ac, 2);
   assert.ok(impact.rows.some((row) => row.key === "Armor class" && row.after === 17));
+});
+
+test("every boost with an action trigger compiles a D&D5e activity", () => {
+  for (const entry of getBoostCatalog().entries) {
+    if (!entry.activation && !entry.healing) continue;
+    const item = prepareBoostItemData(entry, { setId: "audit", idFactory: (() => { let id = 0; return () => `activity-${++id}`; })() });
+    assert.equal(Object.keys(item.system.activities).length, 1, `${entry.name} should have an activity`);
+  }
+});
+
+test("bundled boost descriptions contain rules text without Monster Forge notes", async () => {
+  for (const file of contentFiles.filter((name) => name.startsWith("boost-") && name.endsWith(".json"))) {
+    const item = JSON.parse(await readFile(new URL(`../packs-source/npc-content/${file}`, import.meta.url), "utf8"));
+    const description = item.system.description.value;
+    assert.ok(!description.includes("[[lookup"), `${item.name} has a broken name lookup`);
+    assert.ok(!description.includes("monster-forge-note"), `${item.name} has a module footer`);
+    assert.ok(!description.includes("Use the generated activity"), `${item.name} has workflow instructions in its description`);
+  }
 });
 
 test("audit mode keeps the live actor profile", () => {

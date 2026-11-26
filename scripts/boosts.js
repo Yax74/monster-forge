@@ -346,15 +346,20 @@ function activityActivation(entry) {
 function buildActivity(entry, idFactory) {
   if (!entry.activation && !entry.healing) return null;
   const id = idFactory();
+  const target = entry.target ?? {};
+  const healing = entry.healing ?? {};
   const common = {
     _id: id, type: entry.healing ? "heal" : "utility", name: entry.displayName ?? entry.name, sort: 0,
     activation: activityActivation(entry),
     consumption: { targets: entry.uses?.max ? [{ type: "itemUses", value: "1", target: "" }] : [], scaling: { allowed: false }, spellSlot: false },
     description: { value: "", chatFlavor: "" },
-    range: { units: entry.healing?.range ? "ft" : "self", value: entry.healing?.range ? String(entry.healing.range) : null, override: true },
+    range: {
+      units: target.rangeUnits ?? (healing.range ? "ft" : "self"),
+      value: target.range ?? (healing.range ? String(healing.range) : null), override: true
+    },
     target: {
-      template: { contiguous: false, units: "ft", type: "", stationary: false },
-      affects: { choice: false, type: entry.healing?.target ?? "self", count: entry.healing?.target ? "1" : "" },
+      template: { contiguous: false, units: "ft", type: "", size: "", width: "", height: "", distance: "", direction: "", angle: "", stationary: false },
+      affects: { choice: false, type: target.type ?? healing.target ?? "self", count: target.count ?? (healing.target ? "1" : "") },
       override: true, prompt: true
     }
   };
@@ -371,9 +376,9 @@ function buildEffect(entry, idFactory) {
   if (!entry.effect?.length) return null;
   const modern = entry.effect.map((change) => ({
     _id: idFactory(), key: change.key, value: String(change.value), priority: change.priority ?? 20,
-    type: change.key.startsWith("flags.midi-qol.") ? "custom" : "add", phase: "initial", conditions: "{}", replacement: ""
+    type: change.key.startsWith("flags.midi-qol.") ? "custom" : (change.mode ?? "add"), phase: "initial", conditions: "{}", replacement: ""
   }));
-  const legacy = entry.effect.map((change) => ({ key: change.key, value: String(change.value), mode: change.key.startsWith("flags.midi-qol.") ? 0 : 2, priority: change.priority ?? 20 }));
+  const legacy = entry.effect.map((change) => ({ key: change.key, value: String(change.value), mode: change.key.startsWith("flags.midi-qol.") ? 0 : change.mode === "upgrade" ? 4 : 2, priority: change.priority ?? 20 }));
   const data = {
     _id: idFactory(), name: entry.displayName ?? entry.name, img: entry.img ?? "icons/svg/aura.svg", type: "base", transfer: true, disabled: false,
     duration: {}, statuses: [], flags: { dae: { stackable: "noneName", showIcon: false, specialDuration: [] } }
@@ -386,6 +391,7 @@ function buildEffect(entry, idFactory) {
 
 function itemUses(entry) {
   if (!entry.uses?.max) return { max: "", spent: 0, recovery: [] };
+  if (Array.isArray(entry.uses.recovery)) return { max: String(entry.uses.max), spent: 0, recovery: structuredClone(entry.uses.recovery) };
   const recovery = { period: entry.uses.period ?? "day", type: "recoverAll" };
   if (entry.uses.formula) recovery.formula = entry.uses.formula;
   return { max: String(entry.uses.max), spent: 0, recovery: [recovery] };
@@ -396,18 +402,6 @@ export function prepareBoostItemData(entry, { setId, idFactory = () => crypto.ra
   const name = String(entry.displayName || entry.customName || entry.name).trim().slice(0, 80) || entry.name;
   const activity = buildActivity(entry, idFactory);
   const effect = buildEffect(entry, idFactory);
-  const automation = AUTOMATION_LABELS[entry.automation] ?? entry.automation;
-  const rawCr = String(plan?.foundation?.stats?.cr ?? plan?.config?.cr ?? "0");
-  const cr = rawCr === "1/8" ? 0.125 : rawCr === "1/4" ? 0.25 : rawCr === "1/2" ? 0.5 : Number(rawCr) || 0;
-  const casterLevel = entry.progression ? Math.max(1, Math.floor(cr * entry.progression)) : null;
-  const progressionText = casterLevel
-    ? `<p><strong>Effective caster level:</strong> ${casterLevel}. Add spells separately.</p>`
-    : "";
-  const activityHint = activity
-    ? "<p>Use the generated activity for the roll or action prompt.</p>"
-    : entry.automation === "manual" || entry.automation === "midi"
-      ? `<p><em>${entry.automation === "midi" ? "Midi-QOL/DAE can assist where supported; " : ""}resolve conditional timing manually.</em></p>`
-      : "";
   return {
     name, type: "feat", img: entry.img ?? "icons/svg/aura.svg",
     flags: {
@@ -422,7 +416,7 @@ export function prepareBoostItemData(entry, { setId, idFactory = () => crypto.ra
     effects: effect ? [effect] : [],
     system: {
       description: {
-        value: `<p><strong>[[lookup @name]].</strong> ${escapeHtml(entry.description)}</p>${progressionText}${activityHint}<p class="monster-forge-note">Monster Forge · ${escapeHtml(POWER_LABELS[entry.power] ?? entry.power)} power · ${escapeHtml(automation)}</p>`,
+        value: `<p>${escapeHtml(entry.description)}</p>`,
         chat: "", unidentified: ""
       },
       type: { value: "monster", subtype: "" }, identifier: entry.id.replaceAll(".", "-"), uses: itemUses(entry),

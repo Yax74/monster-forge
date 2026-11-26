@@ -16,11 +16,72 @@
     "type": {
       "value": "monster"
     },
-    "activities": {},
+    "activities": {
+      "594a3ac5relentle": {
+        "_id": "594a3ac5relentle",
+        "type": "utility",
+        "name": "Relentless Endurance",
+        "sort": 0,
+        "activation": {
+          "type": "reaction",
+          "value": 1,
+          "condition": "",
+          "override": true
+        },
+        "consumption": {
+          "targets": [
+            {
+              "type": "itemUses",
+              "value": "1",
+              "target": ""
+            }
+          ],
+          "scaling": {
+            "allowed": false
+          },
+          "spellSlot": false
+        },
+        "description": {
+          "value": "",
+          "chatFlavor": ""
+        },
+        "range": {
+          "units": "self",
+          "value": null,
+          "override": true
+        },
+        "target": {
+          "template": {
+            "contiguous": false,
+            "units": "ft",
+            "type": "",
+            "size": "",
+            "width": "",
+            "height": "",
+            "distance": "",
+            "direction": "",
+            "angle": "",
+            "stationary": false
+          },
+          "affects": {
+            "choice": false,
+            "type": "self",
+            "count": ""
+          },
+          "override": true,
+          "prompt": true
+        }
+      }
+    },
     "uses": {
       "spent": 0,
-      "max": "",
-      "recovery": []
+      "max": 1,
+      "recovery": [
+        {
+          "period": "lr",
+          "type": "recoverAll"
+        }
+      ]
     }
   },
   "effects": [],
@@ -33,6 +94,8 @@
         ],
         "category": "species",
         "template": false,
+        "automation": "core-activity",
+        "requirements": [],
         "version": 1
       }
     }

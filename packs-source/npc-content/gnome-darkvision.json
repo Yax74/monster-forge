@@ -23,7 +23,45 @@
       "recovery": []
     }
   },
-  "effects": [],
+  "effects": [
+    {
+      "_id": "cdff6429gnomedar",
+      "name": "Gnomish Darkvision",
+      "img": "icons/magic/symbols/runes-star-blue.webp",
+      "type": "base",
+      "transfer": true,
+      "disabled": false,
+      "duration": {},
+      "statuses": [],
+      "flags": {
+        "dae": {
+          "stackable": "noneName",
+          "showIcon": false,
+          "specialDuration": []
+        }
+      },
+      "system": {
+        "changes": [
+          {
+            "_id": "c50d5f3dcdff6429",
+            "key": "system.attributes.senses.ranges.darkvision",
+            "value": "60",
+            "priority": 20,
+            "type": "upgrade",
+            "phase": "initial",
+            "conditions": "{}",
+            "replacement": ""
+          }
+        ],
+        "conditions": "{}",
+        "magical": false,
+        "rider": {
+          "statuses": []
+        }
+      },
+      "_key": "!effects!cdff6429gnomedar"
+    }
+  ],
   "flags": {
     "monster-forge": {
       "library": {
@@ -33,6 +71,8 @@
         ],
         "category": "species",
         "template": false,
+        "automation": "core-effect",
+        "requirements": [],
         "version": 1
       }
     }

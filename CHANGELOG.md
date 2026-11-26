@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.11.0
+
+- Added core actor effects for initiative, saving throw, weapon attack, and spell attack boosts; automated initiative advantage and Magic Resistance, while keeping condition-specific saves manual to avoid overgranting advantage.
+- Added proper D&D5e activities and uses for limited-use species traits, including Stonecunning, Healing Hands, Adrenaline Rush, and Relentless Endurance.
+- Added supported species trait effects for poison resistance, darkvision, Gnomish Cunning, Brave, and Fey Ancestry.
+- Gave command and leadership activities ally targeting and removed non-rules workflow notes from generated item descriptions.
+- Fixed trait card layout, grouped all species traits together, simplified the tab label to Traits, and made enabling Foundation select all four managed fields.
+- Reviewed the full bundled library and documented which entries are automated and which still require GM adjudication or configuration.
+
 ## 1.10.0
 
 - Reworked recommended ability scores so CR proficiency benchmarks affect only role-relevant attack and save abilities; unrelated scores now follow the selected role and species profile.

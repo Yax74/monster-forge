@@ -78,7 +78,7 @@
   border-radius: 8px;
   display: grid;
   gap: 0.25rem;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
   padding: 0.3rem;
   position: sticky;
   top: 0;
@@ -289,6 +289,8 @@
 .monster-forge .mf-content-choice input {
   flex: 0 0 auto;
   margin: 0;
+  min-height: auto;
+  width: auto;
   accent-color: var(--color-border-highlight, #c6954b);
 }
 
@@ -297,7 +299,10 @@
 }
 
 .monster-forge .mf-content-choice span {
-  overflow-wrap: anywhere;
+  flex: 1 1 0;
+  min-width: 0;
+  overflow-wrap: normal;
+  word-break: normal;
 }
 
 .monster-forge .mf-boost-name-field {

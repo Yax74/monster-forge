@@ -6,7 +6,7 @@
   "img": "icons/magic/defensive/shield-barrier-blue.webp",
   "system": {
     "description": {
-      "value": "<p><strong>[[lookup @name]].</strong> When an attacker the creature can see hits it with an attack, the creature can use its reaction to halve the attack&#039;s damage against it.</p><p>Use the generated activity for the roll or action prompt.</p><p class=\"monster-forge-note\">Monster Forge · Strong power · Manual feature</p>",
+      "value": "<p>When an attacker the creature can see hits it with an attack, the creature can use its reaction to halve the attack&#039;s damage against it.</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -50,6 +50,12 @@
             "contiguous": false,
             "units": "ft",
             "type": "",
+            "size": "",
+            "width": "",
+            "height": "",
+            "distance": "",
+            "direction": "",
+            "angle": "",
             "stationary": false
           },
           "affects": {
@@ -73,7 +79,7 @@
   "flags": {
     "monster-forge": {
       "generated": true,
-      "version": "1.10.0",
+      "version": "1.11.0",
       "setId": "library-source",
       "kind": "boost",
       "role": "boost",

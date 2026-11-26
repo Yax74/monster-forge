@@ -6,7 +6,7 @@
   "img": "icons/skills/melee/strike-sword-slashing-red.webp",
   "system": {
     "description": {
-      "value": "<p><strong>[[lookup @name]].</strong> The creature gains a +2 bonus to melee and ranged weapon attack rolls.</p><p class=\"monster-forge-note\">Monster Forge · Standard power · Core effect</p>",
+      "value": "<p>The creature gains a +2 bonus to melee and ranged weapon attack rolls.</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -46,7 +46,7 @@
         "changes": [
           {
             "_id": "e224e67db1d00e52",
-            "key": "system.bonuses.mwak.attack",
+            "key": "system.rolls.attack.mwak.bonus",
             "value": "2",
             "priority": 20,
             "type": "add",
@@ -56,7 +56,7 @@
           },
           {
             "_id": "e124e4eab1d00e52",
-            "key": "system.bonuses.rwak.attack",
+            "key": "system.rolls.attack.rwak.bonus",
             "value": "2",
             "priority": 20,
             "type": "add",
@@ -77,7 +77,7 @@
   "flags": {
     "monster-forge": {
       "generated": true,
-      "version": "1.10.0",
+      "version": "1.11.0",
       "setId": "library-source",
       "kind": "boost",
       "role": "boost",
@@ -112,12 +112,12 @@
           "automation": "core",
           "effect": [
             {
-              "key": "system.bonuses.mwak.attack",
-              "value": 2
+              "key": "system.rolls.attack.mwak.bonus",
+              "value": "2"
             },
             {
-              "key": "system.bonuses.rwak.attack",
-              "value": 2
+              "key": "system.rolls.attack.rwak.bonus",
+              "value": "2"
             }
           ],
           "impact": {

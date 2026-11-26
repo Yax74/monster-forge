@@ -6,7 +6,7 @@
   "img": "icons/commodities/stone/boulder-grey-blue.webp",
   "system": {
     "description": {
-      "value": "<p>This dwarf has a supernatural connection to stone that can reveal nearby vibrations. Set its range and duration to match the creature's challenge and intended use.</p>",
+      "value": "<p>As a Bonus Action while touching a stone surface, this dwarf gains Tremorsense out to 60 feet for 10 minutes. It can use this trait a number of times equal to its Proficiency Bonus, regaining all expended uses when it finishes a Long Rest.</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -16,14 +16,124 @@
     "type": {
       "value": "monster"
     },
-    "activities": {},
+    "activities": {
+      "c137056cstonecun": {
+        "_id": "c137056cstonecun",
+        "type": "utility",
+        "name": "Stonecunning",
+        "sort": 0,
+        "activation": {
+          "type": "bonus",
+          "value": 1,
+          "condition": "",
+          "override": true
+        },
+        "consumption": {
+          "targets": [
+            {
+              "type": "itemUses",
+              "value": "1",
+              "target": ""
+            }
+          ],
+          "scaling": {
+            "allowed": false
+          },
+          "spellSlot": false
+        },
+        "description": {
+          "value": "",
+          "chatFlavor": ""
+        },
+        "range": {
+          "units": "self",
+          "value": null,
+          "override": true
+        },
+        "target": {
+          "template": {
+            "contiguous": false,
+            "units": "ft",
+            "type": "",
+            "size": "",
+            "width": "",
+            "height": "",
+            "distance": "",
+            "direction": "",
+            "angle": "",
+            "stationary": false
+          },
+          "affects": {
+            "choice": false,
+            "type": "self",
+            "count": ""
+          },
+          "override": true,
+          "prompt": true
+        },
+        "effects": [
+          {
+            "_id": "1256188cdwarfsto",
+            "onSave": false
+          }
+        ],
+        "appliedEffects": [
+          "1256188cdwarfsto"
+        ]
+      }
+    },
     "uses": {
       "spent": 0,
-      "max": "",
-      "recovery": []
+      "max": "@prof",
+      "recovery": [
+        {
+          "period": "lr",
+          "type": "recoverAll"
+        }
+      ]
     }
   },
-  "effects": [],
+  "effects": [
+    {
+      "_id": "1256188cdwarfsto",
+      "name": "Stonecunning",
+      "img": "icons/magic/symbols/runes-star-blue.webp",
+      "type": "base",
+      "transfer": false,
+      "disabled": false,
+      "duration": {
+        "seconds": 600
+      },
+      "statuses": [],
+      "flags": {
+        "dae": {
+          "stackable": "noneName",
+          "showIcon": false,
+          "specialDuration": []
+        }
+      },
+      "system": {
+        "changes": [
+          {
+            "_id": "527fdd181256188c",
+            "key": "system.attributes.senses.ranges.tremorsense",
+            "value": "60",
+            "priority": 20,
+            "type": "upgrade",
+            "phase": "initial",
+            "conditions": "{}",
+            "replacement": ""
+          }
+        ],
+        "conditions": "{}",
+        "magical": false,
+        "rider": {
+          "statuses": []
+        }
+      },
+      "_key": "!effects!1256188cdwarfsto"
+    }
+  ],
   "flags": {
     "monster-forge": {
       "library": {
@@ -33,6 +143,8 @@
         ],
         "category": "species",
         "template": false,
+        "automation": "core-effect-and-activity",
+        "requirements": [],
         "version": 1
       }
     }

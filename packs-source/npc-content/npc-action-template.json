@@ -6,7 +6,7 @@
   "img": "icons/skills/melee/strike-sword-slashing-red.webp",
   "system": {
     "description": {
-      "value": "<p>Add the NPC action rules text and D&D5e activity data. This template is not intended to be added directly to a creature.</p>",
+      "value": "<p>Add the NPC action rules text and D&amp;D5e activity data. This template is not intended to be added directly to a creature.</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -31,6 +31,8 @@
         "species": [],
         "category": "action",
         "template": true,
+        "automation": "description-only",
+        "requirements": [],
         "version": 1
       }
     }

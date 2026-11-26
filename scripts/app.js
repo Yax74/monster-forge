@@ -467,6 +467,12 @@ function setSectionStates(root, config, foundation, plan) {
     }
     setText(root, `[data-preview='section-${section}']`, summaries[section]);
   }
+  const traitsBadge = root.querySelector("[data-tab-status='traits']");
+  if (traitsBadge) {
+    const enabled = Boolean(config.sections.boosts || config.sections.content);
+    traitsBadge.textContent = enabled ? "On" : "Off";
+    traitsBadge.classList.toggle("is-off", !enabled);
+  }
 }
 
 function activateTab(root, name) {
@@ -728,6 +734,10 @@ function updatePreview(root, actor) {
     if (config.sections.boosts && plan.boosts.selected.length) {
       previewWarnings.push("Selected boosts are layered after the FoF foundation. Review shows their stat and action-economy impact separately from the FoF benchmark.");
     }
+    if (config.sections.content && !midiReady) {
+      const midiItems = compendiumLibraryItems.filter((item) => config.selectedContent.includes(item.uuid) && contentItemRequiresMidi(item));
+      if (midiItems.length) previewWarnings.push(`These selected NPC features use Midi-QOL/DAE effects, which will remain inactive until both modules are enabled: ${midiItems.map((item) => item.name).join(", ")}.`);
+    }
     if (!Object.values(config.sections).some(Boolean)) {
       previewWarnings.push("Every section is off. Enable at least one section before applying.");
     }
@@ -952,6 +962,12 @@ function attachListeners(_event, dialog, actor) {
     preview();
   });
   form.addEventListener("change", (event) => {
+    if (event.target?.name === "sections.foundation" && event.target.checked) {
+      for (const name of ["foundation.manage.hp", "foundation.manage.ac", "foundation.manage.abilities", "foundation.manage.body"]) {
+        const input = form.elements.namedItem(name);
+        if (input) input.checked = true;
+      }
+    }
     if (event.target?.matches?.("[data-boost-item]") && event.target.checked) {
       const groupName = event.target.name;
       for (const sibling of form.querySelectorAll(`input[name="${CSS.escape(groupName)}"][data-boost-item]`)) {
@@ -1358,17 +1374,17 @@ function getAvailableContent(boostConfig = {}, recommendedBoosts = []) {
     const category = isBoost
       ? String(library.categoryLabel ?? library.category ?? "Boosts")
       : library.kind === "species-trait"
-        ? `${species} species traits`
+        ? "Species Traits"
         : String(library.categoryLabel ?? library.category ?? (library.kind === "action" ? "Actions" : "Traits"));
     const groupKey = isBoost
       ? `boost-${library.category}`
       : library.kind === "species-trait"
-        ? `species-${[].concat(library.species ?? []).join("-") || "general"}`
+        ? "species-traits"
         : `${library.kind}-${library.category ?? library.kind}`;
     const groupLabel = isBoost
       ? category
       : library.kind === "species-trait"
-        ? `${species} species traits`
+        ? "Species Traits"
         : category;
     const boostGroup = String(library.group ?? boost.groupId ?? "");
     const boostId = String(boost.id ?? "");
@@ -1396,6 +1412,14 @@ function getAvailableContent(boostConfig = {}, recommendedBoosts = []) {
     });
   }
   return entries.sort((a, b) => a.categorySort - b.categorySort || a.groupLabel.localeCompare(b.groupLabel) || a.name.localeCompare(b.name));
+}
+
+function contentItemRequiresMidi(item) {
+  const effects = item?.effects?.contents ?? (typeof item?.effects?.values === "function" ? [...item.effects.values()] : Object.values(item?.effects ?? {}));
+  return effects.some((effect) => {
+    const changes = effect.system?.changes ?? effect.changes ?? [];
+    return changes.some((change) => String(change.key ?? "").startsWith("flags.midi-qol."));
+  });
 }
 
 async function resolveSelectedContent(uuids = []) {

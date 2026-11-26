@@ -25,14 +25,92 @@ const entries = [
   ["tiefling-legacy", "Fiendish Legacy", "species-trait", "Tiefling", "This creature's fiendish legacy grants a limited magical ability. Add the specific spells and uses appropriate to its lineage."],
   ["dragonborn-breath", "Breath Weapon", "species-trait", "Dragonborn", "When this creature takes the Attack action, it can replace one of its attacks with a breath weapon. Set its damage type, area, damage, and saving throw for this NPC's challenge rating."],
   ["goliath-giant-ancestry", "Giant Ancestry", "species-trait", "Goliath", "This creature manifests a gift tied to its giant ancestry. Select and describe the gift appropriate to this NPC."],
-  ["drow-sunlight-adaptation", "Underdark Adaptation", "species-trait", "Drow", "This drow has keen darkvision and magic associated with its elven lineage. Add only the spells or senses that fit this NPC."],
-  ["duergar-resilience", "Duergar Resilience", "species-trait", "Duergar", "This duergar retains its dwarf parent species traits. Add any Stygian-specific resistance or resilience here; no additional condition immunities are assumed."],
-  ["deep-gnome-cunning", "Underdark Adaptation", "species-trait", "Deep Gnome", "This deep gnome's darkvision extends to 120 feet, and it is adapted to life underground. The parent Gnome profile supplies Gnomish Cunning."],
+  ["drow-sunlight-adaptation", "Underdark Adaptation", "species-trait", "Drow", "This creature has Darkvision with a range of 120 feet."],
+  ["duergar-resilience", "Duergar Resilience", "species-trait", "Duergar", "This creature has advantage on saving throws to avoid or end the Charmed, Frightened, and Stunned conditions."],
+  ["deep-gnome-cunning", "Underdark Adaptation", "species-trait", "Deep Gnome", "This creature has Darkvision with a range of 120 feet."],
   ["gemling-crystalline", "Gemling Crystalline Adaptation", "species-trait", "Gemling", "A gemling bears a distinctive crystalline adaptation. Define its resistance, sense, movement, or other feature for this creature in the item description or activities."],
   ["beast-instinct", "Bestial Instinct", "species-trait", "Beast", "Describe this creature's distinctive natural sense, movement, or hunting adaptation here."],
   ["undead-unliving", "Unliving Nature", "species-trait", "Undead", "This creature does not require air, food, drink, or sleep. Add any additional undead defenses as separate NPC features."],
   ["construct-built", "Constructed Nature", "species-trait", "Construct", "This creature does not require air, food, drink, or sleep. Add any additional construct defenses as separate NPC features."]
 ];
+
+const speciesAutomation = {
+  "dwarf-stonecunning": {
+    activity: { type: "utility", activation: "bonus", uses: { max: "@prof", recovery: [{ period: "lr", type: "recoverAll" }] }, effect: "tremorsense" },
+    description: "As a Bonus Action while touching a stone surface, this dwarf gains Tremorsense out to 60 feet for 10 minutes. It can use this trait a number of times equal to its Proficiency Bonus, regaining all expended uses when it finishes a Long Rest."
+  },
+  "aasimar-healing-hands": {
+    activity: { type: "heal", activation: "action", uses: { max: 1, recovery: [{ period: "lr", type: "recoverAll" }] }, range: 5, target: "creature", healing: "(@prof)d4" },
+    description: "As an action, this creature touches another creature. The target regains hit points equal to a roll of a number of d4s equal to this creature's Proficiency Bonus. Once used, this trait can't be used again until the creature finishes a Long Rest."
+  },
+  "orc-adrenaline-rush": {
+    activity: { type: "utility", activation: "bonus", uses: { max: "@prof", recovery: [{ period: "sr", type: "recoverAll" }, { period: "lr", type: "recoverAll" }] } }
+  },
+  "orc-relentless": {
+    activity: { type: "utility", activation: "reaction", uses: { max: 1, recovery: [{ period: "lr", type: "recoverAll" }] } }
+  }
+};
+
+const speciesEffects = {
+  "dwarf-stonecunning": [{ key: "system.attributes.senses.ranges.tremorsense", value: "60", mode: "upgrade", temporary: true }],
+  "dwarf-resilience": [{ key: "system.traits.dr.value", value: "poison" }],
+  "elf-darkvision": [{ key: "system.attributes.senses.ranges.darkvision", value: "60", mode: "upgrade" }],
+  "gnome-darkvision": [{ key: "system.attributes.senses.ranges.darkvision", value: "60", mode: "upgrade" }],
+  "drow-sunlight-adaptation": [{ key: "system.attributes.senses.ranges.darkvision", value: "120", mode: "upgrade" }],
+  "deep-gnome-cunning": [{ key: "system.attributes.senses.ranges.darkvision", value: "120", mode: "upgrade" }],
+  "gnome-cunning": [
+    { key: "flags.midi-qol.advantage.save.int", value: "1" },
+    { key: "flags.midi-qol.advantage.save.wis", value: "1" },
+    { key: "flags.midi-qol.advantage.save.cha", value: "1" }
+  ],
+  "halfling-brave": [],
+  "elf-fey-ancestry": []
+};
+
+speciesAutomation["dragonborn-breath"] = {
+  activity: { type: "utility", activation: "special" },
+  description: "When this creature takes the Attack action, it can replace one of its attacks with a breath weapon."
+};
+
+function buildFeatureEffect(slug, change, id) {
+  return {
+    _id: id,
+    name: entries.find((entry) => entry[0] === slug)?.[1] ?? slug,
+    img: "icons/magic/symbols/runes-star-blue.webp",
+    type: "base",
+    transfer: !change.temporary,
+    disabled: false,
+    duration: change.temporary ? { seconds: 600 } : {},
+    statuses: [],
+    flags: { dae: { stackable: "noneName", showIcon: false, specialDuration: [] } },
+    system: {
+      changes: [{ _id: stableId(`${id}-change`), key: change.key, value: String(change.value), priority: 20, type: change.key.startsWith("flags.midi-qol.") ? "custom" : (change.mode ?? "add"), phase: "initial", conditions: "{}", replacement: "" }],
+      conditions: "{}", magical: false, rider: { statuses: [] }
+    },
+    _key: `!effects!${id}`
+  };
+}
+
+function buildFeatureActivity(name, config, effectId) {
+  const activityId = stableId(`${name}-activity`).slice(0, 16);
+  const activity = {
+    _id: activityId,
+    type: config.type,
+    name,
+    sort: 0,
+    activation: { type: config.activation, value: 1, condition: "", override: true },
+    consumption: { targets: config.uses?.max ? [{ type: "itemUses", value: "1", target: "" }] : [], scaling: { allowed: false }, spellSlot: false },
+    description: { value: "", chatFlavor: "" },
+    range: { units: config.range ? "ft" : "self", value: config.range ? String(config.range) : null, override: true },
+    target: { template: { contiguous: false, units: "ft", type: "", size: "", width: "", height: "", distance: "", direction: "", angle: "", stationary: false }, affects: { choice: false, type: config.target ?? "self", count: config.target ? "1" : "" }, override: true, prompt: true }
+  };
+  if (config.healing) activity.healing = { number: null, denomination: 0, bonus: "", types: ["healing"], custom: { enabled: true, formula: config.healing }, scaling: { number: 1 }, modifiers: [] };
+  if (effectId) {
+    activity.effects = [{ _id: effectId, onSave: false }];
+    activity.appliedEffects = [effectId];
+  }
+  return { [activityId]: activity };
+}
 
 const speciesIcons = {
   human: "icons/creatures/eyes/human-single-blue.webp",
@@ -64,6 +142,10 @@ for (const [slug, name, kind, speciesLabel, description] of entries) {
   const species = speciesLabel === "Template" ? [] : [speciesLabel === "Deep Gnome" ? "deepGnome" : speciesLabel[0].toLowerCase() + speciesLabel.slice(1).replaceAll(" ", "")];
   const speciesKey = species[0];
   const id = stableId(slug);
+  const automation = speciesAutomation[slug];
+  const effectChanges = speciesEffects[slug] ?? [];
+  const effects = effectChanges.map((change, index) => buildFeatureEffect(slug, change, stableId(`${slug}-effect-${index}`)));
+  const activityEffect = effectChanges.find((change) => change.temporary);
   const data = {
     _key: `!items!${id}`,
     _id: id,
@@ -72,13 +154,13 @@ for (const [slug, name, kind, speciesLabel, description] of entries) {
     img: kind === "species-trait" && speciesIcons[speciesKey] ? speciesIcons[speciesKey]
       : kind === "action" ? "icons/skills/melee/strike-sword-slashing-red.webp" : "icons/sundries/books/book-backed-blue-gold.webp",
     system: {
-      description: { value: `<p>${description}</p>`, chat: "", unidentified: "" },
+      description: { value: `<p>${(automation?.description ?? description).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")}</p>`, chat: "", unidentified: "" },
       source: { custom: "Monster Forge NPC Content" },
       type: { value: "monster" },
-      activities: {},
-      uses: { spent: 0, max: "", recovery: [] }
+      activities: automation?.activity ? buildFeatureActivity(name, automation.activity, activityEffect ? effects.find((effect) => effect.system.changes[0].key === activityEffect.key)?._id : null) : {},
+      uses: automation?.activity?.uses ? { spent: 0, ...automation.activity.uses } : { spent: 0, max: "", recovery: [] }
     },
-    effects: [],
+    effects,
     flags: {
       "monster-forge": {
         library: {
@@ -86,6 +168,8 @@ for (const [slug, name, kind, speciesLabel, description] of entries) {
           species,
           category: kind === "species-trait" ? "species" : kind,
           template: speciesLabel === "Template",
+          automation: effects.length && automation?.activity ? "core-effect-and-activity" : effects.length ? "core-effect" : automation?.activity ? "core-activity" : "description-only",
+          requirements: effects.some((effect) => effect.system.changes.some((change) => change.key.startsWith("flags.midi-qol."))) ? ["midi-qol", "dae"] : [],
           version: 1
         }
       }
@@ -149,7 +233,7 @@ for (const [speciesKey, label, size, speed, darkvision] of profiles) {
     type: "feat",
     img: profileIcons[speciesKey] ?? speciesIcons[speciesKey] ?? "icons/magic/symbols/runes-star-blue.webp",
     system: {
-      description: { value: `<p>Starting profile: ${size}; walk ${speed} ft; darkvision ${darkvision} ft. Suggested ability adjustments are editable Monster Forge heuristics, not 2024 ancestry ability score rules. Traits are separate NPC Items.</p>`, chat: "", unidentified: "" },
+      description: { value: "", chat: "", unidentified: "" },
       source: { custom: "Monster Forge NPC Content" },
       type: { value: "monster" },
       activities: {},

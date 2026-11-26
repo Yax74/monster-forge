@@ -33,6 +33,8 @@
         ],
         "category": "species",
         "template": false,
+        "automation": "description-only",
+        "requirements": [],
         "version": 1
       }
     }

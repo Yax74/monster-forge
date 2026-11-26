@@ -6,7 +6,7 @@
   "img": "icons/skills/movement/feet-winged-boots-brown.webp",
   "system": {
     "description": {
-      "value": "<p><strong>[[lookup @name]].</strong> The creature has advantage on initiative rolls. Apply advantage when combat begins.</p><p>Use the generated activity for the roll or action prompt.</p><p class=\"monster-forge-note\">Monster Forge · Standard power · Manual feature</p>",
+      "value": "<p>The creature has advantage on initiative rolls. Apply advantage when combat begins.</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -50,6 +50,12 @@
             "contiguous": false,
             "units": "ft",
             "type": "",
+            "size": "",
+            "width": "",
+            "height": "",
+            "distance": "",
+            "direction": "",
+            "angle": "",
             "stationary": false
           },
           "affects": {
@@ -69,11 +75,49 @@
     },
     "identifier": "initiative-advantage"
   },
-  "effects": [],
+  "effects": [
+    {
+      "_id": "6333cea1c7f4cbee",
+      "name": "Always Ready",
+      "img": "icons/skills/movement/feet-winged-boots-brown.webp",
+      "type": "base",
+      "transfer": true,
+      "disabled": false,
+      "duration": {},
+      "statuses": [],
+      "flags": {
+        "dae": {
+          "stackable": "noneName",
+          "showIcon": false,
+          "specialDuration": []
+        }
+      },
+      "system": {
+        "changes": [
+          {
+            "_id": "6033c9e8c7f4cbee",
+            "key": "system.attributes.init.roll.mode",
+            "value": "1",
+            "priority": 20,
+            "type": "upgrade",
+            "phase": "initial",
+            "conditions": "{}",
+            "replacement": ""
+          }
+        ],
+        "conditions": "{}",
+        "magical": false,
+        "rider": {
+          "statuses": []
+        }
+      },
+      "_key": "!effects!6333cea1c7f4cbee"
+    }
+  ],
   "flags": {
     "monster-forge": {
       "generated": true,
-      "version": "1.10.0",
+      "version": "1.11.0",
       "setId": "library-source",
       "kind": "boost",
       "role": "boost",
@@ -83,7 +127,7 @@
       "defaultName": "Always Ready",
       "customName": "",
       "power": "standard",
-      "automation": "manual",
+      "automation": "core",
       "exclusiveGroup": "initiative-bonus",
       "requirements": [],
       "library": {
@@ -105,7 +149,7 @@
           "summary": "The creature has advantage on initiative rolls.",
           "description": "The creature has advantage on initiative rolls. Apply advantage when combat begins.",
           "power": "standard",
-          "automation": "manual",
+          "automation": "core",
           "impact": {
             "note": "Advantage on initiative"
           },
@@ -118,7 +162,14 @@
           "exclusiveGroup": "initiative-bonus",
           "rank": null,
           "requirements": [],
-          "img": "icons/skills/movement/feet-winged-boots-brown.webp"
+          "img": "icons/skills/movement/feet-winged-boots-brown.webp",
+          "effect": [
+            {
+              "key": "system.attributes.init.roll.mode",
+              "value": "1",
+              "mode": "upgrade"
+            }
+          ]
         },
         "template": false,
         "version": 2

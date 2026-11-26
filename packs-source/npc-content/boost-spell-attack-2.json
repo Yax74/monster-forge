@@ -6,7 +6,7 @@
   "img": "icons/magic/symbols/runes-star-blue.webp",
   "system": {
     "description": {
-      "value": "<p><strong>[[lookup @name]].</strong> The creature gains a +2 bonus to melee and ranged spell attack rolls.</p><p class=\"monster-forge-note\">Monster Forge · Standard power · Core effect</p>",
+      "value": "<p>The creature gains a +2 bonus to melee and ranged spell attack rolls.</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -46,7 +46,7 @@
         "changes": [
           {
             "_id": "14a1190fce57d1bb",
-            "key": "system.bonuses.msak.attack",
+            "key": "system.rolls.attack.msak.bonus",
             "value": "2",
             "priority": 20,
             "type": "add",
@@ -56,7 +56,7 @@
           },
           {
             "_id": "13a1177cce57d1bb",
-            "key": "system.bonuses.rsak.attack",
+            "key": "system.rolls.attack.rsak.bonus",
             "value": "2",
             "priority": 20,
             "type": "add",
@@ -77,7 +77,7 @@
   "flags": {
     "monster-forge": {
       "generated": true,
-      "version": "1.10.0",
+      "version": "1.11.0",
       "setId": "library-source",
       "kind": "boost",
       "role": "boost",
@@ -112,12 +112,12 @@
           "automation": "core",
           "effect": [
             {
-              "key": "system.bonuses.msak.attack",
-              "value": 2
+              "key": "system.rolls.attack.msak.bonus",
+              "value": "2"
             },
             {
-              "key": "system.bonuses.rsak.attack",
-              "value": 2
+              "key": "system.rolls.attack.rsak.bonus",
+              "value": "2"
             }
           ],
           "impact": {

@@ -6,7 +6,7 @@
   "img": "icons/skills/social/diplomacy-handshake-blue.webp",
   "system": {
     "description": {
-      "value": "<p><strong>[[lookup @name]].</strong> As an action, the creature chooses up to two allies within 30 feet that can hear it. Each chosen ally can use its reaction to make one weapon attack.</p><p>Use the generated activity for the roll or action prompt.</p><p class=\"monster-forge-note\">Monster Forge · Major power · Manual feature</p>",
+      "value": "<p>As an action, the creature chooses up to two allies within 30 feet that can hear it. Each chosen ally can use its reaction to make one weapon attack.</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -41,8 +41,8 @@
           "chatFlavor": ""
         },
         "range": {
-          "units": "self",
-          "value": null,
+          "units": "ft",
+          "value": 30,
           "override": true
         },
         "target": {
@@ -50,12 +50,18 @@
             "contiguous": false,
             "units": "ft",
             "type": "",
+            "size": "",
+            "width": "",
+            "height": "",
+            "distance": "",
+            "direction": "",
+            "angle": "",
             "stationary": false
           },
           "affects": {
             "choice": false,
-            "type": "self",
-            "count": ""
+            "type": "ally",
+            "count": "2"
           },
           "override": true,
           "prompt": true
@@ -73,7 +79,7 @@
   "flags": {
     "monster-forge": {
       "generated": true,
-      "version": "1.10.0",
+      "version": "1.11.0",
       "setId": "library-source",
       "kind": "boost",
       "role": "boost",
@@ -117,7 +123,13 @@
           "exclusiveGroup": "leadership-feature",
           "rank": 1,
           "requirements": [],
-          "img": "icons/skills/social/diplomacy-handshake-blue.webp"
+          "img": "icons/skills/social/diplomacy-handshake-blue.webp",
+          "target": {
+            "type": "ally",
+            "count": "2",
+            "range": 30,
+            "rangeUnits": "ft"
+          }
         },
         "template": false,
         "version": 2

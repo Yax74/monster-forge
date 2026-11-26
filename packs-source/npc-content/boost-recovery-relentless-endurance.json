@@ -6,7 +6,7 @@
   "img": "icons/magic/life/heart-cross-blue.webp",
   "system": {
     "description": {
-      "value": "<p><strong>[[lookup @name]].</strong> When the creature is reduced to 0 hit points but not killed outright, it can drop to 1 hit point instead. Once it uses this feature, it can&#039;t use it again until it finishes a long rest.</p><p>Use the generated activity for the roll or action prompt.</p><p class=\"monster-forge-note\">Monster Forge · Strong power · Manual feature</p>",
+      "value": "<p>When the creature is reduced to 0 hit points but not killed outright, it can drop to 1 hit point instead. Once it uses this feature, it can&#039;t use it again until it finishes a long rest.</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -56,6 +56,12 @@
             "contiguous": false,
             "units": "ft",
             "type": "",
+            "size": "",
+            "width": "",
+            "height": "",
+            "distance": "",
+            "direction": "",
+            "angle": "",
             "stationary": false
           },
           "affects": {
@@ -84,7 +90,7 @@
   "flags": {
     "monster-forge": {
       "generated": true,
-      "version": "1.10.0",
+      "version": "1.11.0",
       "setId": "library-source",
       "kind": "boost",
       "role": "boost",

@@ -6,7 +6,7 @@
   "img": "icons/magic/defensive/shield-barrier-blue.webp",
   "system": {
     "description": {
-      "value": "<p><strong>[[lookup @name]].</strong> The creature has advantage on Intelligence, Wisdom, and Charisma saving throws.</p><p><em>Midi-QOL/DAE can assist where supported; resolve conditional timing manually.</em></p><p class=\"monster-forge-note\">Monster Forge · Major power · Midi/DAE optional</p>",
+      "value": "<p>The creature has advantage on Intelligence, Wisdom, and Charisma saving throws.</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -87,7 +87,7 @@
   "flags": {
     "monster-forge": {
       "generated": true,
-      "version": "1.10.0",
+      "version": "1.11.0",
       "setId": "library-source",
       "kind": "boost",
       "role": "boost",

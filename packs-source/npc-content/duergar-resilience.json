@@ -6,7 +6,7 @@
   "img": "icons/creatures/magical/construct-face-stone-pink.webp",
   "system": {
     "description": {
-      "value": "<p>This duergar retains its dwarf parent species traits. Add any Stygian-specific resistance or resilience here; no additional condition immunities are assumed.</p>",
+      "value": "<p>This creature has advantage on saving throws to avoid or end the Charmed, Frightened, and Stunned conditions.</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -33,6 +33,8 @@
         ],
         "category": "species",
         "template": false,
+        "automation": "description-only",
+        "requirements": [],
         "version": 1
       }
     }

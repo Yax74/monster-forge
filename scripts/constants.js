@@ -1,6 +1,6 @@
 export const MODULE_ID = "monster-forge";
 export const MODULE_TITLE = "Monster Forge";
-export const MODULE_VERSION = "1.10.0";
+export const MODULE_VERSION = "1.11.0";
 
 /**
  * Baseline statistics from the published Forge of Foes monster statistics

@@ -6,7 +6,7 @@
   "img": "icons/magic/defensive/shield-barrier-blue.webp",
   "system": {
     "description": {
-      "value": "<p><strong>[[lookup @name]].</strong> The creature has advantage on saving throws against spells and other magical effects.</p><p><em>resolve conditional timing manually.</em></p><p class=\"monster-forge-note\">Monster Forge · Major power · Manual feature</p>",
+      "value": "<p>The creature has advantage on saving throws against spells and other magical effects.</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -25,11 +25,49 @@
     },
     "identifier": "saves-magic-resistance"
   },
-  "effects": [],
+  "effects": [
+    {
+      "_id": "ee2d7e8469ab93c7",
+      "name": "Magic Resistance",
+      "img": "icons/magic/defensive/shield-barrier-blue.webp",
+      "type": "base",
+      "transfer": true,
+      "disabled": false,
+      "duration": {},
+      "statuses": [],
+      "flags": {
+        "dae": {
+          "stackable": "noneName",
+          "showIcon": false,
+          "specialDuration": []
+        }
+      },
+      "system": {
+        "changes": [
+          {
+            "_id": "ef2d801769ab93c7",
+            "key": "flags.midi-qol.magicResistance.all",
+            "value": "1",
+            "priority": 20,
+            "type": "custom",
+            "phase": "initial",
+            "conditions": "{}",
+            "replacement": ""
+          }
+        ],
+        "conditions": "{}",
+        "magical": false,
+        "rider": {
+          "statuses": []
+        }
+      },
+      "_key": "!effects!ee2d7e8469ab93c7"
+    }
+  ],
   "flags": {
     "monster-forge": {
       "generated": true,
-      "version": "1.10.0",
+      "version": "1.11.0",
       "setId": "library-source",
       "kind": "boost",
       "role": "boost",
@@ -39,9 +77,12 @@
       "defaultName": "Magic Resistance",
       "customName": "",
       "power": "major",
-      "automation": "manual",
+      "automation": "midi",
       "exclusiveGroup": "saving-resilience",
-      "requirements": [],
+      "requirements": [
+        "midi-qol",
+        "dae"
+      ],
       "library": {
         "kind": "boost",
         "category": "resilience",
@@ -61,7 +102,7 @@
           "summary": "The creature has advantage on saving throws against spells and other magical effects.",
           "description": "The creature has advantage on saving throws against spells and other magical effects.",
           "power": "major",
-          "automation": "manual",
+          "automation": "midi",
           "impact": {
             "note": "Advantage vs. magic"
           },
@@ -69,8 +110,17 @@
           "categoryId": "resilience",
           "exclusiveGroup": "saving-resilience",
           "rank": null,
-          "requirements": [],
-          "img": "icons/magic/defensive/shield-barrier-blue.webp"
+          "requirements": [
+            "midi-qol",
+            "dae"
+          ],
+          "img": "icons/magic/defensive/shield-barrier-blue.webp",
+          "effect": [
+            {
+              "key": "flags.midi-qol.magicResistance.all",
+              "value": "1"
+            }
+          ]
         },
         "template": false,
         "version": 2

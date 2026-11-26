@@ -31,6 +31,8 @@
         "species": [],
         "category": "species",
         "template": true,
+        "automation": "description-only",
+        "requirements": [],
         "version": 1
       }
     }

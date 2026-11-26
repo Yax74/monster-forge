@@ -23,7 +23,119 @@
       "recovery": []
     }
   },
-  "effects": [],
+  "effects": [
+    {
+      "_id": "f3b97b85gnomecun",
+      "name": "Gnomish Cunning",
+      "img": "icons/magic/symbols/runes-star-blue.webp",
+      "type": "base",
+      "transfer": true,
+      "disabled": false,
+      "duration": {},
+      "statuses": [],
+      "flags": {
+        "dae": {
+          "stackable": "noneName",
+          "showIcon": false,
+          "specialDuration": []
+        }
+      },
+      "system": {
+        "changes": [
+          {
+            "_id": "d456327af3b97b85",
+            "key": "flags.midi-qol.advantage.save.int",
+            "value": "1",
+            "priority": 20,
+            "type": "custom",
+            "phase": "initial",
+            "conditions": "{}",
+            "replacement": ""
+          }
+        ],
+        "conditions": "{}",
+        "magical": false,
+        "rider": {
+          "statuses": []
+        }
+      },
+      "_key": "!effects!f3b97b85gnomecun"
+    },
+    {
+      "_id": "f2b979f2gnomecun",
+      "name": "Gnomish Cunning",
+      "img": "icons/magic/symbols/runes-star-blue.webp",
+      "type": "base",
+      "transfer": true,
+      "disabled": false,
+      "duration": {},
+      "statuses": [],
+      "flags": {
+        "dae": {
+          "stackable": "noneName",
+          "showIcon": false,
+          "specialDuration": []
+        }
+      },
+      "system": {
+        "changes": [
+          {
+            "_id": "64c8cc65f2b979f2",
+            "key": "flags.midi-qol.advantage.save.wis",
+            "value": "1",
+            "priority": 20,
+            "type": "custom",
+            "phase": "initial",
+            "conditions": "{}",
+            "replacement": ""
+          }
+        ],
+        "conditions": "{}",
+        "magical": false,
+        "rider": {
+          "statuses": []
+        }
+      },
+      "_key": "!effects!f2b979f2gnomecun"
+    },
+    {
+      "_id": "f1b9785fgnomecun",
+      "name": "Gnomish Cunning",
+      "img": "icons/magic/symbols/runes-star-blue.webp",
+      "type": "base",
+      "transfer": true,
+      "disabled": false,
+      "duration": {},
+      "statuses": [],
+      "flags": {
+        "dae": {
+          "stackable": "noneName",
+          "showIcon": false,
+          "specialDuration": []
+        }
+      },
+      "system": {
+        "changes": [
+          {
+            "_id": "1b0d317ef1b9785f",
+            "key": "flags.midi-qol.advantage.save.cha",
+            "value": "1",
+            "priority": 20,
+            "type": "custom",
+            "phase": "initial",
+            "conditions": "{}",
+            "replacement": ""
+          }
+        ],
+        "conditions": "{}",
+        "magical": false,
+        "rider": {
+          "statuses": []
+        }
+      },
+      "_key": "!effects!f1b9785fgnomecun"
+    }
+  ],
   "flags": {
     "monster-forge": {
       "library": {
@@ -33,6 +145,11 @@
         ],
         "category": "species",
         "template": false,
+        "automation": "core-effect",
+        "requirements": [
+          "midi-qol",
+          "dae"
+        ],
         "version": 1
       }
     }
