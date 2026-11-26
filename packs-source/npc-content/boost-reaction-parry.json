@@ -3,10 +3,10 @@
   "_id": "6f2f4d9f28adc1c6",
   "name": "Parry",
   "type": "feat",
-  "img": "icons/svg/shield.svg",
+  "img": "icons/magic/defensive/shield-barrier-blue.webp",
   "system": {
     "description": {
-      "value": "<p>The creature adds its proficiency bonus to its AC against one melee attack that would hit it. To do so, the creature must see the attacker and be wielding a melee weapon or shield.</p>",
+      "value": "<p><strong>[[lookup @name]].</strong> The creature adds its proficiency bonus to its AC against one melee attack that would hit it. To do so, the creature must see the attacker and be wielding a melee weapon or shield.</p><p>Use the generated activity for the roll or action prompt.</p><p class=\"monster-forge-note\">Monster Forge · Standard power · Manual feature</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -17,21 +17,80 @@
       "value": "monster",
       "subtype": ""
     },
-    "activities": {},
+    "activities": {
+      "9b61824d6f2f4d9f": {
+        "_id": "9b61824d6f2f4d9f",
+        "type": "utility",
+        "name": "Parry",
+        "sort": 0,
+        "activation": {
+          "type": "reaction",
+          "value": 1,
+          "condition": "A visible melee attack would hit",
+          "override": true
+        },
+        "consumption": {
+          "targets": [],
+          "scaling": {
+            "allowed": false
+          },
+          "spellSlot": false
+        },
+        "description": {
+          "value": "",
+          "chatFlavor": ""
+        },
+        "range": {
+          "units": "self",
+          "value": null,
+          "override": true
+        },
+        "target": {
+          "template": {
+            "contiguous": false,
+            "units": "ft",
+            "type": "",
+            "stationary": false
+          },
+          "affects": {
+            "choice": false,
+            "type": "self",
+            "count": ""
+          },
+          "override": true,
+          "prompt": true
+        }
+      }
+    },
     "uses": {
-      "spent": 0,
       "max": "",
+      "spent": 0,
       "recovery": []
-    }
+    },
+    "identifier": "reaction-parry"
   },
   "effects": [],
   "flags": {
     "monster-forge": {
+      "generated": true,
+      "version": "1.10.0",
+      "setId": "library-source",
+      "kind": "boost",
+      "role": "boost",
+      "boostId": "reaction.parry",
+      "boostGroup": "defence-reaction",
+      "category": "defence",
+      "defaultName": "Parry",
+      "customName": "",
+      "power": "standard",
+      "automation": "manual",
+      "exclusiveGroup": "defence-reaction",
+      "requirements": [],
       "library": {
         "kind": "boost",
         "category": "defence",
         "categoryLabel": "Defence",
-        "categoryIcon": "icons/svg/shield.svg",
+        "categoryIcon": "icons/magic/defensive/shield-barrier-blue.webp",
         "categoryDescription": "Passive AC or one defensive reaction.",
         "categorySort": 2,
         "group": "defence-reaction",
@@ -58,11 +117,15 @@
           "categoryId": "defence",
           "exclusiveGroup": "defence-reaction",
           "rank": null,
-          "requirements": []
+          "requirements": [],
+          "img": "icons/magic/defensive/shield-barrier-blue.webp"
         },
         "template": false,
         "version": 2
       }
+    },
+    "dae": {
+      "stackable": "noneName"
     }
   }
 }

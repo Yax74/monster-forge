@@ -3,10 +3,10 @@
   "_id": "655d9bb4f4054196",
   "name": "Perfect Readiness",
   "type": "feat",
-  "img": "icons/svg/d20.svg",
+  "img": "icons/skills/movement/feet-winged-boots-brown.webp",
   "system": {
     "description": {
-      "value": "<p>The creature adds twice its proficiency bonus to initiative.</p>",
+      "value": "<p><strong>[[lookup @name]].</strong> The creature adds twice its proficiency bonus to initiative.</p><p class=\"monster-forge-note\">Monster Forge · Major power · Core effect</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -19,19 +19,72 @@
     },
     "activities": {},
     "uses": {
-      "spent": 0,
       "max": "",
+      "spent": 0,
       "recovery": []
-    }
+    },
+    "identifier": "initiative-pb2"
   },
-  "effects": [],
+  "effects": [
+    {
+      "_id": "ba7691c7655d9bb4",
+      "name": "Perfect Readiness",
+      "img": "icons/skills/movement/feet-winged-boots-brown.webp",
+      "type": "base",
+      "transfer": true,
+      "disabled": false,
+      "duration": {},
+      "statuses": [],
+      "flags": {
+        "dae": {
+          "stackable": "noneName",
+          "showIcon": false,
+          "specialDuration": []
+        }
+      },
+      "system": {
+        "changes": [
+          {
+            "_id": "b9769034655d9bb4",
+            "key": "system.attributes.init.bonus",
+            "value": "(2*@attributes.prof)",
+            "priority": 20,
+            "type": "add",
+            "phase": "initial",
+            "conditions": "{}",
+            "replacement": ""
+          }
+        ],
+        "conditions": "{}",
+        "magical": false,
+        "rider": {
+          "statuses": []
+        }
+      },
+      "_key": "!effects!ba7691c7655d9bb4"
+    }
+  ],
   "flags": {
     "monster-forge": {
+      "generated": true,
+      "version": "1.10.0",
+      "setId": "library-source",
+      "kind": "boost",
+      "role": "boost",
+      "boostId": "initiative.pb2",
+      "boostGroup": "initiative-bonus",
+      "category": "initiative",
+      "defaultName": "Perfect Readiness",
+      "customName": "",
+      "power": "major",
+      "automation": "core",
+      "exclusiveGroup": "initiative-bonus",
+      "requirements": [],
       "library": {
         "kind": "boost",
         "category": "initiative",
         "categoryLabel": "Initiative",
-        "categoryIcon": "icons/svg/d20.svg",
+        "categoryIcon": "icons/skills/movement/feet-winged-boots-brown.webp",
         "categoryDescription": "Turn-order boosts. Choose one.",
         "categorySort": 0,
         "group": "initiative-bonus",
@@ -60,11 +113,15 @@
           "categoryId": "initiative",
           "exclusiveGroup": "initiative-bonus",
           "rank": null,
-          "requirements": []
+          "requirements": [],
+          "img": "icons/skills/movement/feet-winged-boots-brown.webp"
         },
         "template": false,
         "version": 2
       }
+    },
+    "dae": {
+      "stackable": "noneName"
     }
   }
 }

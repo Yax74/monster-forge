@@ -3,7 +3,7 @@
   "_id": "a868b44anpctrait",
   "name": "Blank NPC Trait",
   "type": "feat",
-  "img": "icons/svg/book.svg",
+  "img": "icons/sundries/books/book-backed-blue-gold.webp",
   "system": {
     "description": {
       "value": "<p>Add the passive or triggered NPC trait rules text and any relevant activities or effects. This template is not intended to be added directly to a creature.</p>",

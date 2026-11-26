@@ -3,10 +3,10 @@
   "_id": "b1d00e5235976886",
   "name": "Weapon Training II",
   "type": "feat",
-  "img": "icons/svg/target.svg",
+  "img": "icons/skills/melee/strike-sword-slashing-red.webp",
   "system": {
     "description": {
-      "value": "<p>The creature gains a +2 bonus to melee and ranged weapon attack rolls.</p>",
+      "value": "<p><strong>[[lookup @name]].</strong> The creature gains a +2 bonus to melee and ranged weapon attack rolls.</p><p class=\"monster-forge-note\">Monster Forge · Standard power · Core effect</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -19,19 +19,82 @@
     },
     "activities": {},
     "uses": {
-      "spent": 0,
       "max": "",
+      "spent": 0,
       "recovery": []
-    }
+    },
+    "identifier": "accuracy-weapon-2"
   },
-  "effects": [],
+  "effects": [
+    {
+      "_id": "e024e357b1d00e52",
+      "name": "Weapon Training II",
+      "img": "icons/skills/melee/strike-sword-slashing-red.webp",
+      "type": "base",
+      "transfer": true,
+      "disabled": false,
+      "duration": {},
+      "statuses": [],
+      "flags": {
+        "dae": {
+          "stackable": "noneName",
+          "showIcon": false,
+          "specialDuration": []
+        }
+      },
+      "system": {
+        "changes": [
+          {
+            "_id": "e224e67db1d00e52",
+            "key": "system.bonuses.mwak.attack",
+            "value": "2",
+            "priority": 20,
+            "type": "add",
+            "phase": "initial",
+            "conditions": "{}",
+            "replacement": ""
+          },
+          {
+            "_id": "e124e4eab1d00e52",
+            "key": "system.bonuses.rwak.attack",
+            "value": "2",
+            "priority": 20,
+            "type": "add",
+            "phase": "initial",
+            "conditions": "{}",
+            "replacement": ""
+          }
+        ],
+        "conditions": "{}",
+        "magical": false,
+        "rider": {
+          "statuses": []
+        }
+      },
+      "_key": "!effects!e024e357b1d00e52"
+    }
+  ],
   "flags": {
     "monster-forge": {
+      "generated": true,
+      "version": "1.10.0",
+      "setId": "library-source",
+      "kind": "boost",
+      "role": "boost",
+      "boostId": "accuracy.weapon.2",
+      "boostGroup": "weapon-accuracy",
+      "category": "accuracy",
+      "defaultName": "Weapon Training II",
+      "customName": "",
+      "power": "standard",
+      "automation": "core",
+      "exclusiveGroup": "weapon-accuracy",
+      "requirements": [],
       "library": {
         "kind": "boost",
         "category": "accuracy",
         "categoryLabel": "Weapon Accuracy",
-        "categoryIcon": "icons/svg/target.svg",
+        "categoryIcon": "icons/skills/melee/strike-sword-slashing-red.webp",
         "categoryDescription": "Bonuses to all weapon attack rolls.",
         "categorySort": 5,
         "group": "weapon-accuracy",
@@ -64,11 +127,15 @@
           "categoryId": "accuracy",
           "exclusiveGroup": "weapon-accuracy",
           "rank": 2,
-          "requirements": []
+          "requirements": [],
+          "img": "icons/skills/melee/strike-sword-slashing-red.webp"
         },
         "template": false,
         "version": 2
       }
+    },
+    "dae": {
+      "stackable": "noneName"
     }
   }
 }

@@ -3,10 +3,10 @@
   "_id": "c661dda9f2ea00c0",
   "name": "Tactical Guidance",
   "type": "feat",
-  "img": "icons/sundries/flags/banner-blue.webp",
+  "img": "icons/skills/social/diplomacy-handshake-blue.webp",
   "system": {
     "description": {
-      "value": "<p>As a bonus action, the creature chooses one ally within 30 feet that can see or hear it. Before the start of the creature's next turn, the ally can gain advantage on one attack roll, ability check, or saving throw of its choice.</p>",
+      "value": "<p><strong>[[lookup @name]].</strong> As a bonus action, the creature chooses one ally within 30 feet that can see or hear it. Before the start of the creature&#039;s next turn, the ally can gain advantage on one attack roll, ability check, or saving throw of its choice.</p><p>Use the generated activity for the roll or action prompt.</p><p class=\"monster-forge-note\">Monster Forge · Strong power · Midi/DAE optional</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -17,21 +17,83 @@
       "value": "monster",
       "subtype": ""
     },
-    "activities": {},
+    "activities": {
+      "c888bc07c661dda9": {
+        "_id": "c888bc07c661dda9",
+        "type": "utility",
+        "name": "Tactical Guidance",
+        "sort": 0,
+        "activation": {
+          "type": "bonus",
+          "value": 1,
+          "condition": "",
+          "override": true
+        },
+        "consumption": {
+          "targets": [],
+          "scaling": {
+            "allowed": false
+          },
+          "spellSlot": false
+        },
+        "description": {
+          "value": "",
+          "chatFlavor": ""
+        },
+        "range": {
+          "units": "self",
+          "value": null,
+          "override": true
+        },
+        "target": {
+          "template": {
+            "contiguous": false,
+            "units": "ft",
+            "type": "",
+            "stationary": false
+          },
+          "affects": {
+            "choice": false,
+            "type": "self",
+            "count": ""
+          },
+          "override": true,
+          "prompt": true
+        }
+      }
+    },
     "uses": {
-      "spent": 0,
       "max": "",
+      "spent": 0,
       "recovery": []
-    }
+    },
+    "identifier": "leadership-tactical-guidance"
   },
   "effects": [],
   "flags": {
     "monster-forge": {
+      "generated": true,
+      "version": "1.10.0",
+      "setId": "library-source",
+      "kind": "boost",
+      "role": "boost",
+      "boostId": "leadership.tactical-guidance",
+      "boostGroup": "leadership-feature",
+      "category": "leadership",
+      "defaultName": "Tactical Guidance",
+      "customName": "",
+      "power": "strong",
+      "automation": "midi",
+      "exclusiveGroup": "leadership-feature",
+      "requirements": [
+        "midi-qol",
+        "dae"
+      ],
       "library": {
         "kind": "boost",
         "category": "leadership",
         "categoryLabel": "Leadership",
-        "categoryIcon": "icons/sundries/flags/banner-blue.webp",
+        "categoryIcon": "icons/skills/social/diplomacy-handshake-blue.webp",
         "categoryDescription": "Support and command features; choose one.",
         "categorySort": 7,
         "group": "leadership-feature",
@@ -60,11 +122,15 @@
           "requirements": [
             "midi-qol",
             "dae"
-          ]
+          ],
+          "img": "icons/skills/social/diplomacy-handshake-blue.webp"
         },
         "template": false,
         "version": 2
       }
+    },
+    "dae": {
+      "stackable": "noneName"
     }
   }
 }

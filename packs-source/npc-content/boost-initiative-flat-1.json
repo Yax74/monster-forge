@@ -3,10 +3,10 @@
   "_id": "21005952c0ad394f",
   "name": "Quickness I",
   "type": "feat",
-  "img": "icons/svg/d20.svg",
+  "img": "icons/skills/movement/feet-winged-boots-brown.webp",
   "system": {
     "description": {
-      "value": "<p>The creature gains a +1 bonus to initiative.</p>",
+      "value": "<p><strong>[[lookup @name]].</strong> The creature gains a +1 bonus to initiative.</p><p class=\"monster-forge-note\">Monster Forge · Light power · Core effect</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -19,19 +19,72 @@
     },
     "activities": {},
     "uses": {
-      "spent": 0,
       "max": "",
+      "spent": 0,
       "recovery": []
-    }
+    },
+    "identifier": "initiative-flat-1"
   },
-  "effects": [],
+  "effects": [
+    {
+      "_id": "682c687b21005952",
+      "name": "Quickness I",
+      "img": "icons/skills/movement/feet-winged-boots-brown.webp",
+      "type": "base",
+      "transfer": true,
+      "disabled": false,
+      "duration": {},
+      "statuses": [],
+      "flags": {
+        "dae": {
+          "stackable": "noneName",
+          "showIcon": false,
+          "specialDuration": []
+        }
+      },
+      "system": {
+        "changes": [
+          {
+            "_id": "672c66e821005952",
+            "key": "system.attributes.init.bonus",
+            "value": "1",
+            "priority": 20,
+            "type": "add",
+            "phase": "initial",
+            "conditions": "{}",
+            "replacement": ""
+          }
+        ],
+        "conditions": "{}",
+        "magical": false,
+        "rider": {
+          "statuses": []
+        }
+      },
+      "_key": "!effects!682c687b21005952"
+    }
+  ],
   "flags": {
     "monster-forge": {
+      "generated": true,
+      "version": "1.10.0",
+      "setId": "library-source",
+      "kind": "boost",
+      "role": "boost",
+      "boostId": "initiative.flat.1",
+      "boostGroup": "initiative-bonus",
+      "category": "initiative",
+      "defaultName": "Quickness I",
+      "customName": "",
+      "power": "light",
+      "automation": "core",
+      "exclusiveGroup": "initiative-bonus",
+      "requirements": [],
       "library": {
         "kind": "boost",
         "category": "initiative",
         "categoryLabel": "Initiative",
-        "categoryIcon": "icons/svg/d20.svg",
+        "categoryIcon": "icons/skills/movement/feet-winged-boots-brown.webp",
         "categoryDescription": "Turn-order boosts. Choose one.",
         "categorySort": 0,
         "group": "initiative-bonus",
@@ -60,11 +113,15 @@
           "categoryId": "initiative",
           "exclusiveGroup": "initiative-bonus",
           "rank": 1,
-          "requirements": []
+          "requirements": [],
+          "img": "icons/skills/movement/feet-winged-boots-brown.webp"
         },
         "template": false,
         "version": 2
       }
+    },
+    "dae": {
+      "stackable": "noneName"
     }
   }
 }

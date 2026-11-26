@@ -3,10 +3,10 @@
   "_id": "b3a521c533fb1776",
   "name": "Steadfast Constitution",
   "type": "feat",
-  "img": "icons/svg/holy-shield.svg",
+  "img": "icons/magic/defensive/shield-barrier-blue.webp",
   "system": {
     "description": {
-      "value": "<p>The creature has advantage on Constitution saving throws.</p>",
+      "value": "<p><strong>[[lookup @name]].</strong> The creature has advantage on Constitution saving throws.</p><p><em>Midi-QOL/DAE can assist where supported; resolve conditional timing manually.</em></p><p class=\"monster-forge-note\">Monster Forge · Standard power · Midi/DAE optional</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -19,19 +19,75 @@
     },
     "activities": {},
     "uses": {
-      "spent": 0,
       "max": "",
+      "spent": 0,
       "recovery": []
-    }
+    },
+    "identifier": "saves-con-advantage"
   },
-  "effects": [],
+  "effects": [
+    {
+      "_id": "dcd62810b3a521c5",
+      "name": "Steadfast Constitution",
+      "img": "icons/magic/defensive/shield-barrier-blue.webp",
+      "type": "base",
+      "transfer": true,
+      "disabled": false,
+      "duration": {},
+      "statuses": [],
+      "flags": {
+        "dae": {
+          "stackable": "noneName",
+          "showIcon": false,
+          "specialDuration": []
+        }
+      },
+      "system": {
+        "changes": [
+          {
+            "_id": "ddd629a3b3a521c5",
+            "key": "flags.midi-qol.advantage.save.con",
+            "value": "1",
+            "priority": 20,
+            "type": "custom",
+            "phase": "initial",
+            "conditions": "{}",
+            "replacement": ""
+          }
+        ],
+        "conditions": "{}",
+        "magical": false,
+        "rider": {
+          "statuses": []
+        }
+      },
+      "_key": "!effects!dcd62810b3a521c5"
+    }
+  ],
   "flags": {
     "monster-forge": {
+      "generated": true,
+      "version": "1.10.0",
+      "setId": "library-source",
+      "kind": "boost",
+      "role": "boost",
+      "boostId": "saves.con-advantage",
+      "boostGroup": "saving-resilience",
+      "category": "resilience",
+      "defaultName": "Steadfast Constitution",
+      "customName": "",
+      "power": "standard",
+      "automation": "midi",
+      "exclusiveGroup": "saving-resilience",
+      "requirements": [
+        "midi-qol",
+        "dae"
+      ],
       "library": {
         "kind": "boost",
         "category": "resilience",
         "categoryLabel": "Saving Throws",
-        "categoryIcon": "icons/svg/holy-shield.svg",
+        "categoryIcon": "icons/magic/defensive/shield-barrier-blue.webp",
         "categoryDescription": "Broad bonuses or focused resilience.",
         "categorySort": 3,
         "group": "saving-resilience",
@@ -49,7 +105,7 @@
           "automation": "midi",
           "effect": [
             {
-              "key": "flags.midi-qol.advantage.ability.save.con",
+              "key": "flags.midi-qol.advantage.save.con",
               "value": 1
             }
           ],
@@ -63,11 +119,15 @@
           "requirements": [
             "midi-qol",
             "dae"
-          ]
+          ],
+          "img": "icons/magic/defensive/shield-barrier-blue.webp"
         },
         "template": false,
         "version": 2
       }
+    },
+    "dae": {
+      "stackable": "noneName"
     }
   }
 }

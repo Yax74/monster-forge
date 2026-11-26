@@ -3,7 +3,7 @@
   "_id": "35cf444cspeciesp",
   "name": "Goliath Species Profile",
   "type": "feat",
-  "img": "icons/svg/d20.svg",
+  "img": "icons/creatures/magical/humanoid-giant-forest-blue.webp",
   "system": {
     "description": {
       "value": "<p>Starting profile: med; walk 35 ft; darkvision 0 ft. Suggested ability adjustments are editable Monster Forge heuristics, not 2024 ancestry ability score rules. Traits are separate NPC Items.</p>",

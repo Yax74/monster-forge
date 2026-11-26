@@ -3,10 +3,10 @@
   "_id": "37db05e6eea3c8ef",
   "name": "Defended III",
   "type": "feat",
-  "img": "icons/svg/shield.svg",
+  "img": "icons/magic/defensive/shield-barrier-blue.webp",
   "system": {
     "description": {
-      "value": "<p>The creature gains a +3 bonus to AC.</p>",
+      "value": "<p><strong>[[lookup @name]].</strong> The creature gains a +3 bonus to AC.</p><p class=\"monster-forge-note\">Monster Forge · Strong power · Core effect</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -19,19 +19,72 @@
     },
     "activities": {},
     "uses": {
-      "spent": 0,
       "max": "",
+      "spent": 0,
       "recovery": []
-    }
+    },
+    "identifier": "ac-3"
   },
-  "effects": [],
+  "effects": [
+    {
+      "_id": "7a7e915d37db05e6",
+      "name": "Defended III",
+      "img": "icons/magic/defensive/shield-barrier-blue.webp",
+      "type": "base",
+      "transfer": true,
+      "disabled": false,
+      "duration": {},
+      "statuses": [],
+      "flags": {
+        "dae": {
+          "stackable": "noneName",
+          "showIcon": false,
+          "specialDuration": []
+        }
+      },
+      "system": {
+        "changes": [
+          {
+            "_id": "797e8fca37db05e6",
+            "key": "system.attributes.ac.bonus",
+            "value": "3",
+            "priority": 20,
+            "type": "add",
+            "phase": "initial",
+            "conditions": "{}",
+            "replacement": ""
+          }
+        ],
+        "conditions": "{}",
+        "magical": false,
+        "rider": {
+          "statuses": []
+        }
+      },
+      "_key": "!effects!7a7e915d37db05e6"
+    }
+  ],
   "flags": {
     "monster-forge": {
+      "generated": true,
+      "version": "1.10.0",
+      "setId": "library-source",
+      "kind": "boost",
+      "role": "boost",
+      "boostId": "ac.3",
+      "boostGroup": "defence-ac",
+      "category": "defence",
+      "defaultName": "Defended III",
+      "customName": "",
+      "power": "strong",
+      "automation": "core",
+      "exclusiveGroup": "defence-ac",
+      "requirements": [],
       "library": {
         "kind": "boost",
         "category": "defence",
         "categoryLabel": "Defence",
-        "categoryIcon": "icons/svg/shield.svg",
+        "categoryIcon": "icons/magic/defensive/shield-barrier-blue.webp",
         "categoryDescription": "Passive AC or one defensive reaction.",
         "categorySort": 2,
         "group": "defence-ac",
@@ -60,11 +113,15 @@
           "categoryId": "defence",
           "exclusiveGroup": "defence-ac",
           "rank": 3,
-          "requirements": []
+          "requirements": [],
+          "img": "icons/magic/defensive/shield-barrier-blue.webp"
         },
         "template": false,
         "version": 2
       }
+    },
+    "dae": {
+      "stackable": "noneName"
     }
   }
 }

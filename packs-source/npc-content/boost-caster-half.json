@@ -6,7 +6,7 @@
   "img": "icons/magic/symbols/runes-star-blue.webp",
   "system": {
     "description": {
-      "value": "<p>The creature is a half caster. Its effective caster level is one-half its challenge rating, rounded down (minimum 1). This feature doesn't add spells automatically.</p>",
+      "value": "<p><strong>[[lookup @name]].</strong> The creature is a half caster. Its effective caster level is one-half its challenge rating, rounded down (minimum 1). This feature doesn&#039;t add spells automatically.</p><p><strong>Effective caster level:</strong> 1. Add spells separately.</p><p><em>resolve conditional timing manually.</em></p><p class=\"monster-forge-note\">Monster Forge · Standard power · Manual feature</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -19,14 +19,29 @@
     },
     "activities": {},
     "uses": {
-      "spent": 0,
       "max": "",
+      "spent": 0,
       "recovery": []
-    }
+    },
+    "identifier": "caster-half"
   },
   "effects": [],
   "flags": {
     "monster-forge": {
+      "generated": true,
+      "version": "1.10.0",
+      "setId": "library-source",
+      "kind": "boost",
+      "role": "boost",
+      "boostId": "caster.half",
+      "boostGroup": "caster-progression",
+      "category": "spellcasting",
+      "defaultName": "NPC Half Caster",
+      "customName": "",
+      "power": "standard",
+      "automation": "manual",
+      "exclusiveGroup": "caster-progression",
+      "requirements": [],
       "library": {
         "kind": "boost",
         "category": "spellcasting",
@@ -56,11 +71,15 @@
           "categoryId": "spellcasting",
           "exclusiveGroup": "caster-progression",
           "rank": 2,
-          "requirements": []
+          "requirements": [],
+          "img": "icons/magic/symbols/runes-star-blue.webp"
         },
         "template": false,
         "version": 2
       }
+    },
+    "dae": {
+      "stackable": "noneName"
     }
   }
 }

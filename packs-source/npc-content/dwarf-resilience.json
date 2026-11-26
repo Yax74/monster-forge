@@ -3,7 +3,7 @@
   "_id": "a154c0d7dwarfres",
   "name": "Dwarven Resilience",
   "type": "feat",
-  "img": "icons/svg/shield.svg",
+  "img": "icons/commodities/stone/boulder-grey-blue.webp",
   "system": {
     "description": {
       "value": "<p>This creature has resistance to poison damage and advantage on saving throws to avoid or end the Poisoned condition.</p>",

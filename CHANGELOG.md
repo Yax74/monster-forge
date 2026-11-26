@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.10.0
+
+- Reworked recommended ability scores so CR proficiency benchmarks affect only role-relevant attack and save abilities; unrelated scores now follow the selected role and species profile.
+- Moved NPC boosts into the same icon-card selection library as actions and traits, with descriptions on hover, category rollups, search, and selected-only filtering.
+- Compiled boost Items with their native activities, uses, DAE effects, and Midi-QOL changes where supported; replaced monochrome boost icons with coloured Foundry core icons.
+- Kept secondary attack profiles selectable in combined mode at every CR and stopped CR refreshes from overwriting the GM's selection.
+- Removed the duplicate species selector from the new-creature Build tab; Identity remains the source of species for new NPCs.
+
 ## 1.9.0
 
 - Made the Monster Forge token control handle both selected-NPC editing and new creature creation; removed the separate create control.

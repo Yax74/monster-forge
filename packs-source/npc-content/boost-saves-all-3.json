@@ -3,10 +3,10 @@
   "_id": "b1bfa576f923e4b8",
   "name": "Resilient III",
   "type": "feat",
-  "img": "icons/svg/holy-shield.svg",
+  "img": "icons/magic/defensive/shield-barrier-blue.webp",
   "system": {
     "description": {
-      "value": "<p>The creature gains a +3 bonus to all saving throws.</p>",
+      "value": "<p><strong>[[lookup @name]].</strong> The creature gains a +3 bonus to all saving throws.</p><p class=\"monster-forge-note\">Monster Forge · Strong power · Core effect</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -19,19 +19,72 @@
     },
     "activities": {},
     "uses": {
-      "spent": 0,
       "max": "",
+      "spent": 0,
       "recovery": []
-    }
+    },
+    "identifier": "saves-all-3"
   },
-  "effects": [],
+  "effects": [
+    {
+      "_id": "b26c69c0b1bfa576",
+      "name": "Resilient III",
+      "img": "icons/magic/defensive/shield-barrier-blue.webp",
+      "type": "base",
+      "transfer": true,
+      "disabled": false,
+      "duration": {},
+      "statuses": [],
+      "flags": {
+        "dae": {
+          "stackable": "noneName",
+          "showIcon": false,
+          "specialDuration": []
+        }
+      },
+      "system": {
+        "changes": [
+          {
+            "_id": "b36c6b53b1bfa576",
+            "key": "system.bonuses.abilities.save",
+            "value": "3",
+            "priority": 20,
+            "type": "add",
+            "phase": "initial",
+            "conditions": "{}",
+            "replacement": ""
+          }
+        ],
+        "conditions": "{}",
+        "magical": false,
+        "rider": {
+          "statuses": []
+        }
+      },
+      "_key": "!effects!b26c69c0b1bfa576"
+    }
+  ],
   "flags": {
     "monster-forge": {
+      "generated": true,
+      "version": "1.10.0",
+      "setId": "library-source",
+      "kind": "boost",
+      "role": "boost",
+      "boostId": "saves.all.3",
+      "boostGroup": "saving-resilience",
+      "category": "resilience",
+      "defaultName": "Resilient III",
+      "customName": "",
+      "power": "strong",
+      "automation": "core",
+      "exclusiveGroup": "saving-resilience",
+      "requirements": [],
       "library": {
         "kind": "boost",
         "category": "resilience",
         "categoryLabel": "Saving Throws",
-        "categoryIcon": "icons/svg/holy-shield.svg",
+        "categoryIcon": "icons/magic/defensive/shield-barrier-blue.webp",
         "categoryDescription": "Broad bonuses or focused resilience.",
         "categorySort": 3,
         "group": "saving-resilience",
@@ -60,11 +113,15 @@
           "categoryId": "resilience",
           "exclusiveGroup": "saving-resilience",
           "rank": 3,
-          "requirements": []
+          "requirements": [],
+          "img": "icons/magic/defensive/shield-barrier-blue.webp"
         },
         "template": false,
         "version": 2
       }
+    },
+    "dae": {
+      "stackable": "noneName"
     }
   }
 }

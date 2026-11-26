@@ -101,9 +101,11 @@
           <label>Creature tier
             <select name="foundation.tier">{{#each foundation.tierOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
           </label>
-          <label>Species
+          {{#unless isNewNpc}}
+          <label>Species / profile
             <select name="foundation.species">{{#each foundation.speciesOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
           </label>
+          {{/unless}}
         </div>
         <div class="mf-grid mf-grid-2 mf-build-options">
           <label>Actor write mode
@@ -186,97 +188,52 @@
       </div>
     </section>
 
-    <section class="mf-section mf-tab-panel" id="mf-panel-boosts" role="tabpanel" aria-labelledby="mf-tab-boosts" data-tab-panel="boosts" data-section-panel="boosts" hidden>
-      <div class="mf-section-heading">
-        <div><span class="mf-step">3</span><h3>NPC boosts</h3></div>
-        <label class="mf-section-toggle"><input type="checkbox" name="sections.boosts" {{#if config.sections.boosts}}checked{{/if}}> Apply this section</label>
+    <section class="mf-section mf-tab-panel" id="mf-panel-boosts" role="tabpanel" aria-labelledby="mf-tab-boosts" data-tab-panel="boosts" hidden>
+      <div class="mf-section-heading mf-library-heading">
+        <div><span class="mf-step">3</span><h3>NPC actions, traits &amp; boosts</h3></div>
+        <div class="mf-library-toggles">
+          <label class="mf-section-toggle"><input type="checkbox" name="sections.boosts" {{#if config.sections.boosts}}checked{{/if}}> Apply boosts</label>
+          <label class="mf-section-toggle"><input type="checkbox" name="sections.content" {{#if config.sections.content}}checked{{/if}}> Apply actions &amp; traits</label>
+        </div>
       </div>
-      <div data-section-body="boosts">
-        <div class="mf-subheading-row mf-boost-toolbar">
-          <div>
-            <strong>{{boosts.found}} built-in choices</strong>
-            <small data-boost-selected-count>{{boosts.selectedCount}} selected</small>
-          </div>
-          <div class="mf-heading-actions">
-            <button type="button" class="mf-link-button" data-action="recommend-boosts"><i class="fa-solid fa-wand-magic-sparkles"></i> Use role/tier suggestions</button>
-            <button type="button" class="mf-link-button" data-action="clear-boosts"><i class="fa-solid fa-eraser"></i> Clear all</button>
-          </div>
+      <p class="mf-callout" data-auto-trait-summary hidden></p>
+      <p class="mf-help">Select NPC Items from the bundled or linked Item compendiums. Boosts use the same item selection style; one option per boost group can be selected. Hover an item for its full description.</p>
+      <div class="mf-subheading-row mf-boost-toolbar">
+        <div><strong>{{contentGroupCount}} categories · {{boosts.found}} boosts</strong> <small data-boost-selected-count>{{boosts.selectedCount}} selected</small></div>
+        <div class="mf-heading-actions">
+          <button type="button" class="mf-link-button" data-action="recommend-boosts"><i class="fa-solid fa-wand-magic-sparkles"></i> Use role/tier suggestions</button>
+          <button type="button" class="mf-link-button" data-action="clear-boosts"><i class="fa-solid fa-eraser"></i> Clear boosts</button>
         </div>
-        <div class="mf-boost-filters">
-          <label>Find a boost
-            <input type="search" name="boosts.search" value="{{boosts.search}}" placeholder="Search names and effects">
-          </label>
-          <label class="mf-switch"><input type="checkbox" name="boosts.selectedOnly" {{#if boosts.selectedOnly}}checked{{/if}}> Selected only</label>
-        </div>
-        <div class="mf-boost-categories">
-          {{#each boosts.categories}}
-          <details class="mf-boost-category" data-boost-category="{{id}}" {{#if open}}open{{/if}}>
-            <summary>
-              <span><i class="{{icon}}"></i> <strong>{{label}}</strong> <small>{{description}}</small></span>
-              <span class="mf-category-actions"><b data-category-count>{{#if selectedCount}}{{selectedCount}} selected{{else}}None{{/if}}</b><button type="button" title="Clear this category" data-action="clear-boost-category" data-category="{{id}}"><i class="fa-solid fa-eraser"></i></button></span>
-            </summary>
-            <input type="checkbox" name="boosts.openCategories" value="{{id}}" data-category-open {{#if open}}checked{{/if}} hidden>
-            <div class="mf-boost-grid">
-              {{#each groups}}
-              <div class="mf-boost-group" data-boost-group data-label="{{label}}" data-help="{{help}}">
-                <label>{{label}}
-                  <select name="boosts.selection.{{id}}" data-boost-select>
-                    <option value="">None</option>
-                    {{#each options}}<option value="{{value}}" {{#if selected}}selected{{/if}} data-label="{{label}}" data-summary="{{summary}}" data-power="{{powerLabel}} power" data-action="{{actionLabel}}" data-automation="{{automationLabel}}" data-impact="{{impactLabel}}" title="{{summary}}">{{label}}{{#if recommended}} ★{{/if}}</option>{{/each}}
-                  </select>
-                </label>
-                <label class="mf-boost-name" data-boost-name {{#unless hasSelection}}hidden{{/unless}}>Custom item name
-                  <input type="text" name="boosts.name.{{id}}" maxlength="80" value="{{customName}}" placeholder="Keep built-in name">
-                </label>
-                <div class="mf-boost-meta">
-                  <small data-boost-summary>{{help}}</small>
-                  <span data-boost-power hidden></span>
-                  <span data-boost-action hidden></span>
-                  <span data-boost-automation hidden></span>
-                  <span data-boost-impact-badge hidden></span>
-                </div>
-              </div>
-              {{/each}}
+      </div>
+      <div class="mf-content-filters">
+        <label>Find actions, traits, or boosts <input type="search" data-content-search placeholder="Search names, descriptions, or species"></label>
+        <label class="mf-switch"><input type="checkbox" data-content-selected-only> Selected only</label>
+      </div>
+      <div class="mf-content-list">
+        {{#each contentGroups}}
+        <details class="mf-content-group" data-content-group data-section-panel="{{section}}" data-total="{{count}}">
+          <summary><strong>{{label}}</strong><small data-content-group-count>{{#if selectedCount}}{{selectedCount}}/{{count}} selected{{else}}{{count}}{{/if}}</small></summary>
+          <div class="mf-content-group-items">
+            {{#each entries}}
+            <div class="mf-content-card" data-content-entry data-kind="{{kindKey}}" data-species="{{species}}" data-search="{{name}} {{kind}} {{species}} {{category}} {{description}}" {{#if selected}}data-selected="true"{{/if}}>
+              <label class="mf-content-choice" title="{{description}}">
+                <input type="checkbox" name="{{selectionName}}" value="{{selectionValue}}" {{#if selected}}checked{{/if}} {{#if isBoost}}data-boost-item data-boost-id="{{boostId}}" data-boost-group="{{boostGroup}}"{{/if}}>
+                <img src="{{img}}" alt="">
+                <span><strong>{{name}}{{#if recommended}} <em class="mf-recommended-star">★</em>{{/if}}</strong><small>{{kind}} · {{species}} · {{category}}</small></span>
+              </label>
+              {{#if isBoost}}<label class="mf-boost-name-field" data-boost-name-field {{#unless selected}}hidden{{/unless}}>Custom item name <input type="text" name="boosts.name.{{boostGroup}}" maxlength="80" value="{{customName}}" placeholder="Keep item name" data-boost-name-input></label>{{/if}}
             </div>
-          </details>
-          {{/each}}
-        </div>
-        {{#each boosts.warnings}}<p class="mf-callout mf-callout-warning">{{this}}</p>{{/each}}
-        <div class="mf-preview-grid mf-boost-preview"><div><strong>Selected</strong><span data-preview="boosts">—</span></div></div>
-        <ul class="mf-boost-details" data-preview="boost-details" hidden></ul>
-        <p class="mf-help">Each pull-down is exclusive, so incompatible ranks can't stack accidentally. A disabled Boosts section retains the choices and leaves existing generated boosts untouched. ★ marks the current role/tier suggestion.</p>
-      </div>
-      <section class="mf-subsection" data-section-panel="content">
-        <div class="mf-section-heading">
-          <div><span class="mf-step">5</span><h3>NPC actions &amp; traits</h3></div>
-          <label class="mf-section-toggle"><input type="checkbox" name="sections.content" {{#if config.sections.content}}checked{{/if}}> Apply selected Items</label>
-        </div>
-        <div data-section-body="content">
-          <p class="mf-callout" data-auto-trait-summary hidden></p>
-          <p class="mf-help">Choose reusable NPC-only Items from the bundled library or linked Item compendiums. Add or edit entries in your own compendium; set <code>flags.monster-forge.library.kind</code> to <code>action</code>, <code>trait</code>, or <code>species-trait</code> to make them available here.</p>
-          <label>Filter content <input type="search" data-content-search placeholder="Search names, species, or category"></label>
-          <div class="mf-content-list">
-            {{#each contentGroups}}
-            <details class="mf-content-group" data-content-group open>
-              <summary>{{label}} <small>{{count}}</small></summary>
-              <div class="mf-content-group-items">
-                {{#each entries}}
-                <label class="mf-content-card" data-content-entry data-kind="{{kindKey}}" data-species="{{species}}" data-search="{{name}} {{kind}} {{species}} {{category}}">
-                  <input type="checkbox" name="content.items" value="{{uuid}}">
-                  <img src="{{img}}" alt="">
-                  <span><strong>{{name}}</strong><small>{{kind}} · {{species}} · {{category}}</small></span>
-                </label>
-                {{/each}}
-              </div>
-            </details>
-            {{else}}
-            <p class="mf-help">No tagged NPC actions or traits were found. Configure Item compendiums in GM setup or add entries to the bundled pack.</p>
             {{/each}}
           </div>
-          <p class="mf-help">Selected Items are copied onto the NPC and included in Monster Forge undo and replace behavior. Their activities and effects travel with the Item; automation depends on their D&amp;D5e and Midi-QOL data. Review offensive content separately: imported damage is not included in Monster Forge's generated DPR budget.</p>
-        </div>
-      </section>
-
+        </details>
+        {{else}}
+        <p class="mf-help">No tagged NPC actions, traits, or boosts were found. Configure Item compendiums in GM setup or add entries to the bundled pack.</p>
+        {{/each}}
+      </div>
+      {{#each boosts.warnings}}<p class="mf-callout mf-callout-warning">{{this}}</p>{{/each}}
+      <div class="mf-preview-grid mf-boost-preview"><div><strong>Selected boosts</strong><span data-preview="boosts">—</span></div></div>
+      <ul class="mf-boost-details" data-preview="boost-details" hidden></ul>
+      <p class="mf-help">A disabled Apply toggle preserves that section's existing generated items. Selected Items carry their D&amp;D5e activity and effects onto the NPC; the activity runs natively and Midi-QOL/DAE data supplies supported automation.</p>
     </section>
 
     <section class="mf-section mf-tab-panel" id="mf-panel-attacks" role="tabpanel" aria-labelledby="mf-tab-attacks" data-tab-panel="attacks" data-section-panel="attacks" hidden>

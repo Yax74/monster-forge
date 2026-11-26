@@ -371,9 +371,9 @@ function buildEffect(entry, idFactory) {
   if (!entry.effect?.length) return null;
   const modern = entry.effect.map((change) => ({
     _id: idFactory(), key: change.key, value: String(change.value), priority: change.priority ?? 20,
-    type: "add", phase: "initial", conditions: "{}", replacement: ""
+    type: change.key.startsWith("flags.midi-qol.") ? "custom" : "add", phase: "initial", conditions: "{}", replacement: ""
   }));
-  const legacy = entry.effect.map((change) => ({ key: change.key, value: String(change.value), mode: 2, priority: change.priority ?? 20 }));
+  const legacy = entry.effect.map((change) => ({ key: change.key, value: String(change.value), mode: change.key.startsWith("flags.midi-qol.") ? 0 : 2, priority: change.priority ?? 20 }));
   const data = {
     _id: idFactory(), name: entry.displayName ?? entry.name, img: entry.img ?? "icons/svg/aura.svg", type: "base", transfer: true, disabled: false,
     duration: {}, statuses: [], flags: { dae: { stackable: "noneName", showIcon: false, specialDuration: [] } }

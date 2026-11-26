@@ -185,20 +185,26 @@ export function buildFoundationPlan(inputConfig = {}, actorProfile = {}) {
     return [ability, Math.round(clamp(seed + adjustment, 1, 30, 10))];
   }));
   const { attackAbilities, saveAbilities } = configuredAbilities(inputConfig, role, foundation);
-  const requiredModifiers = {};
-  const attackModifier = final.attackBonus - proficiency;
-  const saveModifier = final.saveDc - 8 - proficiency;
 
-  if ((inputConfig.accuracyMode ?? "actor") !== "cr") {
-    for (const ability of attackAbilities) requiredModifiers[ability] = attackModifier;
+  // Forge of Foes scales proficient ability bonuses with CR. The combat role
+  // decides which abilities are proficient; a default weapon preset must not
+  // make an unrelated score (such as a caster's Strength) CR-dependent.
+  const attackFocus = role.castingMode && ["attack", "both"].includes(role.castingMode)
+    ? castingAbility
+    : role.attackAbility;
+  const saveFocus = role.castingMode && ["save", "both"].includes(role.castingMode)
+    ? castingAbility
+    : role.saveAbility;
+  const proficientModifiers = {};
+  if (attackFocus) proficientModifiers[attackFocus] = final.attackBonus - proficiency;
+  if (saveFocus) {
+    const saveModifier = final.saveDc - 8 - proficiency;
+    proficientModifiers[saveFocus] = Math.max(proficientModifiers[saveFocus] ?? -Infinity, saveModifier);
   }
-  if ((inputConfig.saveDcMode ?? "actor") !== "cr") {
-    for (const ability of saveAbilities) {
-      requiredModifiers[ability] = Math.max(requiredModifiers[ability] ?? -Infinity, saveModifier);
-    }
-  }
-  for (const [ability, modifier] of Object.entries(requiredModifiers)) {
-    abilityScores[ability] = scoreForModifier(modifier);
+  for (const [ability, modifier] of Object.entries(proficientModifiers)) {
+    const targetScore = scoreForModifier(modifier);
+    const speciesAdjustment = Number(species.abilities?.[ability]) || 0;
+    abilityScores[ability] = Math.round(clamp(targetScore + speciesAdjustment, 1, 30, targetScore));
   }
   const recommendedAbilities = { ...abilityScores };
   for (const ability of ABILITIES) {

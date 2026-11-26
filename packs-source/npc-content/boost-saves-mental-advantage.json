@@ -3,10 +3,10 @@
   "_id": "046a7a8e1cac34ca",
   "name": "Indomitable Mind",
   "type": "feat",
-  "img": "icons/svg/holy-shield.svg",
+  "img": "icons/magic/defensive/shield-barrier-blue.webp",
   "system": {
     "description": {
-      "value": "<p>The creature has advantage on Intelligence, Wisdom, and Charisma saving throws.</p>",
+      "value": "<p><strong>[[lookup @name]].</strong> The creature has advantage on Intelligence, Wisdom, and Charisma saving throws.</p><p><em>Midi-QOL/DAE can assist where supported; resolve conditional timing manually.</em></p><p class=\"monster-forge-note\">Monster Forge · Major power · Midi/DAE optional</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -19,19 +19,95 @@
     },
     "activities": {},
     "uses": {
-      "spent": 0,
       "max": "",
+      "spent": 0,
       "recovery": []
-    }
+    },
+    "identifier": "saves-mental-advantage"
   },
-  "effects": [],
+  "effects": [
+    {
+      "_id": "edbd3a64046a7a8e",
+      "name": "Indomitable Mind",
+      "img": "icons/magic/defensive/shield-barrier-blue.webp",
+      "type": "base",
+      "transfer": true,
+      "disabled": false,
+      "duration": {},
+      "statuses": [],
+      "flags": {
+        "dae": {
+          "stackable": "noneName",
+          "showIcon": false,
+          "specialDuration": []
+        }
+      },
+      "system": {
+        "changes": [
+          {
+            "_id": "f0bd3f1d046a7a8e",
+            "key": "flags.midi-qol.advantage.save.int",
+            "value": "1",
+            "priority": 20,
+            "type": "custom",
+            "phase": "initial",
+            "conditions": "{}",
+            "replacement": ""
+          },
+          {
+            "_id": "efbd3d8a046a7a8e",
+            "key": "flags.midi-qol.advantage.save.wis",
+            "value": "1",
+            "priority": 20,
+            "type": "custom",
+            "phase": "initial",
+            "conditions": "{}",
+            "replacement": ""
+          },
+          {
+            "_id": "eebd3bf7046a7a8e",
+            "key": "flags.midi-qol.advantage.save.cha",
+            "value": "1",
+            "priority": 20,
+            "type": "custom",
+            "phase": "initial",
+            "conditions": "{}",
+            "replacement": ""
+          }
+        ],
+        "conditions": "{}",
+        "magical": false,
+        "rider": {
+          "statuses": []
+        }
+      },
+      "_key": "!effects!edbd3a64046a7a8e"
+    }
+  ],
   "flags": {
     "monster-forge": {
+      "generated": true,
+      "version": "1.10.0",
+      "setId": "library-source",
+      "kind": "boost",
+      "role": "boost",
+      "boostId": "saves.mental-advantage",
+      "boostGroup": "saving-resilience",
+      "category": "resilience",
+      "defaultName": "Indomitable Mind",
+      "customName": "",
+      "power": "major",
+      "automation": "midi",
+      "exclusiveGroup": "saving-resilience",
+      "requirements": [
+        "midi-qol",
+        "dae"
+      ],
       "library": {
         "kind": "boost",
         "category": "resilience",
         "categoryLabel": "Saving Throws",
-        "categoryIcon": "icons/svg/holy-shield.svg",
+        "categoryIcon": "icons/magic/defensive/shield-barrier-blue.webp",
         "categoryDescription": "Broad bonuses or focused resilience.",
         "categorySort": 3,
         "group": "saving-resilience",
@@ -49,15 +125,15 @@
           "automation": "midi",
           "effect": [
             {
-              "key": "flags.midi-qol.advantage.ability.save.int",
+              "key": "flags.midi-qol.advantage.save.int",
               "value": 1
             },
             {
-              "key": "flags.midi-qol.advantage.ability.save.wis",
+              "key": "flags.midi-qol.advantage.save.wis",
               "value": 1
             },
             {
-              "key": "flags.midi-qol.advantage.ability.save.cha",
+              "key": "flags.midi-qol.advantage.save.cha",
               "value": 1
             }
           ],
@@ -71,11 +147,15 @@
           "requirements": [
             "midi-qol",
             "dae"
-          ]
+          ],
+          "img": "icons/magic/defensive/shield-barrier-blue.webp"
         },
         "template": false,
         "version": 2
       }
+    },
+    "dae": {
+      "stackable": "noneName"
     }
   }
 }

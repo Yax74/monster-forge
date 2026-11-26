@@ -3,7 +3,7 @@
   "_id": "d5708afcspeciesp",
   "name": "Gnome Species Profile",
   "type": "feat",
-  "img": "icons/svg/d20.svg",
+  "img": "icons/magic/symbols/runes-star-blue.webp",
   "system": {
     "description": {
       "value": "<p>Starting profile: sm; walk 30 ft; darkvision 60 ft. Suggested ability adjustments are editable Monster Forge heuristics, not 2024 ancestry ability score rules. Traits are separate NPC Items.</p>",

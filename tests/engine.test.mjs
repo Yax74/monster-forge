@@ -237,7 +237,7 @@ test("recalculates attributes when the role changes without changing the attack 
 
   assert.notDeepEqual(brute.recommendedAbilities, caster.recommendedAbilities);
   assert.equal(brute.recommendedAbilities.str, 16);
-  assert.equal(caster.recommendedAbilities.str, 20);
+  assert.equal(caster.recommendedAbilities.str, 8);
   assert.equal(caster.recommendedAbilities.cha, 20);
   assert.equal(caster.casting.attackBonus, 8);
   assert.equal(caster.casting.saveDc, 16);
@@ -403,8 +403,9 @@ test("recommended counts preserve one or two attack profiles", () => {
   assert.equal(dual.secondary.count, 1);
 
   const fractional = applyRecommendedAttacks({ cr: "1/2", secondaryEnabled: true });
-  assert.equal(fractional.secondaryEnabled, false);
+  assert.equal(fractional.secondaryEnabled, true);
   assert.equal(fractional.primary.count, 1);
+  assert.equal(fractional.secondary.count, 1);
 });
 
 test("recommended counts treat alternative profiles as complete routines", () => {

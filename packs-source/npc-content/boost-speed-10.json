@@ -3,10 +3,10 @@
   "_id": "dc73eecb56c21bdd",
   "name": "Swift II",
   "type": "feat",
-  "img": "icons/svg/wingfoot.svg",
+  "img": "icons/skills/movement/feet-winged-boots-blue.webp",
   "system": {
     "description": {
-      "value": "<p>The creature's walking speed increases by 10 feet.</p>",
+      "value": "<p><strong>[[lookup @name]].</strong> The creature&#039;s walking speed increases by 10 feet.</p><p class=\"monster-forge-note\">Monster Forge · Standard power · Core effect</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -19,19 +19,72 @@
     },
     "activities": {},
     "uses": {
-      "spent": 0,
       "max": "",
+      "spent": 0,
       "recovery": []
-    }
+    },
+    "identifier": "speed-10"
   },
-  "effects": [],
+  "effects": [
+    {
+      "_id": "22104f12dc73eecb",
+      "name": "Swift II",
+      "img": "icons/skills/movement/feet-winged-boots-blue.webp",
+      "type": "base",
+      "transfer": true,
+      "disabled": false,
+      "duration": {},
+      "statuses": [],
+      "flags": {
+        "dae": {
+          "stackable": "noneName",
+          "showIcon": false,
+          "specialDuration": []
+        }
+      },
+      "system": {
+        "changes": [
+          {
+            "_id": "231050a5dc73eecb",
+            "key": "system.attributes.movement.walk",
+            "value": "10",
+            "priority": 20,
+            "type": "add",
+            "phase": "initial",
+            "conditions": "{}",
+            "replacement": ""
+          }
+        ],
+        "conditions": "{}",
+        "magical": false,
+        "rider": {
+          "statuses": []
+        }
+      },
+      "_key": "!effects!22104f12dc73eecb"
+    }
+  ],
   "flags": {
     "monster-forge": {
+      "generated": true,
+      "version": "1.10.0",
+      "setId": "library-source",
+      "kind": "boost",
+      "role": "boost",
+      "boostId": "speed.10",
+      "boostGroup": "movement-speed",
+      "category": "movement",
+      "defaultName": "Swift II",
+      "customName": "",
+      "power": "standard",
+      "automation": "core",
+      "exclusiveGroup": "movement-speed",
+      "requirements": [],
       "library": {
         "kind": "boost",
         "category": "movement",
         "categoryLabel": "Movement",
-        "categoryIcon": "icons/svg/wingfoot.svg",
+        "categoryIcon": "icons/skills/movement/feet-winged-boots-blue.webp",
         "categoryDescription": "Raw speed and one signature mobility feature.",
         "categorySort": 1,
         "group": "movement-speed",
@@ -60,11 +113,15 @@
           "categoryId": "movement",
           "exclusiveGroup": "movement-speed",
           "rank": 2,
-          "requirements": []
+          "requirements": [],
+          "img": "icons/skills/movement/feet-winged-boots-blue.webp"
         },
         "template": false,
         "version": 2
       }
+    },
+    "dae": {
+      "stackable": "noneName"
     }
   }
 }

@@ -3,7 +3,7 @@
   "_id": "70c2c2adspeciesp",
   "name": "Halfling Species Profile",
   "type": "feat",
-  "img": "icons/svg/d20.svg",
+  "img": "icons/consumables/food/bread-toast-tan.webp",
   "system": {
     "description": {
       "value": "<p>Starting profile: sm; walk 30 ft; darkvision 0 ft. Suggested ability adjustments are editable Monster Forge heuristics, not 2024 ancestry ability score rules. Traits are separate NPC Items.</p>",

@@ -3,10 +3,10 @@
   "_id": "a8f6bd5caedafd5c",
   "name": "Relentless Endurance",
   "type": "feat",
-  "img": "icons/svg/heal.svg",
+  "img": "icons/magic/life/heart-cross-blue.webp",
   "system": {
     "description": {
-      "value": "<p>When the creature is reduced to 0 hit points but not killed outright, it can drop to 1 hit point instead. Once it uses this feature, it can't use it again until it finishes a long rest.</p>",
+      "value": "<p><strong>[[lookup @name]].</strong> When the creature is reduced to 0 hit points but not killed outright, it can drop to 1 hit point instead. Once it uses this feature, it can&#039;t use it again until it finishes a long rest.</p><p>Use the generated activity for the roll or action prompt.</p><p class=\"monster-forge-note\">Monster Forge · Strong power · Manual feature</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -17,21 +17,91 @@
       "value": "monster",
       "subtype": ""
     },
-    "activities": {},
+    "activities": {
+      "d1baf194a8f6bd5c": {
+        "_id": "d1baf194a8f6bd5c",
+        "type": "utility",
+        "name": "Relentless Endurance",
+        "sort": 0,
+        "activation": {
+          "type": "special",
+          "value": null,
+          "condition": "Reduced to 0 hit points but not killed outright",
+          "override": true
+        },
+        "consumption": {
+          "targets": [
+            {
+              "type": "itemUses",
+              "value": "1",
+              "target": ""
+            }
+          ],
+          "scaling": {
+            "allowed": false
+          },
+          "spellSlot": false
+        },
+        "description": {
+          "value": "",
+          "chatFlavor": ""
+        },
+        "range": {
+          "units": "self",
+          "value": null,
+          "override": true
+        },
+        "target": {
+          "template": {
+            "contiguous": false,
+            "units": "ft",
+            "type": "",
+            "stationary": false
+          },
+          "affects": {
+            "choice": false,
+            "type": "self",
+            "count": ""
+          },
+          "override": true,
+          "prompt": true
+        }
+      }
+    },
     "uses": {
+      "max": "1",
       "spent": 0,
-      "max": "",
-      "recovery": []
-    }
+      "recovery": [
+        {
+          "period": "day",
+          "type": "recoverAll"
+        }
+      ]
+    },
+    "identifier": "recovery-relentless-endurance"
   },
   "effects": [],
   "flags": {
     "monster-forge": {
+      "generated": true,
+      "version": "1.10.0",
+      "setId": "library-source",
+      "kind": "boost",
+      "role": "boost",
+      "boostId": "recovery.relentless-endurance",
+      "boostGroup": "recovery-feature",
+      "category": "recovery",
+      "defaultName": "Relentless Endurance",
+      "customName": "",
+      "power": "strong",
+      "automation": "manual",
+      "exclusiveGroup": "recovery-feature",
+      "requirements": [],
       "library": {
         "kind": "boost",
         "category": "recovery",
         "categoryLabel": "Recovery",
-        "categoryIcon": "icons/svg/heal.svg",
+        "categoryIcon": "icons/magic/life/heart-cross-blue.webp",
         "categoryDescription": "One healing or survival feature.",
         "categorySort": 4,
         "group": "recovery-feature",
@@ -62,11 +132,15 @@
           "categoryId": "recovery",
           "exclusiveGroup": "recovery-feature",
           "rank": null,
-          "requirements": []
+          "requirements": [],
+          "img": "icons/magic/life/heart-cross-blue.webp"
         },
         "template": false,
         "version": 2
       }
+    },
+    "dae": {
+      "stackable": "noneName"
     }
   }
 }

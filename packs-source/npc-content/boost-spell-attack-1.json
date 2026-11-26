@@ -6,7 +6,7 @@
   "img": "icons/magic/symbols/runes-star-blue.webp",
   "system": {
     "description": {
-      "value": "<p>The creature gains a +1 bonus to melee and ranged spell attack rolls.</p>",
+      "value": "<p><strong>[[lookup @name]].</strong> The creature gains a +1 bonus to melee and ranged spell attack rolls.</p><p class=\"monster-forge-note\">Monster Forge · Light power · Core effect</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -19,14 +19,77 @@
     },
     "activities": {},
     "uses": {
-      "spent": 0,
       "max": "",
+      "spent": 0,
       "recovery": []
-    }
+    },
+    "identifier": "spell-attack-1"
   },
-  "effects": [],
+  "effects": [
+    {
+      "_id": "74cc1ef91e09379f",
+      "name": "Spell Precision I",
+      "img": "icons/magic/symbols/runes-star-blue.webp",
+      "type": "base",
+      "transfer": true,
+      "disabled": false,
+      "duration": {},
+      "statuses": [],
+      "flags": {
+        "dae": {
+          "stackable": "noneName",
+          "showIcon": false,
+          "specialDuration": []
+        }
+      },
+      "system": {
+        "changes": [
+          {
+            "_id": "72cc1bd31e09379f",
+            "key": "system.bonuses.msak.attack",
+            "value": "1",
+            "priority": 20,
+            "type": "add",
+            "phase": "initial",
+            "conditions": "{}",
+            "replacement": ""
+          },
+          {
+            "_id": "71cc1a401e09379f",
+            "key": "system.bonuses.rsak.attack",
+            "value": "1",
+            "priority": 20,
+            "type": "add",
+            "phase": "initial",
+            "conditions": "{}",
+            "replacement": ""
+          }
+        ],
+        "conditions": "{}",
+        "magical": false,
+        "rider": {
+          "statuses": []
+        }
+      },
+      "_key": "!effects!74cc1ef91e09379f"
+    }
+  ],
   "flags": {
     "monster-forge": {
+      "generated": true,
+      "version": "1.10.0",
+      "setId": "library-source",
+      "kind": "boost",
+      "role": "boost",
+      "boostId": "spell.attack.1",
+      "boostGroup": "spell-accuracy",
+      "category": "spellcasting",
+      "defaultName": "Spell Precision I",
+      "customName": "",
+      "power": "light",
+      "automation": "core",
+      "exclusiveGroup": "spell-accuracy",
+      "requirements": [],
       "library": {
         "kind": "boost",
         "category": "spellcasting",
@@ -64,11 +127,15 @@
           "categoryId": "spellcasting",
           "exclusiveGroup": "spell-accuracy",
           "rank": 1,
-          "requirements": []
+          "requirements": [],
+          "img": "icons/magic/symbols/runes-star-blue.webp"
         },
         "template": false,
         "version": 2
       }
+    },
+    "dae": {
+      "stackable": "noneName"
     }
   }
 }

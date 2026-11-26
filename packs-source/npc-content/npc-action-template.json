@@ -3,7 +3,7 @@
   "_id": "11c8723anpcactio",
   "name": "Blank NPC Action",
   "type": "feat",
-  "img": "icons/svg/sword.svg",
+  "img": "icons/skills/melee/strike-sword-slashing-red.webp",
   "system": {
     "description": {
       "value": "<p>Add the NPC action rules text and D&D5e activity data. This template is not intended to be added directly to a creature.</p>",

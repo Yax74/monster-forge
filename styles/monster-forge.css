@@ -262,13 +262,75 @@
 }
 
 .monster-forge .mf-content-card {
-  align-items: center;
   border: 1px solid var(--color-border-light-tertiary, #999);
   border-radius: 0.3rem;
+  min-width: 0;
+  padding: 0.45rem;
+  transition: border-color 120ms ease, background-color 120ms ease;
+}
+
+.monster-forge .mf-content-card:hover {
+  border-color: var(--color-border-highlight, #c6954b);
+}
+
+.monster-forge .mf-content-card:has(input:checked) {
+  border-color: var(--color-border-highlight, #c6954b);
+  background: color-mix(in srgb, var(--color-border-highlight, #c6954b) 10%, transparent);
+}
+
+.monster-forge .mf-content-choice {
+  align-items: center;
+  cursor: pointer;
   display: flex;
   gap: 0.5rem;
   min-width: 0;
-  padding: 0.45rem;
+}
+
+.monster-forge .mf-content-choice input {
+  flex: 0 0 auto;
+  margin: 0;
+  accent-color: var(--color-border-highlight, #c6954b);
+}
+
+.monster-forge .mf-content-choice img {
+  flex: 0 0 auto;
+}
+
+.monster-forge .mf-content-choice span {
+  overflow-wrap: anywhere;
+}
+
+.monster-forge .mf-boost-name-field {
+  display: block;
+  margin: 0.4rem 0 0 1.5rem;
+}
+
+.monster-forge .mf-boost-name-field[hidden] {
+  display: none;
+}
+
+.monster-forge .mf-library-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.75rem;
+}
+
+.monster-forge .mf-content-filters {
+  align-items: end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+}
+
+.monster-forge .mf-content-group > summary {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.monster-forge .mf-recommended-star {
+  color: var(--color-level-warning, #c6954b);
+  font-style: normal;
 }
 
 .monster-forge .mf-content-card img {

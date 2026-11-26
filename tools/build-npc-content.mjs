@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import { getBoostCatalog, prepareBoostItemData, setBoostCatalogItems } from "../scripts/boosts.js";
 
 const output = path.resolve("packs-source/npc-content");
 await fs.mkdir(output, { recursive: true });
@@ -35,7 +36,7 @@ const entries = [
 
 const speciesIcons = {
   human: "icons/creatures/eyes/human-single-blue.webp",
-  dwarf: "icons/svg/shield.svg",
+  dwarf: "icons/commodities/stone/boulder-grey-blue.webp",
   halfling: "icons/consumables/food/bread-toast-tan.webp",
   gnome: "icons/magic/symbols/runes-star-blue.webp",
   elf: "icons/weapons/bows/shortbow-recurve-yellow-blue.webp",
@@ -69,7 +70,7 @@ for (const [slug, name, kind, speciesLabel, description] of entries) {
     name,
     type: "feat",
     img: kind === "species-trait" && speciesIcons[speciesKey] ? speciesIcons[speciesKey]
-      : kind === "action" ? "icons/svg/sword.svg" : "icons/svg/book.svg",
+      : kind === "action" ? "icons/skills/melee/strike-sword-slashing-red.webp" : "icons/sundries/books/book-backed-blue-gold.webp",
     system: {
       description: { value: `<p>${description}</p>`, chat: "", unidentified: "" },
       source: { custom: "Monster Forge NPC Content" },
@@ -127,6 +128,17 @@ const profileIcons = {
   fey: "icons/creatures/magical/fae-fairy-winged-glowing-green.webp"
 };
 
+const boostCategoryIcons = {
+  initiative: "icons/skills/movement/feet-winged-boots-brown.webp",
+  movement: "icons/skills/movement/feet-winged-boots-blue.webp",
+  defence: "icons/magic/defensive/shield-barrier-blue.webp",
+  resilience: "icons/magic/defensive/shield-barrier-blue.webp",
+  recovery: "icons/magic/life/heart-cross-blue.webp",
+  accuracy: "icons/skills/melee/strike-sword-slashing-red.webp",
+  spellcasting: "icons/magic/symbols/runes-star-blue.webp",
+  leadership: "icons/skills/social/diplomacy-handshake-blue.webp"
+};
+
 for (const [speciesKey, label, size, speed, darkvision] of profiles) {
   const slug = `species-profile-${speciesKey}`;
   const id = stableId(slug);
@@ -135,7 +147,7 @@ for (const [speciesKey, label, size, speed, darkvision] of profiles) {
     _id: id,
     name: `${label} Species Profile`,
     type: "feat",
-    img: profileIcons[speciesKey] ?? "icons/svg/d20.svg",
+    img: profileIcons[speciesKey] ?? speciesIcons[speciesKey] ?? "icons/magic/symbols/runes-star-blue.webp",
     system: {
       description: { value: `<p>Starting profile: ${size}; walk ${speed} ft; darkvision ${darkvision} ft. Suggested ability adjustments are editable Monster Forge heuristics, not 2024 ancestry ability score rules. Traits are separate NPC Items.</p>`, chat: "", unidentified: "" },
       source: { custom: "Monster Forge NPC Content" },
@@ -157,4 +169,44 @@ for (const [speciesKey, label, size, speed, darkvision] of profiles) {
     }
   };
   await fs.writeFile(path.join(output, `${slug}.json`), `${JSON.stringify(data, null, 2)}\n`);
+}
+
+// The bundled boost documents are complete, ready-to-use D&D5e Items. This
+// uses the same preparation path as actor embedding so the compendium source
+// includes native activities, uses, and supported DAE/Midi-QOL effects.
+const boostFiles = (await fs.readdir(output)).filter((file) => file.startsWith("boost-") && file.endsWith(".json")).sort();
+const boostDocuments = await Promise.all(boostFiles.map(async (file) => JSON.parse(await fs.readFile(path.join(output, file), "utf8"))));
+const boostFileById = new Map(boostDocuments.map((document, index) => [document._id, boostFiles[index]]));
+setBoostCatalogItems(boostDocuments);
+const boostById = new Map(getBoostCatalog().entries.map((entry) => [entry.id, entry]));
+for (const source of boostDocuments) {
+  const library = source.flags?.["monster-forge"]?.library;
+  const entry = boostById.get(library?.boost?.id);
+  if (!entry) continue;
+  const icon = boostCategoryIcons[library.category] ?? "icons/magic/control/silhouette-aura-energy.webp";
+  const seed = source._id;
+  let index = 0;
+  const prepared = prepareBoostItemData({ ...entry, img: icon }, {
+    setId: "library-source",
+    idFactory: () => stableId(`${seed}-${index++}`).slice(0, 16)
+  });
+  for (const effect of prepared.effects ?? []) effect._key = `!effects!${effect._id}`;
+  const data = {
+    ...source,
+    ...prepared,
+    _key: source._key,
+    _id: source._id,
+    img: icon,
+    system: { ...source.system, ...prepared.system, source: source.system.source },
+    flags: {
+      ...prepared.flags,
+      "monster-forge": {
+        ...prepared.flags?.["monster-forge"],
+        library: { ...library, categoryIcon: icon, boost: { ...library.boost, img: icon } }
+      }
+    }
+  };
+  const file = boostFileById.get(source._id);
+  if (!file) throw new Error(`No source file found for boost item ${source._id}`);
+  await fs.writeFile(path.join(output, file), `${JSON.stringify(data, null, 2)}\n`);
 }

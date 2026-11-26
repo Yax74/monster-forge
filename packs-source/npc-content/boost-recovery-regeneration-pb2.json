@@ -3,10 +3,10 @@
   "_id": "ddfaf28591721b7e",
   "name": "Regeneration II",
   "type": "feat",
-  "img": "icons/svg/heal.svg",
+  "img": "icons/magic/life/heart-cross-blue.webp",
   "system": {
     "description": {
-      "value": "<p>The creature regains hit points equal to twice its proficiency bonus at the start of each of its turns if it has at least 1 hit point.</p>",
+      "value": "<p><strong>[[lookup @name]].</strong> The creature regains hit points equal to twice its proficiency bonus at the start of each of its turns if it has at least 1 hit point.</p><p>Use the generated activity for the roll or action prompt.</p><p class=\"monster-forge-note\">Monster Forge · Strong power · Core activity</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -17,21 +17,96 @@
       "value": "monster",
       "subtype": ""
     },
-    "activities": {},
+    "activities": {
+      "92be956eddfaf285": {
+        "_id": "92be956eddfaf285",
+        "type": "heal",
+        "name": "Regeneration II",
+        "sort": 0,
+        "activation": {
+          "type": "special",
+          "value": null,
+          "condition": "At the start of its turn while above 0 hit points",
+          "override": true
+        },
+        "consumption": {
+          "targets": [],
+          "scaling": {
+            "allowed": false
+          },
+          "spellSlot": false
+        },
+        "description": {
+          "value": "",
+          "chatFlavor": ""
+        },
+        "range": {
+          "units": "self",
+          "value": null,
+          "override": true
+        },
+        "target": {
+          "template": {
+            "contiguous": false,
+            "units": "ft",
+            "type": "",
+            "stationary": false
+          },
+          "affects": {
+            "choice": false,
+            "type": "self",
+            "count": ""
+          },
+          "override": true,
+          "prompt": true
+        },
+        "healing": {
+          "number": null,
+          "denomination": 0,
+          "bonus": "",
+          "types": [
+            "healing"
+          ],
+          "custom": {
+            "enabled": true,
+            "formula": "(2*@prof)"
+          },
+          "scaling": {
+            "number": 1
+          },
+          "modifiers": []
+        }
+      }
+    },
     "uses": {
-      "spent": 0,
       "max": "",
+      "spent": 0,
       "recovery": []
-    }
+    },
+    "identifier": "recovery-regeneration-pb2"
   },
   "effects": [],
   "flags": {
     "monster-forge": {
+      "generated": true,
+      "version": "1.10.0",
+      "setId": "library-source",
+      "kind": "boost",
+      "role": "boost",
+      "boostId": "recovery.regeneration.pb2",
+      "boostGroup": "recovery-feature",
+      "category": "recovery",
+      "defaultName": "Regeneration II",
+      "customName": "",
+      "power": "strong",
+      "automation": "activity",
+      "exclusiveGroup": "recovery-feature",
+      "requirements": [],
       "library": {
         "kind": "boost",
         "category": "recovery",
         "categoryLabel": "Recovery",
-        "categoryIcon": "icons/svg/heal.svg",
+        "categoryIcon": "icons/magic/life/heart-cross-blue.webp",
         "categoryDescription": "One healing or survival feature.",
         "categorySort": 4,
         "group": "recovery-feature",
@@ -61,11 +136,15 @@
           "categoryId": "recovery",
           "exclusiveGroup": "recovery-feature",
           "rank": 2,
-          "requirements": []
+          "requirements": [],
+          "img": "icons/magic/life/heart-cross-blue.webp"
         },
         "template": false,
         "version": 2
       }
+    },
+    "dae": {
+      "stackable": "noneName"
     }
   }
 }

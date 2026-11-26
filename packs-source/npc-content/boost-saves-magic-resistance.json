@@ -3,10 +3,10 @@
   "_id": "69ab93c73894fd2c",
   "name": "Magic Resistance",
   "type": "feat",
-  "img": "icons/svg/holy-shield.svg",
+  "img": "icons/magic/defensive/shield-barrier-blue.webp",
   "system": {
     "description": {
-      "value": "<p>The creature has advantage on saving throws against spells and other magical effects.</p>",
+      "value": "<p><strong>[[lookup @name]].</strong> The creature has advantage on saving throws against spells and other magical effects.</p><p><em>resolve conditional timing manually.</em></p><p class=\"monster-forge-note\">Monster Forge · Major power · Manual feature</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -19,19 +19,34 @@
     },
     "activities": {},
     "uses": {
-      "spent": 0,
       "max": "",
+      "spent": 0,
       "recovery": []
-    }
+    },
+    "identifier": "saves-magic-resistance"
   },
   "effects": [],
   "flags": {
     "monster-forge": {
+      "generated": true,
+      "version": "1.10.0",
+      "setId": "library-source",
+      "kind": "boost",
+      "role": "boost",
+      "boostId": "saves.magic-resistance",
+      "boostGroup": "saving-resilience",
+      "category": "resilience",
+      "defaultName": "Magic Resistance",
+      "customName": "",
+      "power": "major",
+      "automation": "manual",
+      "exclusiveGroup": "saving-resilience",
+      "requirements": [],
       "library": {
         "kind": "boost",
         "category": "resilience",
         "categoryLabel": "Saving Throws",
-        "categoryIcon": "icons/svg/holy-shield.svg",
+        "categoryIcon": "icons/magic/defensive/shield-barrier-blue.webp",
         "categoryDescription": "Broad bonuses or focused resilience.",
         "categorySort": 3,
         "group": "saving-resilience",
@@ -54,11 +69,15 @@
           "categoryId": "resilience",
           "exclusiveGroup": "saving-resilience",
           "rank": null,
-          "requirements": []
+          "requirements": [],
+          "img": "icons/magic/defensive/shield-barrier-blue.webp"
         },
         "template": false,
         "version": 2
       }
+    },
+    "dae": {
+      "stackable": "noneName"
     }
   }
 }

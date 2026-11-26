@@ -6,7 +6,7 @@
   "img": "icons/magic/symbols/runes-star-blue.webp",
   "system": {
     "description": {
-      "value": "<p>The creature gains a +2 bonus to its spell save DC.</p>",
+      "value": "<p><strong>[[lookup @name]].</strong> The creature gains a +2 bonus to its spell save DC.</p><p class=\"monster-forge-note\">Monster Forge · Strong power · Core effect</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -19,14 +19,67 @@
     },
     "activities": {},
     "uses": {
-      "spent": 0,
       "max": "",
+      "spent": 0,
       "recovery": []
-    }
+    },
+    "identifier": "spell-dc-2"
   },
-  "effects": [],
+  "effects": [
+    {
+      "_id": "f1a467c40a026dc0",
+      "name": "Potent Spellcasting II",
+      "img": "icons/magic/symbols/runes-star-blue.webp",
+      "type": "base",
+      "transfer": true,
+      "disabled": false,
+      "duration": {},
+      "statuses": [],
+      "flags": {
+        "dae": {
+          "stackable": "noneName",
+          "showIcon": false,
+          "specialDuration": []
+        }
+      },
+      "system": {
+        "changes": [
+          {
+            "_id": "f2a469570a026dc0",
+            "key": "system.bonuses.spell.dc",
+            "value": "2",
+            "priority": 20,
+            "type": "add",
+            "phase": "initial",
+            "conditions": "{}",
+            "replacement": ""
+          }
+        ],
+        "conditions": "{}",
+        "magical": false,
+        "rider": {
+          "statuses": []
+        }
+      },
+      "_key": "!effects!f1a467c40a026dc0"
+    }
+  ],
   "flags": {
     "monster-forge": {
+      "generated": true,
+      "version": "1.10.0",
+      "setId": "library-source",
+      "kind": "boost",
+      "role": "boost",
+      "boostId": "spell.dc.2",
+      "boostGroup": "spell-dc",
+      "category": "spellcasting",
+      "defaultName": "Potent Spellcasting II",
+      "customName": "",
+      "power": "strong",
+      "automation": "core",
+      "exclusiveGroup": "spell-dc",
+      "requirements": [],
       "library": {
         "kind": "boost",
         "category": "spellcasting",
@@ -60,11 +113,15 @@
           "categoryId": "spellcasting",
           "exclusiveGroup": "spell-dc",
           "rank": 2,
-          "requirements": []
+          "requirements": [],
+          "img": "icons/magic/symbols/runes-star-blue.webp"
         },
         "template": false,
         "version": 2
       }
+    },
+    "dae": {
+      "stackable": "noneName"
     }
   }
 }

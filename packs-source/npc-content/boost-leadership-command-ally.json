@@ -3,10 +3,10 @@
   "_id": "238a8220429d0966",
   "name": "Command Ally",
   "type": "feat",
-  "img": "icons/sundries/flags/banner-blue.webp",
+  "img": "icons/skills/social/diplomacy-handshake-blue.webp",
   "system": {
     "description": {
-      "value": "<p>As a bonus action, the creature chooses one ally within 30 feet that can hear it. That ally can use its reaction to make one weapon attack. Command Ally then recharges on a 5–6.</p>",
+      "value": "<p><strong>[[lookup @name]].</strong> As a bonus action, the creature chooses one ally within 30 feet that can hear it. That ally can use its reaction to make one weapon attack. Command Ally then recharges on a 5–6.</p><p>Use the generated activity for the roll or action prompt.</p><p class=\"monster-forge-note\">Monster Forge · Major power · Manual feature</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -17,21 +17,92 @@
       "value": "monster",
       "subtype": ""
     },
-    "activities": {},
+    "activities": {
+      "2fd60274238a8220": {
+        "_id": "2fd60274238a8220",
+        "type": "utility",
+        "name": "Command Ally",
+        "sort": 0,
+        "activation": {
+          "type": "bonus",
+          "value": 1,
+          "condition": "",
+          "override": true
+        },
+        "consumption": {
+          "targets": [
+            {
+              "type": "itemUses",
+              "value": "1",
+              "target": ""
+            }
+          ],
+          "scaling": {
+            "allowed": false
+          },
+          "spellSlot": false
+        },
+        "description": {
+          "value": "",
+          "chatFlavor": ""
+        },
+        "range": {
+          "units": "self",
+          "value": null,
+          "override": true
+        },
+        "target": {
+          "template": {
+            "contiguous": false,
+            "units": "ft",
+            "type": "",
+            "stationary": false
+          },
+          "affects": {
+            "choice": false,
+            "type": "self",
+            "count": ""
+          },
+          "override": true,
+          "prompt": true
+        }
+      }
+    },
     "uses": {
+      "max": "1",
       "spent": 0,
-      "max": "",
-      "recovery": []
-    }
+      "recovery": [
+        {
+          "period": "recharge",
+          "type": "recoverAll",
+          "formula": "5"
+        }
+      ]
+    },
+    "identifier": "leadership-command-ally"
   },
   "effects": [],
   "flags": {
     "monster-forge": {
+      "generated": true,
+      "version": "1.10.0",
+      "setId": "library-source",
+      "kind": "boost",
+      "role": "boost",
+      "boostId": "leadership.command-ally",
+      "boostGroup": "leadership-feature",
+      "category": "leadership",
+      "defaultName": "Command Ally",
+      "customName": "",
+      "power": "major",
+      "automation": "manual",
+      "exclusiveGroup": "leadership-feature",
+      "requirements": [],
       "library": {
         "kind": "boost",
         "category": "leadership",
         "categoryLabel": "Leadership",
-        "categoryIcon": "icons/sundries/flags/banner-blue.webp",
+        "categoryIcon": "icons/skills/social/diplomacy-handshake-blue.webp",
         "categoryDescription": "Support and command features; choose one.",
         "categorySort": 7,
         "group": "leadership-feature",
@@ -62,11 +133,15 @@
           "categoryId": "leadership",
           "exclusiveGroup": "leadership-feature",
           "rank": null,
-          "requirements": []
+          "requirements": [],
+          "img": "icons/skills/social/diplomacy-handshake-blue.webp"
         },
         "template": false,
         "version": 2
       }
+    },
+    "dae": {
+      "stackable": "noneName"
     }
   }
 }

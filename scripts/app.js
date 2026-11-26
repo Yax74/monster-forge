@@ -31,7 +31,6 @@ import {
   normalizeFoundationConfig
 } from "./foundation.js";
 import {
-  buildBoostCategories,
   calculateBoostImpact,
   getBoostCatalog,
   normalizeBoostConfig,
@@ -142,15 +141,23 @@ async function buildContext(actor, config, isNewNpc = false) {
   const hasFoundation = Boolean(actor.getFlag(MODULE_ID, "foundation"));
   const boostConfig = normalizeBoostConfig(config.boosts);
   const recommendedBoosts = recommendBoosts({ role: config.foundation.role, tier: config.foundation.tier });
-  const boostCategories = buildBoostCategories(boostConfig, recommendedBoosts);
   const boostCatalog = getBoostCatalog();
-  const contentGroups = [...(await getAvailableContent()).reduce((groups, entry) => {
-    const key = `${entry.kind} · ${entry.category}`;
-    const group = groups.get(key) ?? { label: key, entries: [] };
+  const contentGroups = [...getAvailableContent(boostConfig, recommendedBoosts).reduce((groups, entry) => {
+    const key = entry.groupKey;
+    const group = groups.get(key) ?? {
+      id: key, label: entry.groupLabel, section: entry.section,
+      sort: entry.categorySort, entries: []
+    };
     group.entries.push(entry);
     groups.set(key, group);
     return groups;
-  }, new Map()).values()].map((group) => ({ ...group, count: group.entries.length }));
+  }, new Map()).values()]
+    .sort((a, b) => a.sort - b.sort || a.label.localeCompare(b.label))
+    .map((group) => ({
+      ...group,
+      count: group.entries.length,
+      selectedCount: group.entries.filter((entry) => entry.selected).length
+    }));
   const profiles = Array.isArray(game.settings.get(MODULE_ID, "profiles"))
     ? game.settings.get(MODULE_ID, "profiles")
     : [];
@@ -158,6 +165,7 @@ async function buildContext(actor, config, isNewNpc = false) {
     isNewNpc,
     isGM: Boolean(game.user?.isGM),
     contentGroups,
+    contentGroupCount: contentGroups.length,
     contentPacks: availableItemPacks().map((pack) => ({ ...pack, linked: configuredContentPacks().includes(pack.id) })),
     defaultSpeciesTraits: Boolean(game.settings.get(MODULE_ID, "defaultSpeciesTraits")),
     creatureTypeOptions: options(CREATURE_TYPES.map((type) => [type, type[0].toUpperCase() + type.slice(1)]), "humanoid"),
@@ -236,7 +244,6 @@ async function buildContext(actor, config, isNewNpc = false) {
     },
     boosts: {
       ...boostConfig,
-      categories: boostCategories,
       found: boostCatalog.entries.length,
       selectedCount: Object.keys(boostConfig.selections).length,
       recommendations: recommendedBoosts,
@@ -359,8 +366,8 @@ export function parseForgeForm(form) {
       mode: field(data, "foundation.mode", "apply"),
       role: field(data, "foundation.role", "balanced"),
       tier: field(data, "foundation.tier", "standard"),
-      species: creatureTypeField && newCreatureType !== "humanoid"
-        ? newCreatureType
+      species: creatureTypeField
+        ? newCreatureType !== "humanoid" ? newCreatureType : field(data, "newNpc.species", "human")
         : field(data, "foundation.species", "preserve"),
       castingAbility: field(data, "foundation.castingAbility", "auto"),
       hpPolicy: field(data, "foundation.hpPolicy", "ratio"),
@@ -759,75 +766,35 @@ async function confirmAction({ title, content }) {
   });
 }
 
-function updateBoostControls(root, form) {
-  const search = String(form.elements.namedItem("boosts.search")?.value ?? "").trim().toLowerCase();
-  const selectedOnly = Boolean(form.elements.namedItem("boosts.selectedOnly")?.checked);
-  const recommended = new Set(recommendBoosts({
-    role: form.elements.namedItem("foundation.role")?.value,
-    tier: form.elements.namedItem("foundation.tier")?.value
-  }));
-  let selectedCount = 0;
-
-  for (const category of root.querySelectorAll("[data-boost-category]")) {
-    let visibleGroups = 0;
-    let categorySelected = 0;
-    for (const group of category.querySelectorAll("[data-boost-group]")) {
-      const select = group.querySelector("[data-boost-select]");
-      if (!select) continue;
-      for (const candidate of select.options) {
-        if (!candidate.value) continue;
-        candidate.textContent = `${candidate.dataset.label}${recommended.has(candidate.value) ? " ★" : ""}`;
-      }
-      const selected = select.value !== "";
-      const option = select.selectedOptions?.[0];
-      if (selected) {
-        selectedCount += 1;
-        categorySelected += 1;
-      }
-      const nameField = group.querySelector("[data-boost-name]");
-      if (nameField) nameField.hidden = !selected;
-      const summary = group.querySelector("[data-boost-summary]");
-      const power = group.querySelector("[data-boost-power]");
-      const automation = group.querySelector("[data-boost-automation]");
-      const action = group.querySelector("[data-boost-action]");
-      const impact = group.querySelector("[data-boost-impact-badge]");
-      if (summary) summary.textContent = selected ? option?.dataset.summary ?? "" : group.dataset.help ?? "";
-      if (power) {
-        power.textContent = option?.dataset.power ?? "";
-        power.hidden = !selected;
-      }
-      if (automation) {
-        automation.textContent = option?.dataset.automation ?? "";
-        automation.hidden = !selected;
-      }
-      if (action) {
-        action.textContent = option?.dataset.action ?? "";
-        action.hidden = !selected;
-      }
-      if (impact) {
-        impact.textContent = option?.dataset.impact ?? "";
-        impact.hidden = !selected;
-      }
-      const haystack = [group.dataset.label, ...[...select.options].map((entry) => `${entry.textContent} ${entry.dataset.summary ?? ""}`)]
-        .join(" ").toLowerCase();
-      const visible = (!selectedOnly || selected) && (!search || haystack.includes(search));
-      group.hidden = !visible;
-      if (visible) visibleGroups += 1;
+function updateContentControls(root, form) {
+  const search = String(root.querySelector("[data-content-search]")?.value ?? "").trim().toLowerCase();
+  const selectedOnly = Boolean(root.querySelector("[data-content-selected-only]")?.checked);
+  const groups = [...root.querySelectorAll("[data-content-group]")];
+  for (const group of groups) {
+    let visible = 0;
+    let selected = 0;
+    for (const card of group.querySelectorAll("[data-content-entry]")) {
+      const checkbox = card.querySelector("input[type='checkbox']");
+      if (checkbox?.checked) selected += 1;
+      const nameField = card.querySelector("[data-boost-name-field]");
+      const nameInput = card.querySelector("[data-boost-name-input]");
+      if (nameField) nameField.hidden = !checkbox?.checked;
+      if (nameInput) nameInput.disabled = !checkbox?.checked;
+      const matches = !search || card.dataset.search.toLowerCase().includes(search);
+      card.hidden = !matches || (selectedOnly && !checkbox?.checked);
+      if (!card.hidden) visible += 1;
     }
-    category.hidden = visibleGroups === 0;
-    const count = category.querySelector("[data-category-count]");
-    if (count) count.textContent = categorySelected ? `${categorySelected} selected` : "None";
+    group.hidden = visible === 0;
+    const count = group.querySelector("[data-content-group-count]");
+    if (count) count.textContent = selected ? `${selected}/${group.dataset.total} selected` : String(group.dataset.total);
+    if (search && visible) group.open = true;
   }
-  setText(root, "[data-boost-selected-count]", `${selectedCount} selected`);
+  setText(root, "[data-boost-selected-count]", `${form.querySelectorAll("[data-boost-item]:checked").length} selected`);
 }
 
-function clearBoostSelects(root, categoryId = null) {
-  const scope = categoryId
-    ? root.querySelector(`[data-boost-category='${categoryId}']`)
-    : root;
-  if (!scope) return;
-  for (const select of scope.querySelectorAll("[data-boost-select]")) select.value = "";
-  for (const input of scope.querySelectorAll("[data-boost-name] input")) input.value = "";
+function clearBoostSelects(root) {
+  for (const input of root.querySelectorAll("[data-boost-item]")) input.checked = false;
+  for (const input of root.querySelectorAll("[data-boost-name-input]")) input.value = "";
 }
 
 function flattenConfig(value, prefix = "", output = {}) {
@@ -853,7 +820,8 @@ function applyProfileToForm(form, config) {
     if (path.startsWith("boosts.name.")) path = path.replace("boosts.name.", "boosts.names.");
     const value = path === "content.items" ? flat.selectedContent : flat[path];
     if (element.type === "checkbox") {
-      element.checked = Array.isArray(value) ? value.includes(element.value) : Boolean(value);
+      if (element.name.startsWith("boosts.selection.")) element.checked = String(value ?? "") === element.value;
+      else element.checked = Array.isArray(value) ? value.includes(element.value) : Boolean(value);
     } else if (value !== undefined && !Array.isArray(value)) {
       element.value = value ?? "";
     }
@@ -886,7 +854,7 @@ function attachListeners(_event, dialog, actor) {
   const form = dialog.form ?? root.querySelector("form");
   if (!form) return;
   const preview = () => {
-    updateBoostControls(root, form);
+    updateContentControls(root, form);
     updateAutoTraitSummary(root, form);
     updatePreview(root, actor);
   };
@@ -954,18 +922,8 @@ function attachListeners(_event, dialog, actor) {
     setQuickMode(quickToggle.checked);
     await game.settings.set(MODULE_ID, "quickMode", quickToggle.checked);
   });
-  root.querySelector("[data-content-search]")?.addEventListener("input", (event) => {
-    const query = String(event.currentTarget.value ?? "").trim().toLowerCase();
-    for (const group of root.querySelectorAll("[data-content-group]")) {
-      let hasMatch = false;
-      for (const entry of group.querySelectorAll("[data-content-entry]")) {
-        entry.hidden = !entry.dataset.search.toLowerCase().includes(query);
-        hasMatch ||= !entry.hidden;
-      }
-      group.hidden = !hasMatch;
-      if (query && hasMatch) group.open = true;
-    }
-  });
+  root.querySelector("[data-content-search]")?.addEventListener("input", preview);
+  root.querySelector("[data-content-selected-only]")?.addEventListener("change", preview);
   root.querySelector("[data-action='save-gm-setup']")?.addEventListener("click", async () => {
     if (!game.user?.isGM) return;
     const ids = selectedContentPackIds(form);
@@ -980,10 +938,8 @@ function attachListeners(_event, dialog, actor) {
   });
   const syncRecommendation = () => {
     const recommended = applyRecommendedAttacks(parseForgeForm(form));
-    const secondary = form.elements.namedItem("secondaryEnabled");
     const primaryCount = form.elements.namedItem("primary.count");
     const secondaryCount = form.elements.namedItem("secondary.count");
-    if (secondary) secondary.checked = recommended.secondaryEnabled;
     if (primaryCount) primaryCount.value = recommended.primary.count;
     if (secondaryCount) secondaryCount.value = recommended.secondary.count;
   };
@@ -996,6 +952,12 @@ function attachListeners(_event, dialog, actor) {
     preview();
   });
   form.addEventListener("change", (event) => {
+    if (event.target?.matches?.("[data-boost-item]") && event.target.checked) {
+      const groupName = event.target.name;
+      for (const sibling of form.querySelectorAll(`input[name="${CSS.escape(groupName)}"][data-boost-item]`)) {
+        if (sibling !== event.target) sibling.checked = false;
+      }
+    }
     if (event.target?.name === "newNpc.creatureType") {
       const type = event.target.value;
       const speciesPicker = root.querySelector("[data-new-species-picker]");
@@ -1055,24 +1017,13 @@ function attachListeners(_event, dialog, actor) {
     preview();
   });
 
-  for (const details of root.querySelectorAll("details[data-boost-category]")) {
-    details.addEventListener("toggle", () => {
-      const state = details.querySelector("[data-category-open]");
-      if (state) state.checked = details.open;
-    });
-  }
-
   root.querySelector("[data-action='recommend-boosts']")?.addEventListener("click", () => {
     clearBoostSelects(root);
     const recommended = recommendBoosts({
       role: form.elements.namedItem("foundation.role")?.value,
       tier: form.elements.namedItem("foundation.tier")?.value
     });
-    for (const id of recommended) {
-      for (const select of root.querySelectorAll("[data-boost-select]")) {
-        if ([...select.options].some((option) => option.value === id)) select.value = id;
-      }
-    }
+    for (const input of root.querySelectorAll("[data-boost-item]")) input.checked = recommended.has(input.value);
     preview();
   });
 
@@ -1080,15 +1031,6 @@ function attachListeners(_event, dialog, actor) {
     clearBoostSelects(root);
     preview();
   });
-
-  for (const button of root.querySelectorAll("[data-action='clear-boost-category']")) {
-    button.addEventListener("click", (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      clearBoostSelects(root, button.dataset.category);
-      preview();
-    });
-  }
 
   for (const button of root.querySelectorAll("[data-tab-target]")) {
     button.addEventListener("click", () => activateTab(root, button.dataset.tabTarget));
@@ -1397,22 +1339,63 @@ function selectedContentPackIds(form) {
     .filter((id) => id && id !== "monster-forge.npc-content");
 }
 
-async function getAvailableContent() {
+function plainDescription(item) {
+  const html = String(item.system?.description?.value ?? "");
+  const holder = document.createElement("div");
+  holder.innerHTML = html;
+  return holder.textContent?.trim().replace(/\s+/g, " ") ?? "";
+}
+
+function getAvailableContent(boostConfig = {}, recommendedBoosts = []) {
   const entries = [];
   for (const item of compendiumLibraryItems) {
     const library = item.getFlag(MODULE_ID, "library");
-    if (!library || library.template || !["action", "trait", "species-trait"].includes(library.kind)) continue;
+    if (!library || library.template || !["action", "trait", "species-trait", "boost"].includes(library.kind)) continue;
+    const isBoost = library.kind === "boost";
+    const boost = library.boost ?? {};
+    if (isBoost && (!boost.id || !library.group)) continue;
+    const species = [].concat(library.species ?? []).join(", ") || "Any";
+    const category = isBoost
+      ? String(library.categoryLabel ?? library.category ?? "Boosts")
+      : library.kind === "species-trait"
+        ? `${species} species traits`
+        : String(library.categoryLabel ?? library.category ?? (library.kind === "action" ? "Actions" : "Traits"));
+    const groupKey = isBoost
+      ? `boost-${library.category}`
+      : library.kind === "species-trait"
+        ? `species-${[].concat(library.species ?? []).join("-") || "general"}`
+        : `${library.kind}-${library.category ?? library.kind}`;
+    const groupLabel = isBoost
+      ? category
+      : library.kind === "species-trait"
+        ? `${species} species traits`
+        : category;
+    const boostGroup = String(library.group ?? boost.groupId ?? "");
+    const boostId = String(boost.id ?? "");
     entries.push({
       uuid: item.uuid,
       name: item.name,
       kindKey: library.kind,
-      kind: library.kind === "species-trait" ? "Species trait" : library.kind === "action" ? "Action" : "Trait",
-      species: [].concat(library.species ?? []).join(", ") || "Any",
-      category: library.category ?? library.kind,
-      img: item.img
+      kind: isBoost ? "Boost" : library.kind === "species-trait" ? "Species trait" : library.kind === "action" ? "Action" : "Trait",
+      species,
+      category,
+      groupKey,
+      groupLabel,
+      categorySort: Number(library.categorySort) || 100,
+      section: isBoost ? "boosts" : "content",
+      isBoost,
+      boostId,
+      boostGroup,
+      selectionName: isBoost ? `boosts.selection.${boostGroup}` : "content.items",
+      selectionValue: isBoost ? boostId : item.uuid,
+      selected: isBoost ? boostConfig.selections?.[boostGroup] === boostId : false,
+      customName: isBoost ? boostConfig.names?.[boostGroup] ?? "" : "",
+      recommended: isBoost && recommendedBoosts.includes(boostId),
+      description: plainDescription(item) || boost.description || boost.summary || "",
+      img: item.img || library.categoryIcon || "icons/magic/symbols/runes-star-blue.webp"
     });
   }
-  return entries.sort((a, b) => a.category.localeCompare(b.category) || a.name.localeCompare(b.name));
+  return entries.sort((a, b) => a.categorySort - b.categorySort || a.groupLabel.localeCompare(b.groupLabel) || a.name.localeCompare(b.name));
 }
 
 async function resolveSelectedContent(uuids = []) {

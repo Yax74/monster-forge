@@ -3,10 +3,10 @@
   "_id": "e3e04013a3b03f1d",
   "name": "Arcane Blink",
   "type": "feat",
-  "img": "icons/svg/wingfoot.svg",
+  "img": "icons/skills/movement/feet-winged-boots-blue.webp",
   "system": {
     "description": {
-      "value": "<p>Immediately after the creature makes an attack or casts a spell, it can teleport up to 10 feet to an unoccupied space it can see. This movement doesn't provoke opportunity attacks.</p>",
+      "value": "<p><strong>[[lookup @name]].</strong> Immediately after the creature makes an attack or casts a spell, it can teleport up to 10 feet to an unoccupied space it can see. This movement doesn&#039;t provoke opportunity attacks.</p><p>Use the generated activity for the roll or action prompt.</p><p class=\"monster-forge-note\">Monster Forge · Strong power · Manual feature</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -17,21 +17,80 @@
       "value": "monster",
       "subtype": ""
     },
-    "activities": {},
+    "activities": {
+      "f4b188c7e3e04013": {
+        "_id": "f4b188c7e3e04013",
+        "type": "utility",
+        "name": "Arcane Blink",
+        "sort": 0,
+        "activation": {
+          "type": "special",
+          "value": null,
+          "condition": "Immediately after an attack or spell",
+          "override": true
+        },
+        "consumption": {
+          "targets": [],
+          "scaling": {
+            "allowed": false
+          },
+          "spellSlot": false
+        },
+        "description": {
+          "value": "",
+          "chatFlavor": ""
+        },
+        "range": {
+          "units": "self",
+          "value": null,
+          "override": true
+        },
+        "target": {
+          "template": {
+            "contiguous": false,
+            "units": "ft",
+            "type": "",
+            "stationary": false
+          },
+          "affects": {
+            "choice": false,
+            "type": "self",
+            "count": ""
+          },
+          "override": true,
+          "prompt": true
+        }
+      }
+    },
     "uses": {
-      "spent": 0,
       "max": "",
+      "spent": 0,
       "recovery": []
-    }
+    },
+    "identifier": "movement-arcane-blink"
   },
   "effects": [],
   "flags": {
     "monster-forge": {
+      "generated": true,
+      "version": "1.10.0",
+      "setId": "library-source",
+      "kind": "boost",
+      "role": "boost",
+      "boostId": "movement.arcane-blink",
+      "boostGroup": "movement-ability",
+      "category": "movement",
+      "defaultName": "Arcane Blink",
+      "customName": "",
+      "power": "strong",
+      "automation": "manual",
+      "exclusiveGroup": "movement-ability",
+      "requirements": [],
       "library": {
         "kind": "boost",
         "category": "movement",
         "categoryLabel": "Movement",
-        "categoryIcon": "icons/svg/wingfoot.svg",
+        "categoryIcon": "icons/skills/movement/feet-winged-boots-blue.webp",
         "categoryDescription": "Raw speed and one signature mobility feature.",
         "categorySort": 1,
         "group": "movement-ability",
@@ -58,11 +117,15 @@
           "categoryId": "movement",
           "exclusiveGroup": "movement-ability",
           "rank": null,
-          "requirements": []
+          "requirements": [],
+          "img": "icons/skills/movement/feet-winged-boots-blue.webp"
         },
         "template": false,
         "version": 2
       }
+    },
+    "dae": {
+      "stackable": "noneName"
     }
   }
 }

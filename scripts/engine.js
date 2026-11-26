@@ -119,16 +119,17 @@ export function applyRecommendedAttacks(config = {}, rawCr = config.cr) {
   const recommendation = getCrStats(rawCr).recommendedAttacks;
   const merged = mergeDefaults(config, rawCr);
   const alternative = merged.secondaryMode === "alternative";
-  const useSecondary = Boolean(merged.secondaryEnabled) && (alternative || recommendation > 1);
-  let primaryCount = recommendation;
+  const useSecondary = Boolean(merged.secondaryEnabled);
+  const totalAttacks = useSecondary && !alternative ? Math.max(2, recommendation) : recommendation;
+  let primaryCount = totalAttacks;
   let secondaryCount = merged.secondary?.count ?? 1;
 
   if (useSecondary && alternative) {
     secondaryCount = recommendation;
   } else if (useSecondary) {
     const split = clamp(merged.splitPrimary, 5, 95, DEFAULTS.splitPrimary) / 100;
-    primaryCount = Math.min(recommendation - 1, Math.max(1, Math.round(recommendation * split)));
-    secondaryCount = recommendation - primaryCount;
+    primaryCount = Math.min(totalAttacks - 1, Math.max(1, Math.round(totalAttacks * split)));
+    secondaryCount = totalAttacks - primaryCount;
   }
 
   return {

@@ -3,10 +3,10 @@
   "_id": "ca64793cd9964e38",
   "name": "Uncanny Dodge",
   "type": "feat",
-  "img": "icons/svg/shield.svg",
+  "img": "icons/magic/defensive/shield-barrier-blue.webp",
   "system": {
     "description": {
-      "value": "<p>When an attacker the creature can see hits it with an attack, the creature can use its reaction to halve the attack's damage against it.</p>",
+      "value": "<p><strong>[[lookup @name]].</strong> When an attacker the creature can see hits it with an attack, the creature can use its reaction to halve the attack&#039;s damage against it.</p><p>Use the generated activity for the roll or action prompt.</p><p class=\"monster-forge-note\">Monster Forge · Strong power · Manual feature</p>",
       "chat": "",
       "unidentified": ""
     },
@@ -17,21 +17,80 @@
       "value": "monster",
       "subtype": ""
     },
-    "activities": {},
+    "activities": {
+      "b9a91ef0ca64793c": {
+        "_id": "b9a91ef0ca64793c",
+        "type": "utility",
+        "name": "Uncanny Dodge",
+        "sort": 0,
+        "activation": {
+          "type": "reaction",
+          "value": 1,
+          "condition": "A visible attacker hits",
+          "override": true
+        },
+        "consumption": {
+          "targets": [],
+          "scaling": {
+            "allowed": false
+          },
+          "spellSlot": false
+        },
+        "description": {
+          "value": "",
+          "chatFlavor": ""
+        },
+        "range": {
+          "units": "self",
+          "value": null,
+          "override": true
+        },
+        "target": {
+          "template": {
+            "contiguous": false,
+            "units": "ft",
+            "type": "",
+            "stationary": false
+          },
+          "affects": {
+            "choice": false,
+            "type": "self",
+            "count": ""
+          },
+          "override": true,
+          "prompt": true
+        }
+      }
+    },
     "uses": {
-      "spent": 0,
       "max": "",
+      "spent": 0,
       "recovery": []
-    }
+    },
+    "identifier": "reaction-uncanny-dodge"
   },
   "effects": [],
   "flags": {
     "monster-forge": {
+      "generated": true,
+      "version": "1.10.0",
+      "setId": "library-source",
+      "kind": "boost",
+      "role": "boost",
+      "boostId": "reaction.uncanny-dodge",
+      "boostGroup": "defence-reaction",
+      "category": "defence",
+      "defaultName": "Uncanny Dodge",
+      "customName": "",
+      "power": "strong",
+      "automation": "manual",
+      "exclusiveGroup": "defence-reaction",
+      "requirements": [],
       "library": {
         "kind": "boost",
         "category": "defence",
         "categoryLabel": "Defence",
-        "categoryIcon": "icons/svg/shield.svg",
+        "categoryIcon": "icons/magic/defensive/shield-barrier-blue.webp",
         "categoryDescription": "Passive AC or one defensive reaction.",
         "categorySort": 2,
         "group": "defence-reaction",
@@ -58,11 +117,15 @@
           "categoryId": "defence",
           "exclusiveGroup": "defence-reaction",
           "rank": null,
-          "requirements": []
+          "requirements": [],
+          "img": "icons/magic/defensive/shield-barrier-blue.webp"
         },
         "template": false,
         "version": 2
       }
+    },
+    "dae": {
+      "stackable": "noneName"
     }
   }
 }
