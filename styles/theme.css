@@ -1,0 +1,311 @@
+/* Monster Forge theme layer, matched to the Alchemy Workbench palette. */
+.monster-forge-app {
+  color-scheme: dark;
+  --mf-ui-bg: #1b2023;
+  --mf-ui-panel: #303438;
+  --mf-ui-panel-alt: #383c40;
+  --mf-ui-panel-raised: #414044;
+  --mf-ui-field: #20262a;
+  --mf-ui-text: #f1eee6;
+  --mf-ui-muted: #c3c3c0;
+  --mf-ui-heading: #eed8a6;
+  --mf-ui-border: #706a60;
+  --mf-ui-border-subtle: #595851;
+  --mf-ui-accent: #e2bc75;
+  --mf-ui-accent-text: #2e2315;
+  --mf-ui-selected: #534a3b;
+  --mf-ui-hover: #47484a;
+  --mf-ui-disabled: #8d8e8c;
+  --mf-ui-good-bg: #254034;
+  --mf-ui-good-text: #cef0d2;
+  --mf-ui-good-line: #6c977a;
+  --mf-ui-warn-bg: #503c2c;
+  --mf-ui-warn-text: #ffe0ac;
+  --mf-ui-warn-line: #bb9055;
+  --mf-ui-soft-bg: #29363e;
+  --mf-ui-soft-line: #7794a7;
+  --mf-ui-tab-bg: #282d30;
+  --mf-ui-hero-start: #35302b;
+  --mf-ui-hero-end: #252b2e;
+  --mf-ui-focus: #edc987;
+}
+
+/* Follow Foundry's selected light theme, whether the theme class is on body
+   or on the ApplicationV2 window itself. */
+body.theme-light .monster-forge-app,
+.theme-light .monster-forge-app,
+.monster-forge-app.theme-light {
+  color-scheme: light;
+  --mf-ui-bg: #eee9e1;
+  --mf-ui-panel: #fffdf9;
+  --mf-ui-panel-alt: #f5f1e9;
+  --mf-ui-panel-raised: #eae1d4;
+  --mf-ui-field: #ffffff;
+  --mf-ui-text: #282d32;
+  --mf-ui-muted: #4a535c;
+  --mf-ui-heading: #684a20;
+  --mf-ui-border: #928574;
+  --mf-ui-border-subtle: #c1b6a7;
+  --mf-ui-accent: #785521;
+  --mf-ui-accent-text: #ffffff;
+  --mf-ui-selected: #eee1c7;
+  --mf-ui-hover: #ece6dc;
+  --mf-ui-disabled: #6d7175;
+  --mf-ui-good-bg: #e0f0e6;
+  --mf-ui-good-text: #205438;
+  --mf-ui-good-line: #57926a;
+  --mf-ui-warn-bg: #fff0d6;
+  --mf-ui-warn-text: #73501f;
+  --mf-ui-warn-line: #bb8a44;
+  --mf-ui-soft-bg: #e0eaf0;
+  --mf-ui-soft-line: #7092a2;
+  --mf-ui-tab-bg: #e6dfd3;
+  --mf-ui-hero-start: #e8dfd0;
+  --mf-ui-hero-end: #f7f2e9;
+  --mf-ui-focus: #79551d;
+}
+
+/* An explicit dark class takes precedence if the containing interface is light. */
+.monster-forge-app.theme-dark {
+  color-scheme: dark;
+  --mf-ui-bg: #1b2023;
+  --mf-ui-panel: #303438;
+  --mf-ui-panel-alt: #383c40;
+  --mf-ui-panel-raised: #414044;
+  --mf-ui-field: #20262a;
+  --mf-ui-text: #f1eee6;
+  --mf-ui-muted: #c3c3c0;
+  --mf-ui-heading: #eed8a6;
+  --mf-ui-border: #706a60;
+  --mf-ui-border-subtle: #595851;
+  --mf-ui-accent: #e2bc75;
+  --mf-ui-accent-text: #2e2315;
+  --mf-ui-selected: #534a3b;
+  --mf-ui-hover: #47484a;
+  --mf-ui-disabled: #8d8e8c;
+  --mf-ui-good-bg: #254034;
+  --mf-ui-good-text: #cef0d2;
+  --mf-ui-good-line: #6c977a;
+  --mf-ui-warn-bg: #503c2c;
+  --mf-ui-warn-text: #ffe0ac;
+  --mf-ui-warn-line: #bb9055;
+  --mf-ui-soft-bg: #29363e;
+  --mf-ui-soft-line: #7794a7;
+  --mf-ui-tab-bg: #282d30;
+  --mf-ui-hero-start: #35302b;
+  --mf-ui-hero-end: #252b2e;
+  --mf-ui-focus: #edc987;
+}
+
+.monster-forge-app .window-content {
+  padding: 0;
+  overflow: hidden;
+  background: var(--mf-ui-bg);
+  color: var(--mf-ui-text);
+}
+
+.monster-forge {
+  box-sizing: border-box;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  max-height: min(78vh, 900px);
+  padding: 12px 14px 15px;
+  overflow-x: hidden;
+  color: var(--mf-ui-text);
+  background: var(--mf-ui-bg);
+  font: 13px/1.45 var(--font-primary, Arial, sans-serif);
+  overflow-wrap: anywhere;
+}
+
+.monster-forge * { box-sizing: border-box; }
+.monster-forge h2,
+.monster-forge h3,
+.monster-forge h4,
+.monster-forge p { margin-top: 0; }
+.monster-forge h2,
+.monster-forge h3,
+.monster-forge h4,
+.monster-forge strong,
+.monster-forge label { color: var(--mf-ui-text); }
+.monster-forge .mf-help,
+.monster-forge .mf-callout,
+.monster-forge .mf-profile-toolbar small,
+.monster-forge .mf-content-card small,
+.monster-forge .mf-preview-grid span,
+.monster-forge .mf-foundation-preview span { color: var(--mf-ui-muted); }
+
+/* Hero and section navigation. */
+.monster-forge .mf-hero {
+  align-items: center;
+  padding: 16px 19px;
+  border: 1px solid var(--mf-ui-border-subtle);
+  border-radius: 10px;
+  background: linear-gradient(110deg, var(--mf-ui-hero-start), var(--mf-ui-hero-end));
+  color: var(--mf-ui-text);
+}
+.monster-forge .mf-hero h2 { color: var(--mf-ui-text); font-size: 22px; line-height: 1.2; }
+.monster-forge .mf-hero p:not(.mf-eyebrow) { margin: 5px 0 0; color: var(--mf-ui-muted); }
+.monster-forge .mf-eyebrow { color: var(--mf-ui-heading); font-size: 10px; letter-spacing: .15em; }
+.monster-forge .mf-management button {
+  min-height: 34px;
+  border: 1px solid var(--mf-ui-border);
+  border-radius: 6px;
+  background: var(--mf-ui-panel-raised);
+  color: var(--mf-ui-text);
+}
+.monster-forge .mf-tabs {
+  gap: 4px;
+  padding: 6px 8px 0;
+  border: 1px solid var(--mf-ui-border-subtle);
+  border-radius: 8px;
+  background: var(--mf-ui-tab-bg);
+}
+.monster-forge .mf-tab {
+  min-height: 38px;
+  padding: 8px 10px;
+  border-radius: 6px 6px 0 0;
+  color: var(--mf-ui-muted);
+  font-size: 12px;
+  font-weight: 650;
+}
+.monster-forge .mf-tab:hover,
+.monster-forge .mf-tab:focus-visible { color: var(--mf-ui-text); background: var(--mf-ui-hover); }
+.monster-forge .mf-tab.is-active {
+  border-color: var(--mf-ui-border-subtle);
+  border-bottom: 2px solid var(--mf-ui-accent);
+  background: var(--mf-ui-selected);
+  color: var(--mf-ui-heading);
+}
+.monster-forge .mf-tab small {
+  background: var(--mf-ui-good-bg);
+  color: var(--mf-ui-good-text);
+  font-size: 9px;
+}
+.monster-forge .mf-tab small.is-off { background: var(--mf-ui-panel-raised); color: var(--mf-ui-muted); }
+
+/* Consistent raised panels, cards, and grouped item rows. */
+.monster-forge .mf-section,
+.monster-forge .mf-preview,
+.monster-forge .mf-profile-toolbar,
+.monster-forge .mf-quick-section-controls,
+.monster-forge .mf-content-group,
+.monster-forge .mf-content-card,
+.monster-forge .mf-new-npc-card,
+.monster-forge .mf-foundation-preview > div,
+.monster-forge .mf-preview-grid > div,
+.monster-forge .mf-review-sections > div,
+.monster-forge .mf-metrics > div,
+.monster-forge .mf-audit-grid > div,
+.monster-forge .mf-boost-impact > div {
+  border-color: var(--mf-ui-border-subtle);
+  background: var(--mf-ui-panel);
+  color: var(--mf-ui-text);
+}
+.monster-forge .mf-section,
+.monster-forge .mf-preview { border-radius: 9px; padding: 14px; }
+.monster-forge .mf-section h3,
+.monster-forge .mf-preview h3 { color: var(--mf-ui-heading); font-size: 15px; }
+.monster-forge .mf-section-heading { border-color: var(--mf-ui-border-subtle); }
+.monster-forge .mf-step { background: var(--mf-ui-accent); color: var(--mf-ui-accent-text); }
+.monster-forge .mf-preview { border-left-color: var(--mf-ui-accent); }
+.monster-forge .mf-content-group { border-radius: 8px; padding: 8px; }
+.monster-forge .mf-content-group > summary { color: var(--mf-ui-heading); padding: 6px; }
+.monster-forge .mf-content-card {
+  border-radius: 7px;
+  background: var(--mf-ui-panel-alt);
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+.monster-forge .mf-content-card:hover { border-color: var(--mf-ui-border); background: var(--mf-ui-hover); }
+.monster-forge .mf-content-card:has(input:checked) {
+  border-color: var(--mf-ui-accent);
+  background: var(--mf-ui-selected);
+  box-shadow: inset 3px 0 0 var(--mf-ui-accent);
+}
+.monster-forge .mf-audit-summary,
+.monster-forge .mf-reserve-existing,
+.monster-forge .mf-quick-section-controls,
+.monster-forge .mf-section-toggle { background: var(--mf-ui-panel-alt); color: var(--mf-ui-text); }
+.monster-forge .mf-section-toggle { border-color: var(--mf-ui-border); }
+.monster-forge .mf-section-toggle input,
+.monster-forge .mf-switch input,
+.monster-forge .mf-reserve-existing input { accent-color: var(--mf-ui-accent); }
+
+/* Form controls and buttons inherit the same surfaces in both themes. */
+.monster-forge-app .monster-forge input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+.monster-forge-app .monster-forge select,
+.monster-forge-app .monster-forge textarea {
+  min-width: 0;
+  max-width: 100%;
+  border: 1px solid var(--mf-ui-border) !important;
+  border-radius: 5px;
+  background: var(--mf-ui-field) !important;
+  color: var(--mf-ui-text) !important;
+  box-shadow: none !important;
+}
+.monster-forge-app .monster-forge input::placeholder,
+.monster-forge-app .monster-forge textarea::placeholder { color: var(--mf-ui-muted) !important; opacity: 1; }
+.monster-forge .mf-content-choice input,
+.monster-forge .mf-switch input,
+.monster-forge .mf-library-toggles input { accent-color: var(--mf-ui-accent); }
+.monster-forge-app .monster-forge button:not(.mf-tab) {
+  min-height: 36px;
+  padding: 7px 11px;
+  border: 1px solid var(--mf-ui-border) !important;
+  border-radius: 6px;
+  background: var(--mf-ui-panel-raised) !important;
+  color: var(--mf-ui-text) !important;
+  font-size: 12px;
+  line-height: 1.35;
+  box-shadow: none;
+}
+.monster-forge-app .monster-forge button:not(.mf-tab):hover:not(:disabled) {
+  border-color: var(--mf-ui-accent) !important;
+  background: var(--mf-ui-hover) !important;
+}
+.monster-forge-app .monster-forge button:disabled,
+.monster-forge-app .window-footer button:disabled { color: var(--mf-ui-disabled) !important; opacity: .62; cursor: not-allowed; }
+.monster-forge-app .window-footer button {
+  min-height: 38px;
+  border: 1px solid var(--mf-ui-border) !important;
+  border-radius: 6px;
+  background: var(--mf-ui-panel-raised) !important;
+  color: var(--mf-ui-text) !important;
+}
+.monster-forge-app .window-footer button:first-child {
+  border-color: var(--mf-ui-accent) !important;
+  background: var(--mf-ui-accent) !important;
+  color: var(--mf-ui-accent-text) !important;
+}
+.monster-forge-app :is(button,input,select,textarea,summary):focus-visible {
+  outline: 2px solid var(--mf-ui-focus) !important;
+  outline-offset: 2px;
+}
+
+/* Status cards and warnings use Alchemy's semantic color families. */
+.monster-forge .mf-callout {
+  border: 1px solid var(--mf-ui-soft-line);
+  border-radius: 7px;
+  background: var(--mf-ui-soft-bg);
+  color: var(--mf-ui-text);
+}
+.monster-forge .mf-callout-warning,
+.monster-forge .mf-warnings li:not(.is-good) {
+  border-color: var(--mf-ui-warn-line);
+  background: var(--mf-ui-warn-bg);
+  color: var(--mf-ui-warn-text);
+}
+.monster-forge .mf-warnings li.is-good {
+  border-color: var(--mf-ui-good-line);
+  background: var(--mf-ui-good-bg);
+  color: var(--mf-ui-good-text);
+}
+.monster-forge .mf-recommended-star { color: var(--mf-ui-accent); }
+.monster-forge code { color: var(--mf-ui-heading); }
+
+@media (max-width: 740px) {
+  .monster-forge { padding: 9px; }
+  .monster-forge .mf-hero { align-items: flex-start; flex-wrap: wrap; padding: 13px; }
+  .monster-forge .mf-management { justify-content: flex-start; }
+  .monster-forge .mf-tab { flex: 0 0 auto; }
+}

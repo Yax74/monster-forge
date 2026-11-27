@@ -1153,6 +1153,7 @@ export async function openForge(targetActor = null) {
 
     return foundry.applications.api.DialogV2.wait({
       id: `${MODULE_ID}-dialog`,
+      classes: ["monster-forge-app"],
       window: { title: `${MODULE_TITLE}: ${actor.name}`, icon: "fa-solid fa-hammer" },
       position: { width: 920, height: "auto" },
       content,

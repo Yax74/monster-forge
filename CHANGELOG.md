@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.12.0
+
+- Reworked Monster Forge surfaces, controls, tabs, cards, typography, and spacing to match the Alchemy Workbench visual system.
+- Added Foundry-aware light and dark palettes that follow the current Application V2 theme.
+- Added consistent input, button, selected-card, warning, and keyboard-focus treatments for both themes.
+
 ## 1.11.0
 
 - Added core actor effects for initiative, saving throw, weapon attack, and spell attack boosts; automated initiative advantage and Magic Resistance, while keeping condition-specific saves manual to avoid overgranting advantage.
