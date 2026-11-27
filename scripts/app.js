@@ -1043,9 +1043,16 @@ function attachListeners(_event, dialog, actor) {
     preview();
   });
 
-  root.querySelector("[data-action='clear-boosts']")?.addEventListener("click", () => {
+  root.querySelector("[data-action='clear-boosts']")?.addEventListener("click", async () => {
     clearBoostSelects(root);
     preview();
+    // Clearing is an explicit preference; save it immediately so closing the
+    // dialog cannot let generated actor items repopulate the selection later.
+    const saved = {
+      ...(game.settings.get(MODULE_ID, "defaults") ?? {}),
+      boosts: parseForgeForm(form).boosts
+    };
+    await game.settings.set(MODULE_ID, "defaults", clientDefaultsFrom(saved));
   });
 
   for (const button of root.querySelectorAll("[data-tab-target]")) {

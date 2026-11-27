@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.13.1
+
+- Save cleared boost selections immediately so closing the dialog cannot restore previously generated boost items.
+
 ## 1.13.0
 
 - Foundation now opens with hit points, armor class, ability scores, and body fields enabled; existing installations receive this default once, while later individual choices persist.
