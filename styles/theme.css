@@ -111,7 +111,7 @@ body.theme-light .monster-forge-app,
   max-width: 100%;
   max-height: min(78vh, 900px);
   padding: 12px 14px 15px;
-  overflow-x: hidden;
+  overflow: auto hidden;
   color: var(--mf-ui-text);
   background: var(--mf-ui-bg);
   font: 13px/1.45 var(--font-primary, Arial, sans-serif);
@@ -160,6 +160,8 @@ body.theme-light .monster-forge-app,
   border: 1px solid var(--mf-ui-border-subtle);
   border-radius: 8px;
   background: var(--mf-ui-tab-bg);
+  position: static;
+  z-index: auto;
 }
 .monster-forge .mf-tab {
   min-height: 38px;

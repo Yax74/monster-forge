@@ -1145,7 +1145,13 @@ export async function openForge(targetActor = null) {
       : saved;
     let config = mergeDefaults(remembered, actorCr(actor));
     config.foundation = normalizeFoundationConfig(config);
-    config.boosts = restoreBoostConfig(actor, config.boosts);
+    // Existing generated boosts are a migration aid for actors forged before
+    // Monster Forge remembered client selections. Once the setting contains
+    // an explicit selection map (including an empty one), the user's saved
+    // choice is authoritative and clearing boosts must stay cleared.
+    if (!Object.hasOwn(saved.boosts ?? {}, "selections")) {
+      config.boosts = restoreBoostConfig(actor, config.boosts);
+    }
     if (config.followCrAttacks) config = applyRecommendedAttacks(config, config.cr);
     const context = await buildContext(actor, config);
     const render = foundry.applications.handlebars?.renderTemplate ?? globalThis.renderTemplate;
@@ -1168,7 +1174,7 @@ export async function openForge(targetActor = null) {
             try {
               const parsed = parseForgeForm(button.form);
               const { foundation, plan } = buildForgePlan(parsed, actor);
-              await game.settings.set(MODULE_ID, "defaults", plan.config);
+              await game.settings.set(MODULE_ID, "defaults", clientDefaultsFrom(plan.config));
               const result = await applyFoundationPlan(actor, foundation, plan.config.sections);
               ui.notifications.info(`Monster Forge applied ${result.updatedFields} enabled build/foundation field(s) to ${actor.name}.`);
               return true;
@@ -1189,7 +1195,7 @@ export async function openForge(targetActor = null) {
               const parsed = parseForgeForm(button.form);
               const { plan } = buildForgePlan(parsed, actor);
               plan.contentItems = await resolveSelectedContent(parsed.selectedContent);
-              await game.settings.set(MODULE_ID, "defaults", plan.config);
+              await game.settings.set(MODULE_ID, "defaults", clientDefaultsFrom(plan.config));
               const result = await applyPlan(actor, plan);
               const actions = [];
               if (result.created.length) {
@@ -1247,7 +1253,28 @@ async function getSavedDefaults() {
     await game.settings.set(MODULE_ID, "defaults", saved);
     await game.settings.set(MODULE_ID, "foundationDefaultsV19", true);
   }
+  if (!game.settings.get(MODULE_ID, "foundationDefaultsV20")) {
+    // The previous UI could leave an enabled Foundation section with all of
+    // its individual fields off. Give existing installations the same useful
+    // starting point as new installs; later user choices are preserved.
+    saved.foundation = { ...(saved.foundation ?? {}), manage: {
+      ...(saved.foundation?.manage ?? {}), hp: true, ac: true, abilities: true, body: true
+    } };
+    saved.primary = { ...(saved.primary ?? {}), name: "" };
+    saved.secondary = { ...(saved.secondary ?? {}), name: "" };
+    await game.settings.set(MODULE_ID, "defaults", saved);
+    await game.settings.set(MODULE_ID, "foundationDefaultsV20", true);
+  }
   return saved;
+}
+
+function clientDefaultsFrom(config) {
+  const defaults = structuredClone(config);
+  // Optional attack renames belong to the current forge session or an
+  // explicitly saved profile, not the global client defaults.
+  if (defaults.primary) defaults.primary.name = "";
+  if (defaults.secondary) defaults.secondary.name = "";
+  return defaults;
 }
 
 /** Open the builder without requiring a selected or pre-existing NPC. */

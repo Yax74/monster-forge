@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.13.0
+
+- Foundation now opens with hit points, armor class, ability scores, and body fields enabled; existing installations receive this default once, while later individual choices persist.
+- Cleared boost selections remain cleared when reopening an actor; existing generated boosts are only restored for installations without saved boost preferences.
+- Removed nested item-list scrolling and sticky tabs that covered headings, leaving one content scroll area.
+- Attack rename text stays with the current forge or a saved profile instead of becoming a global client default.
+
 ## 1.12.0
 
 - Reworked Monster Forge surfaces, controls, tabs, cards, typography, and spacing to match the Alchemy Workbench visual system.

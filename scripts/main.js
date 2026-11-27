@@ -87,6 +87,13 @@ Hooks.once("init", () => {
     default: false
   });
 
+  game.settings.register(MODULE_ID, "foundationDefaultsV20", {
+    scope: "client",
+    config: false,
+    type: Boolean,
+    default: false
+  });
+
   game.keybindings.register(MODULE_ID, "open", {
     name: "Open Monster Forge",
     hint: "Open Monster Forge for the selected NPC, or create a creature if none is selected.",
